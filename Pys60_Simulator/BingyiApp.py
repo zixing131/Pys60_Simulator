@@ -269,8 +269,6 @@ class App:
     del img
 
   def __redraw(s,rect=()):
-    s.__canvas.blit(s.__img)
-    return
     try:
       s.__canvas.blit(s.__img)
     except:pass    

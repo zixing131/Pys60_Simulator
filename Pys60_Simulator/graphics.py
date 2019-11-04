@@ -9,6 +9,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import string 
 import tkFont
+from appuifw import app as _app
 Draw=lambda x: x
 FONT_BOLD = 1
 FONT_ANTIALIAS = 2
@@ -46,37 +47,53 @@ def convertColor(bgcolor):
     return bgcolor
             
 class Image:
-    def __init__(self,size,mode=None): 
+    def __init__(self,size,mode=None,canvas = None): 
         self.image = Image2.new("RGBA",size,(255,255,255))
         self.size = size
         self.mode=mode
+        self.canvas = canvas
         #win=sysgraphics.GraphWin(width=size[0],height=size[1])
+        #_app.redraw()
     def open(path):
         img = Image2.open(path)
         img2 = Image(img.size)
         img2.image = img
         return img2 	
     def load(self,path):
-        self.image = Image2.open(path)
+        img = Image2.open(path)
+        if(self.mode!=None):
+            img = img.convert(self.mode)
+        self.image = img
     def new(size,mode=None):
         return Image(size,mode)
-    def rectangle(self,pos,color=0x0,fill=0x0,width=1):
+    
+    def rectangle(self,pos,fill=0x0,outline=0x0,width=1):
         draw = ImageDraw.Draw(self.image)
         fill = convertColor(fill)
-        draw.rectangle((pos[0],pos[1],pos[2],pos[3]), fill=fill,width=width)
+        if(outline!=0):
+            outline = convertColor(outline)
+            draw.rectangle((pos[0],pos[1],pos[2],pos[3]), fill=fill,outline=outline,width=width)
+        else:
+            draw.rectangle((pos[0],pos[1],pos[2],pos[3]), fill=fill,width=width)
         del draw
+        
     def clear(self,color): 
         color = convertColor(color)
         if(self.mode!=None):
            color = color+'99'
         image2 = Image2.new("RGBA",self.size,color)
         self.image.paste(image2,(0,0,self.size[0],self.size[1]))
-    def blit(self,img,pos=(0,0),mask=None):
-        pos = (0-pos[0],0-pos[1])
+        if(self.canvas):
+            self.canvas.blit(self)
+    def blit(self,img,target=(0,0),mask=None,source=(0,0)):
+        pos=target 
+        pos=(0-pos[0],0-pos[1])
         if(mask!=None):
            self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+img.size[0]),int(pos[1]+img.size[1])),mask = mask.image)
         else:
            self.image.paste(img.image,(pos[0],pos[1],pos[0]+img.size[0],pos[1]+img.size[1]))
+        if(self.canvas):
+            self.canvas.blit(self)
     def line(self,pos,bgcolor,width=0): 
         draw = ImageDraw.Draw(self.image)
         bgcolor = convertColor(bgcolor)
@@ -87,11 +104,17 @@ class Image:
         #myline.draw(win)
         del draw
         
-    def text(self,pos,text,color,font):
+    def text(self,pos,text,fill = 0x0,font=('sence',15)):
+        color = fill
         #print(pos,text,color,font)
         draw = ImageDraw.Draw(self.image)
         color = convertColor(color)
-        draw.text((pos[0],pos[1]-font[1]),text,fill=color,font = GetFont(color,font))
+        if(type(font) is str):
+            font=(font,15)
+        draw.text((pos[0],pos[1]-font[1]),text,color=color,fill=color,font = GetFont(color,font))
+        if(self.canvas):
+            self.canvas.blit(self)
+         
     def polygon(self,pos,color=0x0,width=1,fill=0x0):
         draw = ImageDraw.Draw(self.image)
         fill = convertColor(fill)
@@ -105,15 +128,41 @@ class Image:
         pos = list(pos)
         draw.point( pos , fill=fill)
         del draw
+    def arc(self,pos,pi1,pi2,color,width=1):
+        draw = ImageDraw.Draw(self.image)
+        color = convertColor(color)
+        pos = list(pos)
+        draw.arc( pos ,pi1,pi2, fill=color)
+        del draw
+    def pieslice(self,pos,pi1,pi2,color,width=1):
+        draw = ImageDraw.Draw(self.image)
+        color = convertColor(color)
+        pos = list(pos)
+        draw.pieslice( pos ,pi1,pi2, fill=color)
+        del draw
+    def ellipse(self,pos,color,fill=0x0):
+        draw = ImageDraw.Draw(self.image)
+        color = convertColor(color)
+        pos = list(pos)
+        draw.ellipse( pos ,color,fill)
+        del draw
+    
     def resize(self,size):
+        _app.redraw()
         pass
     def measure_text(self,title,font):
         font = tkFont.Font(family=font, size=15)
         w = font.measure(title)
-        return [[w,w,w]]
+        if(self.canvas):
+            self.canvas.blit(self)
+        return [[0,0,w,15]]
    
     new=staticmethod(new)
     open=staticmethod(open)
-
+def Draw(canvas):
+    img = Image(canvas.size,canvas = canvas) 
+    canvas.blit(img)
+    return img
+    
 if(__name__=='__main__'):
    print(convertColor((3,280,280)))
