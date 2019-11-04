@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*- 
-import sys
+
+import sys
 import os
 path = os.getcwd()
 index = path.rfind('\\')

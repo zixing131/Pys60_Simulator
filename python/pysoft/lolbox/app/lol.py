@@ -1548,9 +1548,7 @@ class box :
             if  not ( not (cd_t_act and cd_t and k) and s.whil) : 
                 s.timer.cancel()
                 e32.ao_sleep(0)
-                s.timer.after(2, s.zcd_t)
                 try :
-                    print('timer.after')
                     s.timer.after(2, s.zcd_t)
                 except :
                     pass

@@ -24,12 +24,16 @@ class Ao_lock:
 		#self.condition.release()
 class Ao_timer:
     def __init__(self):
-        pass
+        self.iscancel = 0
     def cancel(self):
-        pass
+        self.iscancel = 1
     def after(self,delay,func):
-        #sleep(delay)
+        ao_sleep(2)
+        if(self.iscancel==1):
+            self.iscancel = 0
+            return
         apply(func)
+        
     
 def ao_yield():
     _app.Yield()
