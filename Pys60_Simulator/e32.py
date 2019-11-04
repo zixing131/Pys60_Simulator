@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*- 
 from time import sleep 
 import threading
+
+from threading import Timer
 from threading import Condition
 
 from appuifw import app as _app 
@@ -25,15 +27,16 @@ class Ao_lock:
 class Ao_timer:
     def __init__(self):
         self.iscancel = 0
+        self.timer = None
     def cancel(self):
-        self.iscancel = 1
+        ao_yield()
+        if(self.timer):
+            self.timer.cancel()
     def after(self,delay,func):
-        ao_sleep(2)
-        if(self.iscancel==1):
-            self.iscancel = 0
-            return
-        apply(func)
-        
+        ao_yield()
+        self.timer = Timer(0, func,())
+        self.timer.start()
+        ao_yield()
     
 def ao_yield():
     _app.Yield()

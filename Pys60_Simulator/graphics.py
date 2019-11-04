@@ -7,14 +7,23 @@ except:
 from PIL import Image as Image2
 from PIL import ImageDraw
 from PIL import ImageFont
+import string 
 import tkFont
 Draw=lambda x: x
 FONT_BOLD = 1
 FONT_ANTIALIAS = 2
 
 #win=sysgraphics.GraphWin("Pys60 Simulator",240,320)
-
-
+def RGB_to_Hex(tmp):
+    rgb = tmp #将RGB格式划分开来
+    strs = '#'
+    for i in rgb:
+        num = int(i)#将str转int
+        #将R、G、B分别转化为16进制拼接转换并大写
+        strs += str(hex(num))[-2:].replace('x','0').upper()
+        
+    return strs 
+	
 def hex2rgb(hexcolor):
   rgb = [(hexcolor >> 16) & 0xff,
       (hexcolor >> 8) & 0xff,
@@ -29,9 +38,8 @@ def GetFont(fill=None,font=None):
     fnt = ImageFont.truetype("C:\\WINDOWS\\Fonts\\simsun.ttc", font[1])
     return fnt
 def convertColor(bgcolor):
-    #print(type(bgcolor) )
     if(type(bgcolor) is tuple):
-        bgcolor = sysgraphics.color_rgb(bgcolor[0],bgcolor[1],bgcolor[2])
+        bgcolor = RGB_to_Hex(bgcolor)
     elif(type(bgcolor) is int):
         bgcolor = hex2rgb(bgcolor)
         bgcolor = sysgraphics.color_rgb(bgcolor[0],bgcolor[1],bgcolor[2]) 
@@ -60,7 +68,7 @@ class Image:
     def clear(self,color): 
         color = convertColor(color)
         if(self.mode!=None):
-			color = color+'99'
+           color = color+'99'
         image2 = Image2.new("RGBA",self.size,color)
         self.image.paste(image2,(0,0,self.size[0],self.size[1]))
     def blit(self,img,pos=(0,0),mask=None):
@@ -87,6 +95,7 @@ class Image:
     def polygon(self,pos,color=0x0,width=1,fill=0x0):
         draw = ImageDraw.Draw(self.image)
         fill = convertColor(fill)
+        #print(fill)
         pos = list(pos)
         draw.polygon( pos , fill=fill)
         del draw
@@ -105,3 +114,6 @@ class Image:
    
     new=staticmethod(new)
     open=staticmethod(open)
+
+if(__name__=='__main__'):
+   print(convertColor((3,280,280)))
