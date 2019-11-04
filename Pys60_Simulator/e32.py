@@ -33,8 +33,7 @@ class Ao_timer:
         if(self.timer):
             self.timer.cancel()
     def after(self,delay,func):
-        ao_yield()
-        self.timer = Timer(0, func,())
+        self.timer = Timer(delay,func,())
         self.timer.start()
         ao_yield()
     
