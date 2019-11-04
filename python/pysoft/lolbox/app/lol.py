@@ -584,7 +584,9 @@ class box :
                     s.i.text((xn + (40 * orientation), (185 - (40 * orientation)) + yn), text, f_color, font = ('title', 20))
                 pass
             s.m.blit(s.i)
-        except :
+            print('no except')
+        except Exception as e:
+            print(e)
             pass
 
 
@@ -683,7 +685,7 @@ class box :
     exec ''.join([i for i in 'zllzl=l1ll' if i != 'l' ])
     
     def zcd_t(s):
-        print('zcd init ')
+        print('zcd_t init ')
         while  not ( not (s.zc and s.men) and cd_bg and cd_t and cd_t_act and s.tx) : 
             e32.ao_yield()
             l = range(len(people))
@@ -1034,13 +1036,17 @@ class box :
 
 
     def zcd(s, k = 0, n = None):
+        print(k)
         print('zcd init 2')
         if  not (s.zc) or s.men : 
+            print('zcd return1')
+            
             return None
         if k : 
             if s.img.size[1] != s.img_z_hc.size[1] : 
                 s.img = new(s.img_z_hc.size)
             s.img.blit(s.img_z_hc)
+            print('zcd return2')
             return None
         s.run = s.zc = 1
         if cd_bg == 0 : 
@@ -1494,6 +1500,7 @@ class box :
             return None
         print('pos_zcd init')
         s.zcd(1)
+        print('pos_zcd ing1') 
         if cd_bg == 0 : 
             s.run = 1
             if s.zcd_pos > (len(s.listtxt) - 1) : 
@@ -1535,12 +1542,15 @@ class box :
         elif cd_bg : 
             e32.ao_yield()
             if  not (s.zc) : 
+                print('pos_zcd return1') 
                 return None
             s.zcd_pos_list = s.get_pos()
             if  not ( not (cd_t_act and cd_t and k) and s.whil) : 
                 s.timer.cancel()
                 e32.ao_sleep(0)
+                s.timer.after(2, s.zcd_t)
                 try :
+                    print('timer.after')
                     s.timer.after(2, s.zcd_t)
                 except :
                     pass
@@ -1548,12 +1558,15 @@ class box :
             if s.zcd_pos_list != None : 
                 e32.ao_yield()
                 if  not (s.zc) : 
+                    print('pos_zcd return2') 
                     return None
                 s.img.polygon(s.rim(s.zcd_pos_list[1]), s.pos_color[s.zcd_pos_list[0]], width = 3)
             e32.ao_yield()
             if  not (s.zc) : 
+                print('pos_zcd return3') 
                 return None
             s.img.blit(s.img_pos_, ( - s.zcd_pos[0],  - s.zcd_pos[1]), mask = s.img_pos_mask)
+        
         s.redraw(())
 
 

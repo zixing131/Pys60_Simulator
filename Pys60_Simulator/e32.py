@@ -27,6 +27,10 @@ class Ao_timer:
         pass
     def cancel(self):
         pass
+    def after(self,delay,func):
+        #sleep(delay)
+        apply(func)
+    
 def ao_yield():
     _app.Yield()
 
