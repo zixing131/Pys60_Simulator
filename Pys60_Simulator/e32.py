@@ -25,6 +25,8 @@ class Ao_lock:
 class Ao_timer:
     def __init__(self):
         pass
+    def cancel(self):
+        pass
 def ao_yield():
     _app.Yield()
 

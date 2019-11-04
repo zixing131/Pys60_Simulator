@@ -12,17 +12,21 @@ import thread
 import os
 
 EScreen = 1
-class Canvas(object):
+
+root = tk.Tk()
+cv = tk.Canvas(root, width = 240, height = 320,background='white') 
+class Canvas():
     def __init__(self,redraw_callback=None,event_callback=None, resize_callback=None):
         self.event_callback=event_callback
-        self.root = tk.Tk()
+        self.root = root
         self.root.title('Pys60 Simulator')
         self.root.geometry('240x320')
         self.root.resizable(0,0)
-        self.cv = tk.Canvas(self.root, width = 240, height = 320,background='white') 
+        self.cv = cv
         self.cv.pack(fill=tk.BOTH, expand=tk.YES)
         self.cv.bind_all(sequence="<KeyPress>", func=self.processKeyboardEvent)
         self.lastimg = None
+        self.menu_key_handler = None
         #root.mainloop()
     # 处理键盘事件，ke为控件传递过来的键盘事件对象
     def processKeyboardEvent(self, evt):
@@ -92,8 +96,11 @@ class Canvas(object):
         #self.cv.create_line(10,10,240,320,width=5)  
         
         self.root.update()
-    def update(self): 
-        self.cv.create_image(self.lastimg.width()/2,self.lastimg.height()/2,image = self.lastimg)  
+    def bind(self,key,event):
+        pass
+    def update(self):
+        if(self.lastimg):
+           self.cv.create_image(self.lastimg.width()/2,self.lastimg.height()/2,image = self.lastimg)  
         self.root.update()
 class Text(object):
     def __init__(self,redraw_callback=None,event_callback=None, resize_callback=None):
@@ -201,17 +208,18 @@ class Application(object):
 	
     def __init__(self, **keys):
 		self.exit_key_handler = None
+		self.body=None
     def layout(self,d):
         return  [(240,320)]
     def Yield(self):
         #while 1:
-        self.body.update()
+        if(self.body):self.body.update()
         #time.sleep(0.1)
         
 app = Application()
 def abort():
 	app.body.root.destroy()
-	os._exit()
+	os._exit(0)
 os.abort = abort
 def note(text, type = 'info'):
     if type == "error":

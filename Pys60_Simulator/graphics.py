@@ -52,10 +52,10 @@ class Image:
         self.image = Image2.open(path)
     def new(size,mode=None):
         return Image(size,mode)
-    def rectangle(self,pos,fill):
+    def rectangle(self,pos,color=0x0,fill=0x0,width=1):
         draw = ImageDraw.Draw(self.image)
         fill = convertColor(fill)
-        draw.rectangle((pos[0],pos[1],pos[2],pos[3]), fill=fill)
+        draw.rectangle((pos[0],pos[1],pos[2],pos[3]), fill=fill,width=width)
         del draw
     def clear(self,color): 
         color = convertColor(color)
@@ -66,7 +66,7 @@ class Image:
     def blit(self,img,pos=(0,0),mask=None):
         pos = (0-pos[0],0-pos[1])
         if(mask!=None):
-           self.image.paste(img.image,(pos[0],pos[1],pos[0]+img.size[0],pos[1]+img.size[1]),mask = mask.image)
+           self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+img.size[0]),int(pos[1]+img.size[1])),mask = mask.image)
         else:
            self.image.paste(img.image,(pos[0],pos[1],pos[0]+img.size[0],pos[1]+img.size[1]))
     def line(self,pos,bgcolor,width=0): 
@@ -84,16 +84,24 @@ class Image:
         draw = ImageDraw.Draw(self.image)
         color = convertColor(color)
         draw.text((pos[0],pos[1]-font[1]),text,fill=color,font = GetFont(color,font))
-    def polygon(self,pos,fill):
+    def polygon(self,pos,color=0x0,width=1,fill=0x0):
         draw = ImageDraw.Draw(self.image)
         fill = convertColor(fill)
         pos = list(pos)
         draw.polygon( pos , fill=fill)
         del draw
-    
+    def point(self,pos,color,width=1,fill=0x0):
+        draw = ImageDraw.Draw(self.image)
+        fill = convertColor(fill)
+        pos = list(pos)
+        draw.point( pos , fill=fill)
+        del draw
+    def resize(self,size):
+        pass
     def measure_text(self,title,font):
         font = tkFont.Font(family=font, size=15)
         w = font.measure(title)
         return [[w,w,w]]
+   
     new=staticmethod(new)
     open=staticmethod(open)
