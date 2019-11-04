@@ -1,0 +1,2 @@
+# Pys60_Simulator
+Pys60_Simulator 是一个塞班Python平台模拟器
