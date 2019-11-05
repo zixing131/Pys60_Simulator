@@ -151,16 +151,21 @@ class Image:
         pos = list(pos)
         draw.ellipse( pos ,color,fill)
         del draw
-    
+    def getpixel(self,(x,y)):
+        color = self.image.getpixel((x,y))
+        if(type(color)!=tuple):
+            color = hex2rgb(color)
+            print color
+        return [color]
     def resize(self,size):
         _app.redraw()
         pass
-    def measure_text(self,title,font):
+    def measure_text(self,title,font='dense'):
         font = tkFont.Font(family=font, size=15)
         w = font.measure(title)
         if(self.canvas):
             self.canvas.blit(self)
-        return [[0,0,w,15]]
+        return [[0,0,w,15],w]
    
     new=staticmethod(new)
     open=staticmethod(open)
@@ -168,6 +173,8 @@ def Draw(canvas):
     img = Image(canvas.size,canvas = canvas) 
     canvas.blit(img)
     return img
-    
+def screenshot():
+    img = Image((240,320))
+    return img
 if(__name__=='__main__'):
    print(convertColor((3,280,280)))

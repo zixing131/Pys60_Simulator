@@ -13,32 +13,37 @@ import thread
 import os
 import thread
 EScreen = 1
-
+EHLeftVTop = 0
 root = tk.Tk()
 cv = tk.Canvas(root, width = 240, height = 320,background='white')
 
 class Canvas():
     def __init__(self,redraw_callback=None,event_callback=None, resize_callback=None):
-       self.redraw_callback = redraw_callback
-       self.event_callback=event_callback
-       self.root = root
-       self.root.title('Pys60 Simulator')
-       self.root.geometry('240x320')
-       self.root.resizable(0,0)
-       self.cv = cv
-       self.cv.pack(fill=tk.BOTH, expand=tk.YES)
-       self.cv.bind_all(sequence="<KeyPress>", func=self.processKeyPressEvent)
-       self.cv.bind_all(sequence="<KeyRelease>", func=self.processKeyUpEvent)
-       self.lastimg = None
-       self.menu_key_handler = None
-       self.size=(240,320)
-       self.font = ['font1','font2']
-       self.lastkeytime = time.time()
-       #self.timer = Timer(0,self.redraw,())
-       #self.timer.start()
-       self.lastkeytime=time.time()
+        self.redraw_callback = redraw_callback
+        self.event_callback=event_callback
+        self.root = root
+        self.root.title('Pys60 Simulator')
+        self.root.geometry('240x320')
+        self.root.resizable(0,0)
+        self.cv = cv
+        self.cv.pack(fill=tk.BOTH, expand=tk.YES)
+        self.cv.bind_all(sequence="<KeyPress>", func=self.processKeyPressEvent)
+        self.cv.bind_all(sequence="<KeyRelease>", func=self.processKeyUpEvent)
+        self.lastimg = None
+        self.menu_key_handler = None
+        self.size=(240,320)
+        self.font = ['font1','font2']
+        self.lastkeytime = time.time()
+        #self.timer = Timer(0,self.redraw,())
+        #self.timer.start()
+        self.lastkeytime=time.time()
+        self.allEvents=[]
     #def rectangle():
-        
+    def callEvents(self,evt):
+        keycode = evt["keycode"]
+        for i in self.allEvents:
+            if(keycode == i[0]):
+                i[1]()
     # 处理键盘事件，ke为控件传递过来的键盘事件对象
     def processKeyPressEvent(self, evt):
         #打印键盘事件
@@ -67,37 +72,50 @@ class Canvas():
                 args["keycode"] = 0x30 + key  
                 args["scancode"] = 1
                 args["type"] = keytype
-                if(self.event_callback):self.event_callback(args) 
+                if(self.event_callback):self.event_callback(args)
+                self.callEvents(args)
             if(mykey == 'up'):
                 args = {}
                 args["keycode"] = 63497 #2
                 args["scancode"] = 16
                 args["type"] = keytype
-                if(self.event_callback):self.event_callback(args) 
+                if(self.event_callback):self.event_callback(args)
+                self.callEvents(args)
             if(mykey == 'down'):
                 args = {}
                 args["keycode"] = 63498 #8
                 args["scancode"] = 17
                 args["type"] = keytype
-                if(self.event_callback):self.event_callback(args) 
+                if(self.event_callback):self.event_callback(args)
+                self.callEvents(args)
             if(mykey == 'left'):
                 args = {}
                 args["keycode"] = 63495 #4
                 args["scancode"] = 14
                 args["type"] = keytype
-                if(self.event_callback):self.event_callback(args) 
+                if(self.event_callback):self.event_callback(args)
+                self.callEvents(args)
             if(mykey == 'right'):
                 args = {}
                 args["keycode"] = 63496 #6
                 args["scancode"] = 15
                 args["type"] = keytype
-                if(self.event_callback):self.event_callback(args) 
+                if(self.event_callback):self.event_callback(args)
+                self.callEvents(args)
             if(mykey == 'space'):
                 args = {}
                 args["keycode"] = 63557 #5
                 args["scancode"] = 167
                 args["type"] = keytype
                 if(self.event_callback):self.event_callback(args)
+                self.callEvents(args)
+            if (mykey == 'backspace'):
+                args = {}
+                args["keycode"] = 8  # backspace
+                args["scancode"] = 0
+                args["type"] = keytype
+                if (self.event_callback): self.event_callback(args)
+                self.callEvents(args)
         
         if evt.type == "4":
             pass
@@ -176,15 +194,8 @@ class Canvas():
     def clear(self,color):
         pass
     def bind(self,key,event):
-        pass
+        self.allEvents.append((key,event))
     def update(self):
-        try:
-           if(self.lastimg):
-             self.cv.create_image(self.lastimg.width()/2,self.lastimg.height()/2,image = self.lastimg)
-           self.root.update()
-        except Exception,e:
-            pass
-            #print(e)
         self.redraw()
     def redraw(self):
         try:
@@ -320,10 +331,12 @@ class Application(object):
          self.body.redraw()
     def Yield(self):
        #while 1:
-       if(self.body):
-         self.body.update()
+       try:
+           if(self.body):
+               self.body.update()
          #self.body.redraw()
-         
+       except:
+           pass
        #time.sleep(0.1)
        
 app = Application()
@@ -338,5 +351,12 @@ def note(text, type = 'info'):
        tkMessageBox.showinfo(type.title(),text) 
 def query(text, type = 'info'):
     return ''
+class popup:
+    def __init__(self):
+        pass
+    def show(self,a,b,c,d,e):
+        pass
+def InfoPopup():
+    return  popup()
 import e32
 e32=e32
