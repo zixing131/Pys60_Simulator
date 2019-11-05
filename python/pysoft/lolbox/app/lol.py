@@ -5,18 +5,30 @@
 
 
 __doc__ = '\n英雄联盟控 for s60v3\nBy:白色(Bysir)\nQQ:101964529\n尊重作者、请勿更改\n'
-import e32
+
 import math
 import sys
 import os
 mypath = os.getcwd()
 index = mypath.rfind('\\')
 mypath=mypath[:index]
+index = mypath.rfind('\\')
+mypath=mypath[:index]
+index = mypath.rfind('\\')
+mypath=mypath[:index]
+index = mypath.rfind('\\')
+mypath=mypath[:index]
 mypath2 = mypath+"\\python\\pysoft\\lolbox\\"
+mypath3 =  mypath+"\\Pys60_Simulator\\"
 mypath = mypath+"\\python\\pysoft\\lolbox\\app\\"
+print(mypath3)
+
+sys.path.append(mypath)
+sys.path.append(mypath3)
 
 cn = lambda x, : x.decode('utf-8') 
-en = lambda x, : x.encode('utf-8') 
+en = lambda x, : x.encode('utf-8')
+import e32
 import appuifw as appuifw
 import sysinfo
 import akntextutils
@@ -27,7 +39,7 @@ def pass_():
     pass
 
 
-sys.path.append(mypath)
+
 from Data import *
 from lol_event import *
 if __name__ == '__main__' : 
@@ -1550,7 +1562,8 @@ class box :
                 s.timer.cancel()
                 e32.ao_sleep(0)
                 try :
-                    s.timer.after(2, s.zcd_t)
+                    s.zcd_t()
+                    #s.timer.after(2, s.zcd_t)
                 except :
                     pass
                 pass
