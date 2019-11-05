@@ -12,19 +12,30 @@ import os
 mypath = os.getcwd()
 index = mypath.rfind('\\')
 mypath=mypath[:index]
-index = mypath.rfind('\\')
-mypath=mypath[:index]
-index = mypath.rfind('\\')
-mypath=mypath[:index]
-index = mypath.rfind('\\')
-mypath=mypath[:index]
-mypath2 = mypath+"\\python\\pysoft\\lolbox\\"
-mypath3 =  mypath+"\\Pys60_Simulator\\"
-mypath = mypath+"\\python\\pysoft\\lolbox\\app\\"
-print(mypath3)
+mypath4 =  mypath+"\\Pys60_Simulator\\"
+mypath5 = mypath+"\\python\\pysoft\\lolbox\\app\\"
+mypath6 = mypath+"\\python\\pysoft\\lolbox\\"
 
-sys.path.append(mypath)
-sys.path.append(mypath3)
+index = mypath.rfind('\\')
+mypath=mypath[:index]
+index = mypath.rfind('\\')
+mypath=mypath[:index]
+index = mypath.rfind('\\')
+mypath=mypath[:index]
+
+mypath3 = mypath + "\\Pys60_Simulator\\"
+
+mypath2 = mypath+"\\python\\pysoft\\lolbox\\"
+mypath = mypath+"\\python\\pysoft\\lolbox\\app\\"
+#print(mypath3)
+if(__name__ =='__main__'):
+    sys.path.append(mypath)
+    sys.path.append(mypath3)
+else:
+    sys.path.append(mypath4)
+    sys.path.append(mypath5)
+    mypath = mypath5
+    mypath2 = mypath6
 
 cn = lambda x, : x.decode('utf-8') 
 en = lambda x, : x.encode('utf-8')
