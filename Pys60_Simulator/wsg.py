@@ -1450,8 +1450,10 @@ class StaticEdit(Window, ) :
                 self._change = False
             if self._StaticEdit__enter : 
                 self.image.drawRect(self.left, self.top, self.width, self.height, 16568953)
+                self.drawText()
             else : 
                 self.image.drawRect(self.left, self.top, self.width, self.height, 8101565)
+                self.drawText()
             pass
         elif message == WM_MOUSEMOVE : 
             self.cx = lparam[0]
