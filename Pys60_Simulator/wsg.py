@@ -12,7 +12,7 @@ import graphics
 import e32
 import glib
 import sys
-path = 'c:\\data\\wsg\\'
+path = u"..\\python\\pysoft\\wsg\\"
 #FONT = appuifw.Canvas().font[0]
 FONT = 'dense'
 SCRX, SCRY = appuifw.app.layout(appuifw.EScreen)[0]

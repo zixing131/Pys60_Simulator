@@ -1,0 +1,40 @@
+==== PushButton类 ====
+
+PushButton类用于构造弹出式按钮
+
+构造函数参数如下:
+(parent,text,x,y,cx,cy,callback,color=0,size=16)
+parent为按钮父窗口，不能为空，可以是Window实例
+或GroupButton实例或Panel实例,text为按钮名称(u码串)
+x,y,cx,cy分别为按钮左上角坐标(相对于父窗口),按钮宽度
+和按钮高度，callback为按钮弹起之后的回调函数,color
+为按钮文字颜色，size为按钮文字大小
+
+----常用方法----
+
+show()
+    用于显示按钮,默认按钮构造后处于可显示状态
+    如果你不想程序启动时显示该按钮，你可以在构造完
+    按钮之后调用hide()方法
+
+hide()
+    用于隐藏按钮
+
+SetText(txt)
+    设置按钮名称为txt(u码串)。
+    注意:请不要设置太长以免超过按钮宽度而显示在了
+    按钮之外(这个本来应该是我考虑的问题)
+
+SetColor(color)
+    设置按钮字体颜色
+
+SetFont(size)
+    设置按钮字体大小，size为一正整数
+    注意:请不要设置太大以免超过按钮范围而显示在了
+    按钮之外
+    
+Move(x,y,cx,cy)
+    相对于父窗口移动按钮位置
+    x,y,cx,cy意义和构造函数中的一样
+
+==== 结束 ====

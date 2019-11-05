@@ -34,9 +34,9 @@ class Canvas():
        self.font = ['font1','font2']
        self.lastkeytime = time.time()
        #root.mainloop()
-       self.timer = Timer(0.1,self.redraw,())
+       #self.timer = Timer(0.1,self.redraw,())
        #self.timer.start()
-       #self.lastkeytime=time.time()
+       self.lastkeytime=time.time()
     #def rectangle():
         
     # 处理键盘事件，ke为控件传递过来的键盘事件对象

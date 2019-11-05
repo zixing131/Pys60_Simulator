@@ -1,0 +1,33 @@
+==== Trackbar类 ====
+
+Trackbar类用于构造追踪条控件
+
+构造函数参数如下:
+(parent,x,y,cx,cy,gap=1,minvalue=0,maxvalue=100,beg=0,bool=False,format=u"%d",style=FOLLOW,color=0,size=16)
+parent为父窗口,x,y,cx,cy为控件左上角横纵坐标(相对于父窗口)和控件宽度
+和高度，cx>=10,cy>=20(过小时会被自动调整),如果要显示当前值则cy>=20+2+size
+gap为变化间隔,minvalue为最小值，maxvalue为最大值，beg为最初值,
+如果beg不是minvalue+n*gap格式，则最初值会被自动调整，bool指示是否显示当前值
+format为显示格式,style为显示位置,有Trackbar.LEFT,Trackbar.FOLLOW,Trackbar.CENTER和Trackbar.RIGHT四种，color为当前值的显示颜色，size则为显示字体大小
+
+----常用方法----
+
+show()
+    用于显示追踪条,默认追踪条构造后处于可显示状态
+    如果你不想程序启动时显示该追踪条，你可以在构造完
+    追踪条之后调用hide()方法
+
+hide()
+    用于隐藏追踪条
+
+Move(x,y,cx,cy)
+    相对于父窗口移动追踪条位置
+    x,y,cx,cy意义和构造函数中的一样
+
+SetValue(value)
+    设置当前值
+
+GetValue()
+    获取当前值
+
+==== 结束 ====
