@@ -117,7 +117,12 @@ class Image:
          
     def polygon(self,pos,color=0x0,width=1,fill=0x0):
         draw = ImageDraw.Draw(self.image)
+        ismask = 0
+        if( len(str(fill))>7):
+            ismask = 1
         fill = convertColor(fill)
+        if(ismask):
+            fill = fill+'bb'
         #print(fill)
         pos = list(pos)
         draw.polygon( pos , fill=fill)
