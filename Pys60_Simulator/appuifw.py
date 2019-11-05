@@ -32,6 +32,7 @@ class Canvas():
        self.menu_key_handler = None
        self.size=(240,320)
        self.font = ['font1','font2']
+       self.lastkeytime = time.time()
        #root.mainloop()
        self.timer = Timer(0.1,self.redraw,())
        #self.timer.start()
