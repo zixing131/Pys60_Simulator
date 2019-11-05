@@ -324,7 +324,7 @@ class Window(object, ) :
 
 
     def WndProc(self, message, wparam, lparam):
-        if message == WM_PAINT : 
+        if message == WM_PAINT :
             if self._change : 
                 self.image.clear(self.color)
                 self._change = False

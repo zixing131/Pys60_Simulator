@@ -15,7 +15,8 @@ import thread
 EScreen = 1
 
 root = tk.Tk()
-cv = tk.Canvas(root, width = 240, height = 320,background='white') 
+cv = tk.Canvas(root, width = 240, height = 320,background='white')
+
 class Canvas():
     def __init__(self,redraw_callback=None,event_callback=None, resize_callback=None):
        self.redraw_callback = redraw_callback
@@ -33,8 +34,7 @@ class Canvas():
        self.size=(240,320)
        self.font = ['font1','font2']
        self.lastkeytime = time.time()
-       #root.mainloop()
-       #self.timer = Timer(0.1,self.redraw,())
+       #self.timer = Timer(0,self.redraw,())
        #self.timer.start()
        self.lastkeytime=time.time()
     #def rectangle():
@@ -164,28 +164,39 @@ class Canvas():
        #
        #print(evt.type) 
     def blit(self,img):
-       img = ImageTk.PhotoImage(img.image,master = self.cv) 
-       self.lastimg = img
-       self.cv.create_image(img.width()/2,img.height()/2,image = img) 
-       #self.cv.create_line(10,10,240,320,width=5)
-       self.root.update()
+        try:
+            img = ImageTk.PhotoImage(image=img.image,master = self.cv)
+            self.lastimg = img
+            self.cv.create_image(img.width()/2,img.height()/2,image = img)
+            #self.cv.create_line(10,10,240,320,width=5)
+            self.root.update()
+        except Exception,e:
+            pass
+            #print(e)
     def clear(self,color):
         pass
     def bind(self,key,event):
-       pass
+        pass
     def update(self):
-       if(self.lastimg):
-         self.cv.create_image(self.lastimg.width()/2,self.lastimg.height()/2,image = self.lastimg)  
-       self.root.update()
-       #self.redraw()
+        try:
+           if(self.lastimg):
+             self.cv.create_image(self.lastimg.width()/2,self.lastimg.height()/2,image = self.lastimg)
+           self.root.update()
+        except Exception,e:
+            pass
+            #print(e)
+        self.redraw()
     def redraw(self):
-      #print(self.redraw_callback)
-      if(self.redraw_callback==None):
-        return
-      else:
-        self.redraw_callback(())
-      self.timer = Timer(0.1,self.redraw,())
-      self.timer.start()
+        try:
+            #print(self.redraw_callback)
+            if(self.redraw_callback==None):
+                return
+            else:
+                self.redraw_callback(())
+            #self.timer = Timer(0,self.redraw,())
+            #self.timer.start()
+        except:
+            pass
        
 class Text(object):
     def __init__(self,redraw_callback=None,event_callback=None, resize_callback=None):

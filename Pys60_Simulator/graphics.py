@@ -67,7 +67,7 @@ class Image:
     def new(size,mode=None):
         return Image(size,mode)
     
-    def rectangle(self,pos,fill=0x0,outline=0x0,width=1):
+    def rectangle(self,pos,color = 0x0,fill=0x0,width=1,outline=0x0):
         draw = ImageDraw.Draw(self.image)
         fill = convertColor(fill)
         if(outline!=0):

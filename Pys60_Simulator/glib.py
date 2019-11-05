@@ -41,7 +41,7 @@ def drawImage(self, img, x = 0, y = 0, anchor = (LEFT | TOP)):
 
 
 def drawRect(self, left, top, w, h, col = 0, wid = 1):
-    self.rectangle((left, top, left + w, top + h), col, width = wid)
+    self.rectangle((left, top, left + w, top + h), fill=col, width = wid)
 
 
 
