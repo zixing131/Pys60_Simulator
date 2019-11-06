@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "D:/Users/zixing/Documents/GitHub/Pys60_Simulator/Pys60_Simulator/MobilePs/ÊÖ»ú»æÍ¼.py", line 44, in <module>
+    appuifw.app.body.root.update()
+  File "C:\Python27\Lib\lib-tk\Tkinter.py", line 1023, in update
+    self.tk.call('update')
+_tkinter.TclError: can't invoke "update" command:  application has been destroyed

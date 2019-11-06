@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*- 
 from time import sleep 
 import threading
-
+import shutil
 from threading import Timer
 from threading import Condition
 
 from appuifw import app as _app 
 _UpdateEvent, _EVT_UPDATE = None,None
-
+s60_version_info = (3, 0)
 class Ao_lock:
     def __init__(self):
 		#self.condition = threading.Condition()
@@ -50,3 +50,5 @@ def ao_sleep(interval, cb=None):
 
 def in_emulator():
     return True
+def file_copy(old,new):
+    shutil.copy(old, new)

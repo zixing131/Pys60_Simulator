@@ -181,11 +181,11 @@ class Canvas():
             #print("鼠标： %s" % evt.num)
        #
        #print(evt.type) 
-    def blit(self,img):
+    def blit(self,img,target = (0,0)):
         try:
             img = ImageTk.PhotoImage(image=img.image,master = self.cv)
             self.lastimg = img
-            self.cv.create_image(img.width()/2,img.height()/2,image = img)
+            self.cv.create_image(target[0]+img.width()/2,target[1]+img.height()/2,image = img)
             #self.cv.create_line(10,10,240,320,width=5)
             self.root.update()
         except Exception,e:

@@ -26,4 +26,4 @@ if x > y :
 else : 
     scrshot.blit(splash, target = (32, 117))
 msys.send_fg()
-import main
+import main2
