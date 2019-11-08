@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import requests
 from myjson import json
+mypath=u"..\\python\\pysoft\\ithome\\"
+cachePath = mypath+"cache\\"
 
 class Tops:
     def __init__(self,data):
@@ -71,7 +73,12 @@ class IthomeNet:
 
     def getSlide(self): #顶部滚动
         return [Slide(i) for i in json.loads(self.get(self.slideUrl))]
-
+    def getPic(self,picurl):
+        req = requests.get(picurl)
+        img = req.content
+        imgpath = cachePath+"cache.jpg"
+        open(imgpath,'wb').write(img)
+        return imgpath
 
 if(__name__ == '__main__'):
     ithomenet = IthomeNet()

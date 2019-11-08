@@ -57,9 +57,12 @@ class ithomeUi(object,):
             nowIndex = i + self.x
             if(nowIndex >= len(self.newsList.newslist)):
                 break
+            imgurl = self.newsList.newslist[nowIndex].image
             newimg = ph.Image.new((self.newsWidth,self.newsHeight))
-            newTopImg = ph.Image.new((self.newImgWidth,self.newImgHeight))
-            newTopImg.clear(0xff0000)
+            newTopImg = ph.Image.new((self.newImgWidth,self.newImgHeight),mode="RGBA")
+            #newTopImg.clear(0xff0000)
+            newTopImg.load(itnet.getPic(imgurl))
+            newTopImg.resize((self.newImgWidth,self.newImgHeight))
             newimg.blit(newTopImg,(0-self.newsCornor,0-self.newsCornor))
             textBasePos = (self.newsCornor*2 + self.newImgHeight,self.newsCornor)
             textWidth = self.newsWidth - self.newImgWidth - self.newsCornor*3
@@ -67,7 +70,7 @@ class ithomeUi(object,):
             title=self.newsList.newslist[nowIndex].title
             titlelist = akntextutils.wrap_text_to_array(title.decode("u8"), "dense", textWidth)
             for j in range(len(titlelist)):
-                newimg.text((textBasePos[0],textBasePos[1]+(j+1)*25),titlelist[j],0x0,("dense",18,FONT_ANTIALIAS))
+                newimg.text((textBasePos[0],textBasePos[1]+(j+1)*15),titlelist[j],0x0,("dense",15,FONT_ANTIALIAS))
             NewsListImg.append(newimg)
         return NewsListImg
 

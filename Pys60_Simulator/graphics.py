@@ -158,8 +158,7 @@ class Image:
             print color
         return [color]
     def resize(self,size):
-        _app.redraw()
-        pass
+        self.image = self.image.resize(size)
     def measure_text(self,title,font='dense'):
         font = tkFont.Font(family=font, size=15)
         w = font.measure(title)
