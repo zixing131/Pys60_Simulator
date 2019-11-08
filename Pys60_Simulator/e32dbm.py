@@ -2,21 +2,25 @@
 import json,os
 import e32db
 
-class db(dict):
-    def __init__(self,file1,mode,data={}):
-        self.file1=file1
-        for i in data:
-            self[i]=data[i]
+class db(object):
+
+    def __setitem__(self,item,value):
+        self.data[item] = value
+    def __getitem__(self,item):
+        return str(self.data[int(item)])
+    def __init__(self,filename,mode,data={}):
+        self.filename=filename
+        self.data = data
     def items(self):
+        return self.data
         ret = []
-        for i in self:
-            ret.append((i,self[i]))
+        for i in self.data:
+            ret.append((i,self.data[i]))
         return ret
     def close(self):
-        data=json.dumps(self)
-        self.file1.write(data)
-        self.file1.close()
-
+        data=json.dumps(self.data)
+        if(self.filename!=''):
+            e32db.open(self.filename,'wb').write(data)
 
 def open(name, flags = 'r', mode = 0666):
     """Open the specified database, flags is one of c to create
@@ -38,15 +42,13 @@ def open(name, flags = 'r', mode = 0666):
     if flags[0] == 'n':
         create = 1
     if create:
-        file1 = e32db.open(filename,'wb')
-        return db(file1,flags)
+        return db(filename,flags)
     else:
         file1 = e32db.open(filename,'rb').read()
-        file2 = e32db.open(filename,'wb')
         if(file1!=''):
-            return db(file2,flags,json.loads(file1))
+            return db(filename,flags,eval(file1))
         else:
-            return db(file2,flags)
+            return db(filename,flags)
     
 
 if __name__=='__main__':

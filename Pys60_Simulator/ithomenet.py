@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import requests
+import urllib
+import md5
+import os
 from myjson import json
 mypath=u"..\\python\\pysoft\\ithome\\"
 cachePath = mypath+"cache\\"
@@ -73,10 +76,18 @@ class IthomeNet:
 
     def getSlide(self): #顶部滚动
         return [Slide(i) for i in json.loads(self.get(self.slideUrl))]
+    def getMd5(self,data):
+        hash = md5.new()
+        hash.update(data)
+        return hash.hexdigest()
+    def Url2FileName(self,url):
+        return self.getMd5(url)
     def getPic(self,picurl):
-        req = requests.get(picurl)
-        img = req.content
-        imgpath = cachePath+"cache.jpg"
+        imgpath = cachePath + self.Url2FileName(picurl) + ".jpg"
+        if(os.path.exists(imgpath)):
+            return imgpath
+        req = urllib.urlopen(picurl)
+        img = req.read()
         open(imgpath,'wb').write(img)
         return imgpath
 

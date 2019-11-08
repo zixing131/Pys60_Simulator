@@ -64,6 +64,7 @@ class Image:
         if(self.mode!=None):
             img = img.convert(self.mode)
         self.image = img
+        self.size = img.size
     def new(size,mode=None):
         return Image(size,mode)
     
@@ -159,6 +160,8 @@ class Image:
         return [color]
     def resize(self,size):
         self.image = self.image.resize(size)
+        self.size = size
+        return self
     def measure_text(self,title,font='dense'):
         font = tkFont.Font(family=font, size=15)
         w = font.measure(title)

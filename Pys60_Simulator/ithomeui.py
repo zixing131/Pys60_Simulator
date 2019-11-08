@@ -17,6 +17,7 @@ class ithomeUi(object,):
         self.running = 1
         self.menuL = [(cn("刷新"), lambda: self.refush()),
                       (cn("到顶部"), lambda: self.toTop()),
+                      (cn("清除缓存"), lambda: self.delCache()),
                    (cn("退出"), lambda: self.exit())]
         self.width = 240
         self.height = 320
@@ -35,6 +36,8 @@ class ithomeUi(object,):
         self.newsList = itnet.getNewList()
         self.SlideList = itnet.getSlide()
 
+    def delCache(self): #清除缓存
+        pass
     def refush(self): #刷新
         pass
     def redraw(self):#重绘界面
@@ -59,10 +62,9 @@ class ithomeUi(object,):
                 break
             imgurl = self.newsList.newslist[nowIndex].image
             newimg = ph.Image.new((self.newsWidth,self.newsHeight))
-            newTopImg = ph.Image.new((self.newImgWidth,self.newImgHeight),mode="RGBA")
+            newTopImg = ph.Image.open(itnet.getPic(imgurl))
             #newTopImg.clear(0xff0000)
-            newTopImg.load(itnet.getPic(imgurl))
-            newTopImg.resize((self.newImgWidth,self.newImgHeight))
+            newTopImg = newTopImg.resize((self.newImgWidth,self.newImgHeight))
             newimg.blit(newTopImg,(0-self.newsCornor,0-self.newsCornor))
             textBasePos = (self.newsCornor*2 + self.newImgHeight,self.newsCornor)
             textWidth = self.newsWidth - self.newImgWidth - self.newsCornor*3
@@ -93,7 +95,7 @@ class ithomeUi(object,):
             self.img.blit(self.background, (0, 0))
             self.redraw()
             app.blit(self.img)
-            sleep(0.07)
+            sleep(0.1)
 
     def key(self, event):
         key = event["keycode"]

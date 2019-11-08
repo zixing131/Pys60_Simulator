@@ -42,7 +42,7 @@ class json(object):
                 list[x] = self.ch_list(list[x])
         return list
     def loads(self,str):
-        mydict = eval(str)
+        mydict = eval(str.replace(' ','').replace('\r','').replace('\t','').replace('\n',''))
         if(type(mydict) is dict):
             for x in mydict.keys():
                 if type(mydict[x]) == types.StringType:
