@@ -64,8 +64,8 @@ class Canvas():
                 args["keycode"] = 0
                 args["scancode"] = 164
                 args["type"] = keytype
-                self.event_callback(args) 
-            if(mykey == 'w'): 
+                if(self.event_callback):self.event_callback(args)
+            elif(mykey == 'w'):
                 if(app.exit_key_handler):app.exit_key_handler() 
             if(key!=-1):
                 args = {}

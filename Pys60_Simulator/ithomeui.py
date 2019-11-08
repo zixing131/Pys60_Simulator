@@ -7,14 +7,111 @@ from BingyiApp import *
 cn=lambda x:x.decode("u8")
 sleep=e32.ao_sleep
 mypath=u"..\\python\\pysoft\\ithome\\"
+cachePath = mypath+"cache\\"
+import ithomenet
+itnet = ithomenet.IthomeNet()
+
 
 class ithomeUi(object,):
     def __init__(self):
-        pass
-    def main(self):
-        ui.app.Yield()
+        self.running = 1
+        self.menuL = [(cn("刷新"), lambda: self.refush()),
+                      (cn("到顶部"), lambda: self.toTop()),
+                   (cn("退出"), lambda: self.exit())]
+        self.width = 240
+        self.height = 320
+        self.img = ph.Image.new((self.width, self.height))
+        self.background = ph.Image.new((self.width, self.height))
+        self.background.clear(0xffffff)
+        self.x = 0
+        self.y = 0
+        self.baseCornor = 5
+        self.newsCornor = 2
+        self.SlideHeight = 80
+        self.newsHeight = 60
+        self.newImgHeight = self.newsHeight - self.newsCornor *2
+        self.newImgWidth = self.newImgHeight
+        self.newsWidth = self.width - self.baseCornor*2
+        self.newsList = itnet.getNewList()
+        self.SlideList = itnet.getSlide()
 
-app=App(mypath+'splash.png',3)
+    def refush(self): #刷新
+        pass
+    def redraw(self):#重绘界面
+        if(self.x == 0):
+            self.drawMain()
+        else:
+            self.drawNewsList()
+    def drawSlide(self): #绘制顶部滚动图
+        self.SlideWidth = self.width - self.baseCornor*2
+        self.SlideImg = ph.Image.new((self.SlideWidth, self.SlideHeight))
+        self.SlideImg.clear(0xff0000)
+        self.img.blit(self.SlideImg, (0 - self.baseCornor, 0 - self.baseCornor))
+    def drawMain(self):#绘制第一页主页
+        self.drawSlide()
+        self.drawNewsList()
+    def genNewsListImg(self):
+        showNewsCount = int(self.height/self.newsHeight) + 1 #要显示的新闻数量
+        NewsListImg = []
+        for i in range(showNewsCount):
+            nowIndex = i + self.x
+            if(nowIndex >= len(self.newsList.newslist)):
+                break
+            newimg = ph.Image.new((self.newsWidth,self.newsHeight))
+            newTopImg = ph.Image.new((self.newImgWidth,self.newImgHeight))
+            newTopImg.clear(0xff0000)
+            newimg.blit(newTopImg,(0-self.newsCornor,0-self.newsCornor))
+            textBasePos = (self.newsCornor*2 + self.newImgHeight,self.newsCornor)
+            textWidth = self.newsWidth - self.newImgWidth - self.newsCornor*3
+            textHeight = self.newsHeight - self.newsCornor*2
+            title=self.newsList.newslist[nowIndex].title
+            titlelist = akntextutils.wrap_text_to_array(title.decode("u8"), "dense", textWidth)
+            for j in range(len(titlelist)):
+                newimg.text((textBasePos[0],textBasePos[1]+(j+1)*25),titlelist[j],0x0,("dense",18,FONT_ANTIALIAS))
+            NewsListImg.append(newimg)
+        return NewsListImg
+
+    def drawNewsList(self):#绘制下面的新闻列表
+        self.NewsBasePos = (0,0)
+        if(self.x == 0):
+            self.NewsBasePos = (self.baseCornor, self.SlideHeight + self.baseCornor*2)
+        else:
+            self.NewsBasePos = (self.baseCornor, self.baseCornor)
+        newListImg = self.genNewsListImg()
+        for i in range(len(newListImg)):
+            self.img.blit(newListImg[i],(0-self.NewsBasePos[0],0-(self.NewsBasePos[1] + i * (self.newsHeight + self.newsCornor*2))))
+
+    def toTop(self):#到顶部
+        pass
+
+    def main(self):
+        app.keyType = 1
+        while self.running:
+            self.img.blit(self.background, (0, 0))
+            self.redraw()
+            app.blit(self.img)
+            sleep(0.07)
+
+    def key(self, event):
+        key = event["keycode"]
+        scan = event["scancode"]
+        type = event["type"]
+        if scan == 164 and type == 3:
+            #菜单
+            app.menu(self.menuL)
+        if(key == 0x32 or key == 63497):
+            self.x-=1
+            if (self.x <0):
+                self.x = 0
+        elif(key == 0x38 or key == 63498):
+            self.x+=1
+
+    def exit(self):
+        if app.query2(cn("要退出吗？")):
+            self.running = 0
+            os.abort()
+
+app=App(mypath+'splash.png',0)
 app.TitleName=cn("IT之家")
 #app.keyType=0
 app.allClass([ithomeUi])
