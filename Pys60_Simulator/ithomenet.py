@@ -61,7 +61,7 @@ class Slide:
         self.link = data['link']
         self.opentype = data['opentype']
         self.device = data['device']
-        self.device = data['image']
+        self.image = data['image']
 
 class IthomeNet:
     def __init__(self):
@@ -69,7 +69,7 @@ class IthomeNet:
         self.newsListUrl = self.urlhead +'json/newslist/news?r=0'
         self.slideUrl =self.urlhead + 'json/slide/index'
     def get(self,url):
-        return requests.get(url).text
+        return urllib.urlopen(url).read()
 
     def getNewList(self): #新闻列表
         return NewList(json.loads(self.get(self.newsListUrl)))

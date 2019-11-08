@@ -24,7 +24,7 @@ class ithomeUi(object,):
         self.img = ph.Image.new((self.width, self.height))
         self.background = ph.Image.new((self.width, self.height))
         self.background.clear(0xffffff)
-        self.x = 0
+        self.x = -1
         self.y = 0
         self.baseCornor = 5
         self.newsCornor = 2
@@ -35,20 +35,28 @@ class ithomeUi(object,):
         self.newsWidth = self.width - self.baseCornor*2
         self.newsList = itnet.getNewList()
         self.SlideList = itnet.getSlide()
+        self.SlideIndex = 0
 
     def delCache(self): #清除缓存
         pass
     def refush(self): #刷新
         pass
     def redraw(self):#重绘界面
-        if(self.x == 0):
+        if(self.x == -1):
             self.drawMain()
         else:
             self.drawNewsList()
     def drawSlide(self): #绘制顶部滚动图
+        if(self.nowtime>=1):
+            self.nowtime = 0
+            self.SlideIndex += 1
+        if(self.SlideIndex>=len(self.SlideList)):
+            self.SlideIndex = 0
         self.SlideWidth = self.width - self.baseCornor*2
-        self.SlideImg = ph.Image.new((self.SlideWidth, self.SlideHeight))
-        self.SlideImg.clear(0xff0000)
+        imgurl = self.SlideList[self.SlideIndex].image
+        self.SlideImg = ph.Image.open(itnet.getPic(imgurl))
+        self.SlideImg = self.SlideImg.resize((self.SlideWidth, self.SlideHeight))
+        #self.SlideImg.clear(0xff0000)
         self.img.blit(self.SlideImg, (0 - self.baseCornor, 0 - self.baseCornor))
     def drawMain(self):#绘制第一页主页
         self.drawSlide()
@@ -58,6 +66,8 @@ class ithomeUi(object,):
         NewsListImg = []
         for i in range(showNewsCount):
             nowIndex = i + self.x
+            if(nowIndex<0):
+                continue
             if(nowIndex >= len(self.newsList.newslist)):
                 break
             imgurl = self.newsList.newslist[nowIndex].image
@@ -78,24 +88,29 @@ class ithomeUi(object,):
 
     def drawNewsList(self):#绘制下面的新闻列表
         self.NewsBasePos = (0,0)
-        if(self.x == 0):
+        if(self.x == -1):
             self.NewsBasePos = (self.baseCornor, self.SlideHeight + self.baseCornor*2)
         else:
             self.NewsBasePos = (self.baseCornor, self.baseCornor)
         newListImg = self.genNewsListImg()
         for i in range(len(newListImg)):
             self.img.blit(newListImg[i],(0-self.NewsBasePos[0],0-(self.NewsBasePos[1] + i * (self.newsHeight + self.newsCornor*2))))
+            self.img.line((self.NewsBasePos[0],self.NewsBasePos[1] + i * (self.newsHeight + self.newsCornor*2),self.NewsBasePos[0]+self.newsWidth,self.NewsBasePos[1] + i * (self.newsHeight + self.newsCornor*2)),0xdddddd,width=1)
 
     def toTop(self):#到顶部
         pass
 
     def main(self):
         app.keyType = 1
+        self.nowtime = 0
         while self.running:
             self.img.blit(self.background, (0, 0))
             self.redraw()
             app.blit(self.img)
             sleep(0.1)
+            self.nowtime+=0.1
+            break
+
 
     def key(self, event):
         key = event["keycode"]
@@ -106,10 +121,15 @@ class ithomeUi(object,):
             app.menu(self.menuL)
         if(key == 0x32 or key == 63497):
             self.x-=1
-            if (self.x <0):
-                self.x = 0
+            if (self.x <-1):
+                self.x = -1
         elif(key == 0x38 or key == 63498):
             self.x+=1
+            if(self.x> len(self.newsList.newslist)-4):
+                self.x= len(self.newsList.newslist)-4
+        self.img.blit(self.background, (0, 0))
+        self.redraw()
+        app.blit(self.img)
 
     def exit(self):
         if app.query2(cn("要退出吗？")):
@@ -121,3 +141,4 @@ app.TitleName=cn("IT之家")
 #app.keyType=0
 app.allClass([ithomeUi])
 app.main()
+e32.Ao_lock().wait()

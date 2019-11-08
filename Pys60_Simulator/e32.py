@@ -16,7 +16,7 @@ class Ao_lock:
 		self.iswait = 1
 		while self.iswait:
 			_app.Yield()
-			sleep(0)
+			sleep(0.2)
 		#self.condition.acquire()
 		#self.condition.wait(5)
 		#self.condition.release()
