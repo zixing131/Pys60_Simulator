@@ -163,11 +163,17 @@ class Image:
         self.size = size
         return self
     def measure_text(self,title,font='dense'):
-        font = tkFont.Font(family=font, size=15)
-        w = font.measure(title)
+        myfont = None
+        height = 15
+        if(type(font) is tuple):
+            myfont = tkFont.Font(family=font[0], size=font[1]-5)
+            height = font[1]
+        else:
+            myfont = tkFont.Font(family=font, size=15)
+        w = myfont.measure(title)
         if(self.canvas):
             self.canvas.blit(self)
-        return [[0,0,w,15],w]
+        return [[0,0,w,height],w]
    
     new=staticmethod(new)
     open=staticmethod(open)

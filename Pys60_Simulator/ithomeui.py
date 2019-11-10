@@ -19,11 +19,12 @@ class ithomeUi(object,):
                       (cn("到顶部"), lambda: self.toTop()),
                       (cn("清除缓存"), lambda: self.delCache()),
                    (cn("退出"), lambda: self.exit())]
-        self.width = 240
-        self.height = 320
+        screen = (ui.app.body.size[0],ui.app.body.size[1])
+        self.width = screen[0]
+        self.height = screen[1]
         self.img = ph.Image.new((self.width, self.height))
         self.background = ph.Image.new((self.width, self.height))
-        self.background.clear(0xffffff)
+        self.background.clear(0xeeeeee)
         self.x = -1
         self.y = 0
         self.baseCornor = 5

@@ -183,7 +183,7 @@ class Window(object, ) :
     def event(self, key):
         type = key['type']
         code = key['scancode']
-        print(key)
+        #print(key)
         if type == 3 : 
             self.WndProc(WM_KEYDOWN, code, 0)
         elif type == 1 : 

@@ -5,17 +5,18 @@ try:  # import as appropriate for 2.x vs. 3.x
    import tkinter as tk
 except:
    import Tkinter as tk 
-import tkMessageBox 
+import tkMessageBox
+screen = (240,320)
 from threading import Timer
 from PIL import ImageTk
 import time
 import thread
 import os
-import thread
+
 EScreen = 1
 EHLeftVTop = 0
 root = tk.Tk()
-cv = tk.Canvas(root, width = 240, height = 320,background='white')
+cv = tk.Canvas(root, width = screen[0], height = screen[1],background='white')
 
 class Canvas():
     def __init__(self,redraw_callback=None,event_callback=None, resize_callback=None):
@@ -23,7 +24,7 @@ class Canvas():
         self.event_callback=event_callback
         self.root = root
         self.root.title('Pys60 Simulator')
-        self.root.geometry('240x320')
+        self.root.geometry(str(screen[0])+'x'+str(screen[1]))
         self.root.resizable(0,0)
         self.cv = cv
         self.cv.pack(fill=tk.BOTH, expand=tk.YES)
@@ -31,7 +32,7 @@ class Canvas():
         self.cv.bind_all(sequence="<KeyRelease>", func=self.processKeyUpEvent)
         self.lastimg = None
         self.menu_key_handler = None
-        self.size=(240,320)
+        self.size=screen
         self.font = ['font1','font2']
         self.lastkeytime = time.time()
         #self.timer = Timer(0,self.redraw,())
@@ -206,8 +207,8 @@ class Canvas():
                 self.redraw_callback(())
             #self.timer = Timer(0,self.redraw,())
             #self.timer.start()
-        except:
-            pass
+        except Exception, ex:
+            print(ex)
        
 class Text(object):
     def __init__(self,redraw_callback=None,event_callback=None, resize_callback=None):
@@ -317,7 +318,7 @@ class Application(object):
     def __init__(self, **keys):
        self.exit_key_handler = None
        self.body=None
-       self.screen = (0,0,240,320)
+       self.screen = (0,0,screen[0],screen[1])
        #thread.start_new_thread(self.refush,())
     def refush(self):
        while 1:
@@ -325,7 +326,7 @@ class Application(object):
               self.body.update()
               time.sleep(0.1)
     def layout(self,d):
-       return  [(240,320)]
+       return  [ screen]
     def redraw(self):
        if(self.body):
          self.body.redraw()
@@ -335,8 +336,8 @@ class Application(object):
            if(self.body):
                self.body.update()
          #self.body.redraw()
-       except:
-           pass
+       except Exception,ex:
+           print(ex)
        #time.sleep(0.1)
        
 app = Application()
