@@ -7,12 +7,13 @@ from appuifw import app as _app
 ECorner1 = 1
 ECorner2 = 2
 class New():
-    def __init__(self,pos,cornertype,txtlimit=0):
+    def __init__(self,pos,cornertype,txtlimit=0,strlimit=0):
         self.pos = pos
         height =  self.pos[3] - self.pos[1]
         width = self.pos[2] - self.pos[0]
         cv = _app.body and _app.body.cv or None
         self.textbox = tk.Text(cv,width=width,height=height)
+        self.textwindow = None
     def textstyle(self,a,b,c,style):
         pass
     def bgcolor(self,color):
@@ -22,7 +23,11 @@ class New():
     def select(self,start,end):
         pass
     def focus(self,data):
-        pass
+        if(data==1):
+            self.textbox.focus()
+        else:
+            pass
+            #self.textbox.focus_set()
     def visible(self,data):
         #self.textbox.pack(padx=self.pos[0],pady=self.pos[1])
         height =  self.pos[3] - self.pos[1]
@@ -31,12 +36,14 @@ class New():
         y=self.pos[1] + height/2
         cv = _app.body and _app.body.cv or None
         if(cv!=None):
-           self.textwindow = _app.body.cv.create_window((x,y),window=self.textbox,height = height, width =width)
-    def get(self):
+           if(data==1):
+               self.textwindow = _app.body.cv.create_window((x,y),window=self.textbox,height = height, width =width)
+           elif(data==0):
+               if(self.textwindow!=None):
+                   _app.body.cv.delete(self.textwindow)
+    def get(self,fullget=1):
         ret = self.textbox.get('0.0',tk.END)
-        ret = ret[0:len(ret)-2]
+        if(fullget==0):ret = ret[0:len(ret)-2]
         cv = _app.body and _app.body.cv or None
-        if(cv!=None):
-            _app.body.cv.delete(self.textwindow)
         return ret
 

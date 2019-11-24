@@ -16,8 +16,8 @@ class Demo(object, ):
         self.label_username = Label(self.wnd, cn('账号：'), 38, 71)
         self.label_password = Label(self.wnd, cn('密码：'), 38, 100)
         #self.link.SetColor(1921983)
-        self.txt_username = Textbox(self.wnd,'',78,69,120,24)
-        self.txt_password = Textbox(self.wnd, '', 78, 97, 120, 24)
+        self.txt_username = Textbox(self.wnd,cn('请输入账号'),78,69,120,24,limit=10)
+        self.txt_password = Textbox(self.wnd, cn('请输入密码'), 78, 97, 120, 24,limit=16)
         self.ismoved = False
         self.oldhandler = ui.app.exit_key_handler
         self.lock = e32.Ao_lock()

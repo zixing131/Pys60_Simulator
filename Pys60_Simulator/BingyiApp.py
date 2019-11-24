@@ -115,7 +115,7 @@ class App:
         if s.type=="query":
           s.choice=True
         else:
-          s.choice=s.field.get()
+          s.choice=s.field.get(fullget=0)
         s.__lock.signal()
       elif s.super==3:
         s.choice2=True
@@ -138,7 +138,7 @@ class App:
         if s.type=="query":
           s.choice=True
         else:
-          s.choice=s.field.get()
+          s.choice=s.field.get(fullget=0)
         s.__lock.signal()
       elif s.super==3:
         s.choice2=True
