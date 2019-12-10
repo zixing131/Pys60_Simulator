@@ -112,7 +112,7 @@ class Image:
         color = convertColor(color)
         if(type(font) is str):
             font=(font,15)
-        draw.text((pos[0],pos[1]-font[1]),text,color=color,fill=color,font = GetFont(color,font))
+        draw.text((pos[0],pos[1]-font[1]),text,fill=color,font = GetFont(color,font))
         if(self.canvas):
             self.canvas.blit(self)
          
