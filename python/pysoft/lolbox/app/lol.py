@@ -564,7 +564,7 @@ class box :
 
 
 
-    def redraw(s, rect, k = 0):
+    def redraw(s, rect=0, k = 0):
         try :
             s.i.clear(color_likebg)
             s.i.blit(s.img, (s.x, s.y))

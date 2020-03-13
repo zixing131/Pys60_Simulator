@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import requests
 import urllib
-import md5
+import hashlib
 import os
-from myjson import json
+import simplejson as json
 mypath=u"..\\python\\pysoft\\ithome\\"
+if(os.name!='nt'):
+    mypath = u"e:\\python\\pysoft\\ithome\\"
 cachePath = mypath+"cache\\"
 
 class Tops:
@@ -77,7 +79,7 @@ class IthomeNet:
     def getSlide(self): #顶部滚动
         return [Slide(i) for i in json.loads(self.get(self.slideUrl))]
     def getMd5(self,data):
-        hash = md5.new()
+        hash = hashlib.md5()
         hash.update(data)
         return hash.hexdigest()
     def Url2FileName(self,url):

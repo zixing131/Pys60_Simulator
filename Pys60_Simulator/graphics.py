@@ -47,13 +47,17 @@ def convertColor(bgcolor):
     return bgcolor
             
 class Image:
-    def __init__(self,size,mode=None,canvas = None): 
+    def __init__(self,size,mode=None,canvas = None):
         self.image = Image2.new("RGBA",size,(255,255,255))
+
         self.size = size
+        self._image = self.size
         self.mode=mode
         self.canvas = canvas
         #win=sysgraphics.GraphWin(width=size[0],height=size[1])
         #_app.redraw()
+    def transpose(self,a=1):
+        return self
     def open(path):
         img = Image2.open(path)
         img2 = Image(img.size)
@@ -78,7 +82,7 @@ class Image:
             draw.rectangle((pos[0],pos[1],pos[2],pos[3]), fill=fill,width=width)
         del draw
         
-    def clear(self,color): 
+    def clear(self,color=0):
         color = convertColor(color)
         if(self.mode!=None):
            color = color+'99'
@@ -90,12 +94,15 @@ class Image:
         pos=target 
         pos=(0-pos[0],0-pos[1])
         if(mask!=None):
-           self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+img.size[0]),int(pos[1]+img.size[1])),mask = mask.image)
+            try:
+                self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+img.size[0]),int(pos[1]+img.size[1])),mask = mask.image)
+            except:
+                self.image.paste(img.image, (pos[0], pos[1], pos[0] + img.size[0], pos[1] + img.size[1]))
         else:
-           self.image.paste(img.image,(pos[0],pos[1],pos[0]+img.size[0],pos[1]+img.size[1]))
+           self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+img.size[0]),int(pos[1]+img.size[1])))
         if(self.canvas):
             self.canvas.blit(self)
-    def line(self,pos,bgcolor,width=0): 
+    def line(self,pos,bgcolor=0,width=0,outline=0):
         draw = ImageDraw.Draw(self.image)
         bgcolor = convertColor(bgcolor)
         draw.line((pos[0],pos[1],pos[2],pos[3]), fill=bgcolor,width=width)

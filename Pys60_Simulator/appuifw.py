@@ -53,6 +53,7 @@ class Canvas():
     def processKeyPressEvent(self, evt):
         # 打印键盘事件
         flag = time.time() - self.lastkeytime
+        print(flag)
         self.lastkeytime = time.time()
         keytype = 3
         if (flag < 0.1):
@@ -144,19 +145,21 @@ class Canvas():
                 args["keycode"] = -1
                 args["scancode"] = 164
                 args["type"] = keytype
-                self.event_callback(args)
+                if (self.event_callback): self.event_callback(args)
             if (key != -1):
                 args = {}
                 args["keycode"] = -1
                 args["scancode"] = 1
                 args["type"] = keytype
                 if (self.event_callback): self.event_callback(args)
+                self.callEvents(args)
             if (mykey == 'up'):
                 args = {}
                 args["keycode"] = -1
                 args["scancode"] = 16
                 args["type"] = keytype
                 if (self.event_callback): self.event_callback(args)
+                self.callEvents(args)
             if (mykey == 'down'):
                 args = {}
                 args["keycode"] = -1
@@ -169,18 +172,21 @@ class Canvas():
                 args["scancode"] = 14
                 args["type"] = keytype
                 if (self.event_callback): self.event_callback(args)
+                self.callEvents(args)
             if (mykey == 'right'):
                 args = {}
                 args["keycode"] = -1
                 args["scancode"] = 15
                 args["type"] = keytype
                 if (self.event_callback): self.event_callback(args)
+                self.callEvents(args)
             if (mykey == 'space'):
                 args = {}
                 args["keycode"] = -1
                 args["scancode"] = 167
                 args["type"] = keytype
                 if (self.event_callback): self.event_callback(args)
+                self.callEvents(args)
 
         if evt.type == "4":
             pass
@@ -208,13 +214,13 @@ class Canvas():
     def update(self):
         self.redraw()
 
-    def redraw(self):
+    def redraw(self,t=1):
         try:
             # print(self.redraw_callback)
             if (self.redraw_callback == None):
                 return
             else:
-                self.redraw_callback(())
+                self.redraw_callback()
             # self.timer = Timer(0,self.redraw,())
             # self.timer.start()
         except Exception, ex:
@@ -334,6 +340,8 @@ class Application(object):
         self.screen = (0, 0, screen[0], screen[1])
         # thread.start_new_thread(self.refush,())
 
+    def focus(self):
+        pass
     def refush(self):
         while 1:
             if (self.body != None):
@@ -343,7 +351,7 @@ class Application(object):
     def layout(self, d):
         return [screen]
 
-    def redraw(self):
+    def redraw(self,t=1):
         if (self.body):
             self.body.redraw()
 
