@@ -174,7 +174,7 @@ class Window(object, ) :
 
 
 
-    def redraw(self, v):
+    def redraw(self, v=0):
         self.WndProc(WM_PAINT, 0, 0)
 
 
