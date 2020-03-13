@@ -2,11 +2,16 @@
 
 zt=u"Sans MT 936_s60",15,1
 import appuifw as ui,e32
+import os
 import graphics as ph,base64,thread,os,random
-from BingyiApp import *
+#from BingyiApp import *
+import akntextutils2
+from graphics import *
 cn=lambda x:x.decode("u8")
 sleep=e32.ao_sleep
 mypath=u"..\\python\\pysoft\\ithome\\"
+if(os.name!='nt'):
+    mypath = u"e:\\python\\pysoft\\ithome\\"
 cachePath = mypath+"cache\\"
 import ithomenet
 itnet = ithomenet.IthomeNet()
@@ -15,11 +20,14 @@ itnet = ithomenet.IthomeNet()
 class ithomeUi(object,):
     def __init__(self):
         self.running = 1
+        ui.app.screen = "full"
         self.menuL = [(cn("刷新"), lambda: self.refush()),
                       (cn("到顶部"), lambda: self.toTop()),
                       (cn("清除缓存"), lambda: self.delCache()),
                    (cn("退出"), lambda: self.exit())]
-        screen = (ui.app.body.size[0],ui.app.body.size[1])
+        screen = ui.app.layout(ui.EScreen)[0]
+        self.__canvas = ui.Canvas(self.redraw, self.key)
+        ui.app.body = self.__canvas
         self.width = screen[0]
         self.height = screen[1]
         self.img = ph.Image.new((self.width, self.height))
@@ -42,11 +50,16 @@ class ithomeUi(object,):
         pass
     def refush(self): #刷新
         pass
+
+    def blit(self,img):
+        self.__canvas.blit(img)
+
     def redraw(self):#重绘界面
         if(self.x == -1):
             self.drawMain()
         else:
             self.drawNewsList()
+        self.blit(self.img)
     def drawSlide(self): #绘制顶部滚动图
         if(self.nowtime>=1):
             self.nowtime = 0
@@ -81,7 +94,7 @@ class ithomeUi(object,):
             textWidth = self.newsWidth - self.newImgWidth - self.newsCornor*3
             textHeight = self.newsHeight - self.newsCornor*2
             title=self.newsList.newslist[nowIndex].title
-            titlelist = akntextutils.wrap_text_to_array(title.decode("u8"), "dense", textWidth)
+            titlelist = akntextutils2.to_array(title, "dense", textWidth)
             for j in range(len(titlelist)):
                 newimg.text((textBasePos[0],textBasePos[1]+(j+1)*15),titlelist[j],0x0,("dense",15,FONT_ANTIALIAS))
             NewsListImg.append(newimg)
@@ -104,13 +117,12 @@ class ithomeUi(object,):
     def main(self):
         app.keyType = 1
         self.nowtime = 0
-        while self.running:
-            self.img.blit(self.background, (0, 0))
-            self.redraw()
-            app.blit(self.img)
-            sleep(0.1)
-            self.nowtime+=0.1
-            break
+        self.redraw1()
+
+    def redraw1(self):
+        self.img.blit(self.background, (0, 0))
+        self.redraw()
+        self.nowtime+=0.1
 
 
     def key(self, event):
@@ -137,9 +149,9 @@ class ithomeUi(object,):
             self.running = 0
             os.abort()
 
-app=App(mypath+'splash.png',0)
+#app=App(mypath+'splash.png',0)
+app=ithomeUi()
 app.TitleName=cn("IT之家")
 #app.keyType=0
-app.allClass([ithomeUi])
 app.main()
 e32.Ao_lock().wait()
