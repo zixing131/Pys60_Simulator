@@ -42,7 +42,7 @@ def ao_yield():
     _app.Yield()
 
 def drive_list():
-    return [""]
+    return ['c','d','e','z']
 
 def ao_sleep(interval, cb=None): 
     ao_yield()

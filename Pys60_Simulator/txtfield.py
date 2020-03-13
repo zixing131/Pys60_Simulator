@@ -6,8 +6,11 @@ except:
 from appuifw import app as _app 
 ECorner1 = 1
 ECorner2 = 2
+EReadOnly=1
+EDisableCursor=1
+EDisplayOnly=1
 class New():
-    def __init__(self,pos,cornertype,txtlimit=0,strlimit=0):
+    def __init__(self,pos,cornertype=0,txtlimit=0,strlimit=0,editorflag=0):
         self.pos = pos
         height =  self.pos[3] - self.pos[1]
         width = self.pos[2] - self.pos[0]

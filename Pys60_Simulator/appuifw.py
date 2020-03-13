@@ -214,7 +214,7 @@ class Canvas():
     def update(self):
         self.redraw()
 
-    def redraw(self):
+    def redraw(self,t=1):
         try:
             # print(self.redraw_callback)
             if (self.redraw_callback == None):
@@ -340,6 +340,8 @@ class Application(object):
         self.screen = (0, 0, screen[0], screen[1])
         # thread.start_new_thread(self.refush,())
 
+    def focus(self):
+        pass
     def refush(self):
         while 1:
             if (self.body != None):
@@ -349,7 +351,7 @@ class Application(object):
     def layout(self, d):
         return [screen]
 
-    def redraw(self):
+    def redraw(self,t=1):
         if (self.body):
             self.body.redraw()
 

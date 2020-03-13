@@ -115,7 +115,6 @@ class ithomeUi(object,):
         pass
 
     def main(self):
-        app.keyType = 1
         self.nowtime = 0
         self.redraw1()
 
@@ -130,8 +129,9 @@ class ithomeUi(object,):
         scan = event["scancode"]
         type = event["type"]
         if scan == 164 and type == 3:
+            pass
             #菜单
-            app.menu(self.menuL)
+            #app.menu(self.menuL)
         if(key == 0x32 or key == 63497):
             self.x-=1
             if (self.x <-1):
@@ -142,10 +142,9 @@ class ithomeUi(object,):
                 self.x= len(self.newsList.newslist)-4
         self.img.blit(self.background, (0, 0))
         self.redraw()
-        app.blit(self.img)
 
     def exit(self):
-        if app.query2(cn("要退出吗？")):
+        if ui.query(cn("要退出吗？")):
             self.running = 0
             os.abort()
 
