@@ -220,7 +220,7 @@ class Canvas():
             if (self.redraw_callback == None):
                 return
             else:
-                self.redraw_callback(())
+                self.redraw_callback()
             # self.timer = Timer(0,self.redraw,())
             # self.timer.start()
         except Exception, ex:

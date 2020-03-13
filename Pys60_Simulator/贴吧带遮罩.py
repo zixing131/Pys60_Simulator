@@ -25,7 +25,89 @@ ui.app.screen="full"#定义屏幕全屏
 
 def _redraw():  # 定义重绘函数
     can.blit(img)
-ui.app.body=can=ui.Canvas(event_callback=None, redraw_callback=_redraw)
+
+def redraw():
+    img.clear(dl.bgcr)
+    ima.clear(dl.inputcr)
+    imb.clear(dl.oncr)
+    imc.clear(dl.oncr)
+    imd.clear(dl.oncr)
+    """for i in range(25):
+        imi=ph.Image.new((dl.w,1))
+        imi.clear((i*10,i*10,i*10))
+        img.blit(imi,target=(0,i))
+    #画顶部边框
+    """
+    #下面是贴图到img
+    if(dl.ping==1):
+        img.blit(tietu,(-88,-25),mask=maska)#贴吧LOGO
+        img.blit(ima,(-55,-112))#帐号输入框
+        img.blit(ima,(-55,-153))#密码输入框
+        if(dl.pnum==0):
+            img.blit(gof,(-59,-199))#不用手机号登录
+        elif(dl.pnum==1):
+            img.blit(gon,(-59,-199))#用手机号登录
+        if(dl.rempsw==0):
+            img.blit(gof,(-59,-240))#不记密码
+        elif(dl.rempsw==1):
+            img.blit(gon,(-59,-240))#记住密码
+        if(s_p==0 or s_p==1):
+            img.blit(imd,(-55,-(113+41*s_p)))
+            img.blit(imd,(-202,-(113+41*s_p)))
+            img.blit(imb,(-55,-(112+41*s_p)))
+            img.blit(imb,(-55,-(135+41*s_p)))#选择框
+        else:
+            img.blit(imd,(-55,-(113+41*s_p)))
+            img.blit(imd,(-160,-(113+41*s_p)))
+            img.blit(imc,(-55,-(112+41*s_p)))
+            img.blit(imc,(-55,-(133+41*s_p)))#选择框
+        img.text((62,132),id,0xf,zt)#帐号遮盖
+        if(psw==cn("请输入密码")):
+            img.text((62,173),psw,0xf,zt)#密码遮盖
+        else:img.text((62,173),cn("********"),0xf,zt)
+        #img.text((40,20), cn("百度贴吧客户端 v1.0"),0xf,zt)
+        img.text((15,132), cn("帐号:"),0xf,zt)
+        img.text((15,173), cn("密码:"),0xf,zt)
+        img.text((10,310), cn("登录"),0xf,zt)
+        img.text((195,310), cn("返回"),0xf,zt)
+        img.text((80,214), cn("手机号登录"),0xf,zt)
+        img.text((80,255), cn("记住密码"),0xf,zt)
+    elif(dl.ping==2):
+        img.blit(tietu,(-30,-55),mask=maska)#贴吧LOGO
+        img.blit(ima,(-150,-60))#帐号输入框
+        img.blit(ima,(-150,-100))#密码输入框
+        if(dl.pnum==0):
+            img.blit(gof,(-154,-144))#不用手机号登录
+        elif(dl.pnum==1):
+            img.blit(gon,(-154,-144))#用手机号登录
+        if(dl.rempsw==0):
+            img.blit(gof,(-154,-184))#不记密码
+        elif(dl.rempsw==1):
+            img.blit(gon,(-154,-184))#记住密码
+        if(s_p==0 or s_p==1):
+            img.blit(imd,(-150,-(60+40*s_p)))
+            img.blit(imd,(-300,-(60+40*s_p)))
+            img.blit(imb,(-150,-(60+40*s_p)))
+            img.blit(imb,(-150,-(82+40*s_p)))#选择框
+        else:
+            img.blit(imd,(-150,-(60+40*s_p)))
+            img.blit(imd,(-255,-(60+40*s_p)))
+            img.blit(imc,(-150,-(60+40*s_p)))
+            img.blit(imc,(-150,-(80+40*s_p)))#选择框
+        img.text((158,80),id,0xf,zt)#帐号遮盖
+        if(psw==cn("请输入密码")):
+            img.text((158,120),psw,0xf,zt)#密码遮盖
+        else:img.text((158,120),cn("********"),0xf,zt)
+        #img.text((200,300), cn("百度贴吧客户端 v1.0"),0xf,zt)
+        img.text((110,80), cn("帐号:"),0xf,zt)
+        img.text((110,120), cn("密码:"),0xf,zt)
+        img.text((10,230), cn("登录"),0xf,zt)
+        img.text((280,230), cn("返回"),0xf,zt)
+        img.text((175,158), cn("手机号登录"),0xf,zt)
+        img.text((175,198), cn("记住密码"),0xf,zt)
+    _redraw()
+
+ui.app.body=can=ui.Canvas(event_callback=None, redraw_callback=redraw)
 
 class dl:pass
 dl.version="V1.0"
@@ -118,6 +200,7 @@ def move_d():#按键下
     kj1.focus(0)
     kj2.visible(0)
     kj2.focus(0)
+    redraw()
 def enter():#按键确认
     global id,psw
     if(s_p==0):
@@ -166,11 +249,14 @@ def enter():#按键确认
             dl.rempsw=1
         elif(dl.rempsw==1):
             dl.rempsw=0
+    redraw()
 
 def fan():#定义返回键动作
     ui.note(cn("在这里定义返回键东西"))
+    redraw()
 def denglu():#定义登录键动作
     ui.note(cn("在这里定义登录键键东西"))
+    redraw()
     
 def main():
     global id,psw
@@ -180,87 +266,7 @@ def main():
     can.bind(63557,lambda:enter())
     can.bind(63554,lambda:denglu())
     can.bind(63555,lambda:fan())
-    while 1:
-        img.clear(dl.bgcr)
-        ima.clear(dl.inputcr)
-        imb.clear(dl.oncr)
-        imc.clear(dl.oncr)
-        imd.clear(dl.oncr)
-        """for i in range(25):
-            imi=ph.Image.new((dl.w,1))
-            imi.clear((i*10,i*10,i*10))
-            img.blit(imi,target=(0,i))
-        #画顶部边框
-        """
-        #下面是贴图到img
-        if(dl.ping==1):
-            img.blit(tietu,(-88,-25),mask=maska)#贴吧LOGO
-            img.blit(ima,(-55,-112))#帐号输入框
-            img.blit(ima,(-55,-153))#密码输入框
-            if(dl.pnum==0):
-                img.blit(gof,(-59,-199))#不用手机号登录
-            elif(dl.pnum==1):
-                img.blit(gon,(-59,-199))#用手机号登录
-            if(dl.rempsw==0):
-                img.blit(gof,(-59,-240))#不记密码
-            elif(dl.rempsw==1):
-                img.blit(gon,(-59,-240))#记住密码
-            if(s_p==0 or s_p==1):
-                img.blit(imd,(-55,-(113+41*s_p)))
-                img.blit(imd,(-202,-(113+41*s_p)))
-                img.blit(imb,(-55,-(112+41*s_p)))
-                img.blit(imb,(-55,-(135+41*s_p)))#选择框
-            else:
-                img.blit(imd,(-55,-(113+41*s_p)))
-                img.blit(imd,(-160,-(113+41*s_p)))
-                img.blit(imc,(-55,-(112+41*s_p)))
-                img.blit(imc,(-55,-(133+41*s_p)))#选择框
-            img.text((62,132),id,0xf,zt)#帐号遮盖
-            if(psw==cn("请输入密码")):
-                img.text((62,173),psw,0xf,zt)#密码遮盖
-            else:img.text((62,173),cn("********"),0xf,zt)
-            #img.text((40,20), cn("百度贴吧客户端 v1.0"),0xf,zt)
-            img.text((15,132), cn("帐号:"),0xf,zt)
-            img.text((15,173), cn("密码:"),0xf,zt)
-            img.text((10,310), cn("登录"),0xf,zt)
-            img.text((195,310), cn("返回"),0xf,zt)
-            img.text((80,214), cn("手机号登录"),0xf,zt)
-            img.text((80,255), cn("记住密码"),0xf,zt)
-        elif(dl.ping==2):
-            img.blit(tietu,(-30,-55),mask=maska)#贴吧LOGO
-            img.blit(ima,(-150,-60))#帐号输入框
-            img.blit(ima,(-150,-100))#密码输入框
-            if(dl.pnum==0):
-                img.blit(gof,(-154,-144))#不用手机号登录
-            elif(dl.pnum==1):
-                img.blit(gon,(-154,-144))#用手机号登录
-            if(dl.rempsw==0):
-                img.blit(gof,(-154,-184))#不记密码
-            elif(dl.rempsw==1):
-                img.blit(gon,(-154,-184))#记住密码
-            if(s_p==0 or s_p==1):
-                img.blit(imd,(-150,-(60+40*s_p)))
-                img.blit(imd,(-300,-(60+40*s_p)))
-                img.blit(imb,(-150,-(60+40*s_p)))
-                img.blit(imb,(-150,-(82+40*s_p)))#选择框
-            else:
-                img.blit(imd,(-150,-(60+40*s_p)))
-                img.blit(imd,(-255,-(60+40*s_p)))
-                img.blit(imc,(-150,-(60+40*s_p)))
-                img.blit(imc,(-150,-(80+40*s_p)))#选择框
-            img.text((158,80),id,0xf,zt)#帐号遮盖
-            if(psw==cn("请输入密码")):
-                img.text((158,120),psw,0xf,zt)#密码遮盖
-            else:img.text((158,120),cn("********"),0xf,zt)
-            #img.text((200,300), cn("百度贴吧客户端 v1.0"),0xf,zt)
-            img.text((110,80), cn("帐号:"),0xf,zt)
-            img.text((110,120), cn("密码:"),0xf,zt)
-            img.text((10,230), cn("登录"),0xf,zt)
-            img.text((280,230), cn("返回"),0xf,zt)
-            img.text((175,158), cn("手机号登录"),0xf,zt)
-            img.text((175,198), cn("记住密码"),0xf,zt)
-        _redraw()
-        sleep(0.08)
+    redraw()
 
 main()
 ui.app.exit_key_handler = lock.signal
