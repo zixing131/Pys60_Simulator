@@ -48,6 +48,10 @@ class ithomeUi(object, ):
         self.newImgHeight = self.newsHeight - self.newsCornor * 2
         self.newImgWidth = int(self.newImgHeight/0.75)
         self.loadingImg = ph.Image.open(mypath+"image_loading.jpg").resize((self.newImgWidth,self.newImgHeight))
+
+        self.maskImg = Image.new(screen, "L")
+        self.maskImg.clear(0x888888)
+
         self.newsWidth = self.width - self.baseCornor * 2
         self.SlideIndex = 0
         self.nowtime=0
@@ -66,6 +70,7 @@ class ithomeUi(object, ):
         self.slideChangeThread = e32.Ao_timer()
         self.lastX=self.selectedIndex-1
         itnet.loadImg(self.AsyncLoad)
+
     def AsyncLoad(self,percent):
         self.background.blit(self.startUpImg)
         x1=10
@@ -214,6 +219,8 @@ class ithomeUi(object, ):
         self.redraw()
         # self.img.save("d:\\a.png")
         self.nowtime += 0.1
+    def drawMenu(self):
+        pass
 
     def key(self, event):
         if (self.loading == 1):
@@ -222,9 +229,7 @@ class ithomeUi(object, ):
         scan = event["scancode"]
         type = event["type"]
         if scan == 164 and type == 3:
-            pass
-            # 菜单
-            # app.menu(self.menuL)
+            self.drawMenu()
         if (key == 0x32 or key == 63497):
             self.selectedIndex -= 1
             if (self.selectedIndex < 0):

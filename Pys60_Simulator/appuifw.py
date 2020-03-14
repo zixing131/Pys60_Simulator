@@ -18,6 +18,10 @@ EScreen = 1
 EHLeftVTop = 0
 root = tk.Tk()
 cv = tk.Canvas(root, width=screen[0], height=screen[1], background='white')
+def on_closing():
+    abort()
+root.protocol("WM_DELETE_WINDOW", on_closing)
+
 
 
 class Canvas():
@@ -334,6 +338,7 @@ class Text(object):
 class Application(object):
 
     def __init__(self, **keys):
+        self.running = 1
         self.exit_key_handler = None
         self.body = None
         self.screen = (0, 0, screen[0], screen[1])
@@ -342,7 +347,7 @@ class Application(object):
     def focus(self):
         pass
     def refush(self):
-        while 1:
+        while self.running:
             if (self.body != None):
                 self.body.update()
                 time.sleep(0.1)
@@ -369,6 +374,7 @@ app = Application()
 
 
 def abort():
+    app.running = 0
     app.body.root.destroy()
     os._exit(0)
 
