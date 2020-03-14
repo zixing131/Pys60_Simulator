@@ -36,7 +36,8 @@ class ithomeUi(object, ):
         self.height = screen[1]
         self.img = ph.Image.new((self.width, self.height))
         self.background = ph.Image.new((self.width, self.height))
-        self.background.clear(0xeeeeee)
+        self.bgcolor = 0xeeeeee
+        self.background.clear(self.bgcolor)
         self.x = -1
         self.y = 0
         self.baseCornor = 5
@@ -59,10 +60,11 @@ class ithomeUi(object, ):
         itnet.newImgWidth = self.newImgWidth
         itnet.SlideHeight = self.SlideHeight
         itnet.SlideWidth = self.SlideWidth
-
+        self.AsyncLoad(10)
         self.newsList = itnet.getNewList()
         self.SlideList = itnet.getSlide()
-
+        self.slideChangeThread = e32.Ao_timer()
+        self.lastX=self.selectedIndex-1
         itnet.loadImg(self.AsyncLoad)
     def AsyncLoad(self,percent):
         self.background.blit(self.startUpImg)
@@ -73,10 +75,21 @@ class ithomeUi(object, ):
         self.background.rectangle((x1,y1,x2,y2),0xc3c3c3,fill=0xc3c3c3)
 
         x2 = ((self.width-20)*(float(percent)/float(100)))+10
-        self.background.rectangle((x1, y1, x2, y2), 0x5ccdef,  fill = 0x5ccdef)
+        self.background.rectangle((x1, y1, x2, y2), 0x20C602,  fill = 0x20C602)
 
         self.img.blit(self.background)
-        pass
+        self.blit(self.img)
+        if(percent>=100):
+            self.lastX = self.selectedIndex - 1
+            self.redraw()
+            self.slideChangeThread.after(3,self.slideChange)
+    def slideChange(self):
+        self.SlideIndex += 1
+        if (self.SlideIndex >= len(self.SlideList)):
+            self.SlideIndex = 0
+        self.redraw()
+        self.slideChangeThread.after(3, self.slideChange)
+
 
     def delCache(self):  # 清除缓存
         pass
@@ -91,16 +104,22 @@ class ithomeUi(object, ):
         if (self.x == -1):
             self.drawMain()
         else:
-            self.drawNewsList()
+            if (self.lastX != self.selectedIndex):
+                self.img.clear(self.bgcolor)
+                self.drawNewsList()
+        self.lastX = self.selectedIndex
 
     def __redraw(self, size=0):  # 重绘界面
         self.blit(self.img)
 
     def redraw(self):  # 重绘界面
-        self.img.blit(self.background, (0, 0))
-
+        if(self.loading == 1):
+            return
+        self.loading = 1
+        #self.img.blit(self.background, (0, 0))
         self.genImg()
         self.__redraw()
+        self.loading = 0
 
     def drawSlide(self):  # 绘制顶部滚动图
         if(len(self.SlideList)<1):
@@ -113,11 +132,16 @@ class ithomeUi(object, ):
         imgurl = self.SlideList[self.SlideIndex].image
         self.SlideImg = itnet.getPic(imgurl, (self.SlideWidth, self.SlideHeight))
         # self.SlideImg.clear(0xff0000)
+        timg = ph.Image.new((self.width,  self.SlideHeight + self.baseCornor))
+        timg.clear(self.bgcolor)
+        self.img.blit(timg, (0, 0))
+        del timg
         self.img.blit(self.SlideImg, (0 - self.baseCornor, 0 - self.baseCornor))
 
     def drawMain(self):  # 绘制第一页主页
         self.drawSlide()
-        self.drawNewsList()
+        if(self.lastX != self.selectedIndex):
+            self.drawNewsList()
 
     def genNewsListImg(self):
         showNewsCount = int(self.height / self.newsHeight) + 1  # 要显示的新闻数量
@@ -158,10 +182,14 @@ class ithomeUi(object, ):
             self.NewsBasePos = (self.baseCornor, self.baseCornor)
         nowX = self.NewsBasePos[1] + (self.selectedIndex - self.x - 1) * (self.newsHeight + self.newsCornor * 2)
         col = 0xee0000
-        self.img.rectangle((2, nowX - 2, self.width - 2, nowX + self.newsCornor * 2 - 2 + self.newsHeight), col,
-                           fill=col)
-        newListImg = self.genNewsListImg()
 
+        timg=ph.Image.new((self.width,self.height-self.SlideHeight))
+        timg.clear(self.bgcolor)
+        self.img.blit(timg,(0,0-self.SlideHeight-self.baseCornor))
+        del timg
+        self.img.rectangle((2, nowX - 2, self.width - 2, nowX + self.newsCornor * 2 - 2 + self.newsHeight), col,
+                          fill=col)
+        newListImg = self.genNewsListImg()
         for i in range(len(newListImg)):
             self.img.blit(newListImg[i], (
             0 - self.NewsBasePos[0], 0 - (self.NewsBasePos[1] + i * (self.newsHeight + self.newsCornor * 2))))
@@ -218,9 +246,8 @@ class ithomeUi(object, ):
             t = int(self.height / self.newsHeight) - 1
             if (self.x > len(self.newsList.newslist) - t):
                 self.x = len(self.newsList.newslist) - t
-        self.loading = 1
+
         self.redraw()
-        self.loading = 0
 
     def exit(self):
         if ui.query(cn("要退出吗？"), "query"):

@@ -88,9 +88,17 @@ class IthomeNet:
         self.th1 = e32.Ao_timer()
         self.th2 = e32.Ao_timer()
         self.errorImg = None
+        self.asyncLoad = None
+        self.imgcount = 0
+        self.nowimgindex = 0
 
     def get(self, url):
         return urllib.urlopen(url).read()
+
+    def asyncLoadChange(self,precent):
+        if(self.asyncLoad):
+            #print precent
+            self.asyncLoad(precent)
 
     def getImageAsync(self):
         if(self.newslist==[]):
@@ -99,6 +107,10 @@ class IthomeNet:
             imgurl = i.image
             # print imgurl
             self.getPic(imgurl, (self.newImgWidth, self.newImgHeight))
+            self.nowimgindex += 1
+            p = (float(90)/float(self.imgcount)) * self.nowimgindex + 10
+            self.asyncLoadChange(p)
+
 
     def getSlideImageAsync(self):
         if (self.slidelist == []):
@@ -106,6 +118,10 @@ class IthomeNet:
         for i in self.slidelist:
             imgurl = i.image
             self.getPic(imgurl, (self.SlideWidth, self.SlideHeight))
+            self.nowimgindex += 1
+            p = (float(90) / float(self.imgcount)) * self.nowimgindex + 10
+            self.asyncLoadChange(p)
+
 
     def getNewList(self):  # 鏂伴椈鍒楄〃
         t = self.get(self.newsListUrl)
@@ -120,7 +136,6 @@ class IthomeNet:
         # t = open("e:\\1濉炵彮QQ\\ithome\\data\\slide.txt", "rb").read()
         t = [Slide(i) for i in json.loads(t)]
         self.slidelist = t
-
         return t
 
     def getMd5(self, data):
@@ -137,13 +152,8 @@ class IthomeNet:
         return None
 
     def loadImg(self,AsyncLoad):
-        t = 1
-        while 1:
-            e32.ao_sleep(0.01)
-            AsyncLoad(t)
-            t+=1
-            if(t>100):
-                t=1
+        self.asyncLoad = AsyncLoad
+        self.imgcount = len(self.newslist.newslist) + len(self.slidelist)
         self.th1.after(0, self.getImageAsync)
         self.th2.after(0, self.getSlideImageAsync)
 
@@ -190,6 +200,7 @@ class IthomeNet:
             del t
             return self.imglist[key]
         except:
+            self.errorImg.resize(size)
             self.imglist[key] = self.errorImg
             return self.errorImg
 
