@@ -76,17 +76,15 @@ class ithomeUi:
         self.SlideWidth = self.width - self.baseCornor*2
         imgurl = self.SlideList[self.SlideIndex].image
         #print imgurl
-        print "before open"
         pat=itnet.getPic(imgurl)
         print pat
         #print self.SlideImg
         self.SlideImg = ph.Image.open(pat)
         #print self.SlideImg
-        print "open"
         
         self.SlideImg = graphics.Image.new((self.SlideWidth, self.SlideHeight))
         self.SlideImg = self.SlideImg.resize((self.SlideWidth, self.SlideHeight))
-        print "resize"
+
         
         #self.SlideImg.clear(0xff0000)
         self.img.blit(self.SlideImg, (0 - self.baseCornor, 0 - self.baseCornor))

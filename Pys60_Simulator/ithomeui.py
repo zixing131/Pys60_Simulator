@@ -21,6 +21,7 @@ itnet = ithomenet.IthomeNet()
 
 class ithomeUi(object, ):
     def __init__(self, path):
+        self.TitleName = "IThome"
         self.running = 1
         self.selectedIndex = 0
         self.loading = 0
@@ -41,16 +42,41 @@ class ithomeUi(object, ):
         self.baseCornor = 5
         self.newsCornor = 2
         self.SlideHeight = 80
+        self.SlideWidth = self.width - self.baseCornor * 2
         self.newsHeight = 60
         self.newImgHeight = self.newsHeight - self.newsCornor * 2
-        self.newImgWidth = self.newImgHeight
+        self.newImgWidth = int(self.newImgHeight/0.75)
+        self.loadingImg = ph.Image.open(mypath+"image_loading.jpg").resize((self.newImgWidth,self.newImgHeight))
         self.newsWidth = self.width - self.baseCornor * 2
-        self.newsList = itnet.getNewList()
-        self.SlideList = itnet.getSlide()
         self.SlideIndex = 0
+        self.nowtime=0
         self.__canvas = ui.Canvas(self.__redraw, self.key)
         ui.app.body = self.__canvas
-        self.blit(ph.Image.open(path))
+        self.startUpImg = ph.Image.open(path)
+        self.img.blit(self.startUpImg)
+
+        itnet.newImgHeight = self.newImgHeight
+        itnet.newImgWidth = self.newImgWidth
+        itnet.SlideHeight = self.SlideHeight
+        itnet.SlideWidth = self.SlideWidth
+
+        self.newsList = itnet.getNewList()
+        self.SlideList = itnet.getSlide()
+
+        itnet.loadImg(self.AsyncLoad)
+    def AsyncLoad(self,percent):
+        self.background.blit(self.startUpImg)
+        x1=10
+        y1=self.height-80
+        x2=self.width-10
+        y2=self.height-60
+        self.background.rectangle((x1,y1,x2,y2),0xc3c3c3,fill=0xc3c3c3)
+
+        x2 = ((self.width-20)*(float(percent)/float(100)))+10
+        self.background.rectangle((x1, y1, x2, y2), 0x5ccdef,  fill = 0x5ccdef)
+
+        self.img.blit(self.background)
+        pass
 
     def delCache(self):  # 清除缓存
         pass
@@ -77,12 +103,13 @@ class ithomeUi(object, ):
         self.__redraw()
 
     def drawSlide(self):  # 绘制顶部滚动图
+        if(len(self.SlideList)<1):
+            return
         if (self.nowtime >= 1):
             self.nowtime = 0
             self.SlideIndex += 1
         if (self.SlideIndex >= len(self.SlideList)):
             self.SlideIndex = 0
-        self.SlideWidth = self.width - self.baseCornor * 2
         imgurl = self.SlideList[self.SlideIndex].image
         self.SlideImg = itnet.getPic(imgurl, (self.SlideWidth, self.SlideHeight))
         # self.SlideImg.clear(0xff0000)
@@ -95,6 +122,8 @@ class ithomeUi(object, ):
     def genNewsListImg(self):
         showNewsCount = int(self.height / self.newsHeight) + 1  # 要显示的新闻数量
         NewsListImg = []
+        if(len(self.newsList.newslist)<1):
+            return NewsListImg
         for i in range(showNewsCount):
             nowIndex = i + self.x
             if (nowIndex < 0):
@@ -105,10 +134,11 @@ class ithomeUi(object, ):
             newimg = ph.Image.new((self.newsWidth, self.newsHeight))
             # print itnet.getPic(imgurl)
             newTopImg = itnet.getPic(imgurl, (self.newImgWidth, self.newImgHeight))
+            #newTopImg = self.loadingImg
             # newTopImg1.clear(0xff0000)
             newimg.blit(newTopImg, (0 - self.newsCornor, 0 - self.newsCornor))
             del newTopImg
-            textBasePos = (self.newsCornor * 2 + self.newImgHeight, self.newsCornor)
+            textBasePos = (self.newsCornor * 2 + self.newImgWidth , self.newsCornor)
             textWidth = self.newsWidth - self.newImgWidth + 30
             textHeight = self.newsHeight - self.newsCornor * 2
             title = self.newsList.newslist[nowIndex].title
@@ -199,9 +229,9 @@ class ithomeUi(object, ):
 
 
 # app=App(mypath+'splash.png',0)
-app = ithomeUi(mypath + 'splash.png')
-app.TitleName = cn("IT之家")
+ithome = ithomeUi(mypath + 'splash.png')
+ithome.TitleName = cn("IT之家")
 # app.keyType=0
-app.main()
-ui.app.exit_key_handler = app.exit
+ithome.main()
+ui.app.exit_key_handler = ithome.exit
 e32.Ao_lock().wait()

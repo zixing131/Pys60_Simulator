@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # import requests
-import urllib
+import urllib, e32
 import hashlib
 import os
 import graphics as ph
 import simplejson as json
+import thread
 
 mypath = u"..\\python\\pysoft\\ithome\\"
 if (os.name != 'nt'):
@@ -26,7 +27,6 @@ class Tops:
         self.image = data['image']
         self.hitcount = data['hitcount']
         self.commentcount = data['commentcount']
-
         self.cid = data['cid']
         self.sid = data['sid']
         self.url = data['url']
@@ -78,20 +78,50 @@ class IthomeNet:
         self.urlhead = 'http://api.ithome.com/'
         self.newsListUrl = self.urlhead + 'json/newslist/news?r=0'
         self.slideUrl = self.urlhead + 'json/slide/index'
+        self.newsCornor = 2
+        self.newImgHeight = 0
+        self.newImgWidth = 0
+        self.SlideHeight = 0
+        self.SlideWidth = 0
+        self.newslist = []
+        self.slidelist = []
+        self.th1 = e32.Ao_timer()
+        self.th2 = e32.Ao_timer()
+        self.errorImg = None
 
     def get(self, url):
         return urllib.urlopen(url).read()
 
-    def getNewList(self):  # 新闻列表
-        t=self.get(self.newsListUrl)
-        #t = open("e:\\1塞班QQ\\ithome\\data\\newlist.txt", "rb").read()
+    def getImageAsync(self):
+        if(self.newslist==[]):
+            return
+        for i in self.newslist.newslist:
+            imgurl = i.image
+            # print imgurl
+            self.getPic(imgurl, (self.newImgWidth, self.newImgHeight))
 
-        return NewList(json.loads(t))
+    def getSlideImageAsync(self):
+        if (self.slidelist == []):
+            return
+        for i in self.slidelist:
+            imgurl = i.image
+            self.getPic(imgurl, (self.SlideWidth, self.SlideHeight))
 
-    def getSlide(self):  # 顶部滚动
-        t=self.get(self.slideUrl)
-        #t = open("e:\\1塞班QQ\\ithome\\data\\slide.txt", "rb").read()
-        return [Slide(i) for i in json.loads(t)]
+    def getNewList(self):  # 鏂伴椈鍒楄〃
+        t = self.get(self.newsListUrl)
+        # t = open("e:\\1濉炵彮QQ\\ithome\\data\\newlist.txt", "rb").read()
+        t = NewList(json.loads(t))
+        # thread.start_new_thread(self.getImageAsync,(t,))
+        self.newslist = t
+        return t
+
+    def getSlide(self):  # 椤堕儴婊氬姩
+        t = self.get(self.slideUrl)
+        # t = open("e:\\1濉炵彮QQ\\ithome\\data\\slide.txt", "rb").read()
+        t = [Slide(i) for i in json.loads(t)]
+        self.slidelist = t
+
+        return t
 
     def getMd5(self, data):
         hash = hashlib.md5()
@@ -106,7 +136,20 @@ class IthomeNet:
             return self.imglist[key]
         return None
 
+    def loadImg(self,AsyncLoad):
+        t = 1
+        while 1:
+            e32.ao_sleep(0.01)
+            AsyncLoad(t)
+            t+=1
+            if(t>100):
+                t=1
+        self.th1.after(0, self.getImageAsync)
+        self.th2.after(0, self.getSlideImageAsync)
+
     def getPic(self, picurl, size):
+        if(self.errorImg == None):
+            self.errorImg = ph.Image.open(mypath + "error_image.jpg").resize((self.newImgWidth, self.newImgHeight))
         key = self.Url2FileName(picurl)
         t = self.getLocalPic(key)
         if (t != None):
@@ -114,25 +157,45 @@ class IthomeNet:
         imgpath = cachePath + key + ".jpg"
         # imgpath = cachePath + "02365e66cb2e9ef6e27a1f0c24af90a3.jpg"
         # return imgpath
-        if (os.path.exists(imgpath)):
+        try:
+            if (os.path.exists(imgpath)):
+                f = open(imgpath,'rb')
+                data = f.read(2)
+                f.close()
+                if(data=='' or data==None or data.encode('hex').lower()!='ffd8'):
+                    req = urllib.urlopen(picurl)
+                    img = req.read()
+                    open(imgpath, 'wb').write(img)
+                    t1 = ph.Image.open(imgpath)
+                    t = t1.resize(size)
+                    del t1
+                    t.save(imgpath)
+                    self.imglist[key] = t
+                    del t
+                    return self.imglist[key]
+                t1 = ph.Image.open(imgpath)
+                t = t1.resize(size)
+                del t1
+                self.imglist[key] = t
+                del t
+                return self.imglist[key]
+            req = urllib.urlopen(picurl)
+            img = req.read()
+            open(imgpath, 'wb').write(img)
             t1 = ph.Image.open(imgpath)
             t = t1.resize(size)
             del t1
+            t.save(imgpath)
             self.imglist[key] = t
             del t
             return self.imglist[key]
-        req = urllib.urlopen(picurl)
-        img = req.read()
-        open(imgpath, 'wb').write(img)
-        t1 = ph.Image.open(imgpath)
-        t = t1.resize(size)
-        del t1
-        self.imglist[key] = t
-        del t
-        return self.imglist[key]
+        except:
+            self.imglist[key] = self.errorImg
+            return self.errorImg
 
 
 if (__name__ == '__main__'):
     ithomenet = IthomeNet()
-    t = ithomenet.getNewList()
+    t = ithomenet.getSlide()
+    ithomenet.loadImg()
     print(t)

@@ -111,6 +111,9 @@ class Image:
         #myline.setWidth(width)
         #myline.draw(win)
         del draw
+    def save(self,path):
+        self.image = self.image.convert('RGB')
+        self.image.save(path)
         
     def text(self,pos,text,fill = 0x0,font=('sence',15)):
         color = fill

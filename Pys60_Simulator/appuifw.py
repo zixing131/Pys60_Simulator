@@ -53,7 +53,6 @@ class Canvas():
     def processKeyPressEvent(self, evt):
         # 打印键盘事件
         flag = time.time() - self.lastkeytime
-        print(flag)
         self.lastkeytime = time.time()
         keytype = 3
         if (flag < 0.1):
@@ -385,7 +384,8 @@ def note(text, type='info'):
 
 
 def query(text, type='info'):
-    return ''
+    return True
+
 
 
 class popup:
