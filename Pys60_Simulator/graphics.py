@@ -48,7 +48,10 @@ def convertColor(bgcolor):
             
 class Image:
     def __init__(self,size,mode=None,canvas = None):
-        self.image = Image2.new("RGBA",size,(255,255,255))
+        if(mode!='L'):
+            self.image = Image2.new("RGBA",size,(255,255,255))
+        else:
+            self.image = Image2.new("RGBA", size, (255, 255, 255))
 
         self.size = size
         self._image = self.size
@@ -96,7 +99,8 @@ class Image:
         if(mask!=None):
             try:
                 self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+img.size[0]),int(pos[1]+img.size[1])),mask = mask.image)
-            except:
+            except Exception,ex:
+                print(ex)
                 self.image.paste(img.image, (pos[0], pos[1], pos[0] + img.size[0], pos[1] + img.size[1]))
         else:
            self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+img.size[0]),int(pos[1]+img.size[1])))
