@@ -100,7 +100,8 @@ class ithomeUi(object, ):
         #文章index
         self.articleIndex = self.articleMinIndex
         #文章上下走动的step
-        self.articleStep = 15
+        self.articleStep = 60
+        self.articleMinStep = 10
         self.articleMaxIndex = self.height + self.articleStep
 
         self.menuSpeed = 40
@@ -222,41 +223,37 @@ class ithomeUi(object, ):
     def drawArticle(self):
         self.background.clear(self.bgcolor)
 
-        articleName =  self.text_to_array(self.newsList.newslist[self.selectedIndex].title,('dense',20),self.width-10)
-        articleTime = self.newsList.newslist[self.selectedIndex].postdate.replace('T',' ').split('.')[0]
-        newsid= self.newsList.newslist[self.selectedIndex].newsid
-        newsauthor = self.NewsContent.newssource +' ( ' +self.NewsContent.newsauthor +' ) '
-        detial = self.NewsContent.detail.replace('<p>','  ').replace('</p>','\n')
-        articleData = self.text_to_array(detial,('dense',15),self.width-10)
-
         nowline = 1
         titleLineHeight=20
         articleLineHeight = 15
 
         nowY = titleLineHeight + self.articleIndex
 
-        for i in range(len(articleName)):
+        for i in range(len(self.articleName)):
             #离屏不绘制
             if(nowY<0 or nowY > self.height + titleLineHeight):
                 nowY += titleLineHeight
                 continue
-            self.background.text((5, nowY), articleName[i],0, font=("dense",20))
+            self.background.text((5, nowY),self. articleName[i],0, font=("dense",20))
             nowY+=titleLineHeight
         # 离屏不绘制
         if (nowY > 0 or nowY < self.height + titleLineHeight):
-            dateAndAuthor = articleTime+' ' +newsauthor
+            dateAndAuthor = self.articleTime+' ' +self.newsauthor
             self.background.text((5, nowY-7), dateAndAuthor, 0x888888, font=("dense", 10))
         nowY+=10
 
-        for i in range(len(articleData)):
+        for i in range(len(self.articleData)):
             # 离屏不绘制
             if (nowY < 0 or nowY > self.height + articleLineHeight):
                 nowY += articleLineHeight
                 continue
-            self.background.text((5, nowY), articleData[i], 0)
+            self.background.text((5, nowY), self.articleData[i], 0)
             nowY += articleLineHeight
 
         self.articleMaxIndex = nowY - self.articleIndex
+
+        if(self.articleMaxIndex<self.height):
+            self.articleMaxIndex = self.height
 
         self.img.blit(self.background)
         self.__redraw()
@@ -503,6 +500,15 @@ class ithomeUi(object, ):
                 self.articleIndex = self.articleMinIndex
                 newsid = self.newsList.newslist[self.selectedIndex].newsid
                 self.NewsContent = itnet.getNewsContent(newsid)
+
+                self.articleName = self.text_to_array(self.newsList.newslist[self.selectedIndex].title, ('dense', 20),
+                                                      self.width - 10)
+                self.articleTime = self.newsList.newslist[self.selectedIndex].postdate.replace('T', ' ').split('.')[0]
+                newsid = self.newsList.newslist[self.selectedIndex].newsid
+                self.newsauthor = self.NewsContent.newssource + ' ( ' + self.NewsContent.newsauthor + ' ) '
+                self.articleDetial = self.NewsContent.detail.replace('<p>', '  ').replace('</p>', '\n')
+                self.articleData = self.text_to_array(self.articleDetial, ('dense', 15), self.width - 10)
+
                 self.RunningForm = self.allForm.article
                 self.lastRunningForm = self.RunningForm
                 self.loading = 0
@@ -562,12 +568,17 @@ class ithomeUi(object, ):
         self.redraw()
 
     def articleKeyUp(self):
-        self.articleIndex += self.articleStep
+        for i in range(0,self.articleStep, self.articleMinStep):
+            self.articleIndex += self.articleMinStep
+            self.drawArticle()
         if (self.articleIndex > self.articleMinIndex):
             self.articleIndex = self.articleMinIndex
 
     def articleKeyDown(self):
-        self.articleIndex -= self.articleStep
+        for i in range(0, self.articleStep, self.articleMinStep):
+            self.articleIndex -=  self.articleMinStep
+            self.drawArticle()
+
         if (self.articleIndex <= 0 - (self.articleMaxIndex - self.height)):
             self.articleIndex = 0 - (self.articleMaxIndex- self.height)
 
