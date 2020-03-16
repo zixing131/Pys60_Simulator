@@ -57,6 +57,18 @@ class NewList:
         for i in data['newslist']:
             self.newslist.append(News(i))
 
+class NewsContent:
+    def __init__(self ,data):
+        self.success = data['success']
+        self.newssource = data['newssource']
+        self.newsauthor = data['newsauthor']
+        self.keyword = data['keyword']
+        self.btheme = data['btheme']
+        self.detail = data['detail']
+
+        self.z = data['z']
+
+
 
 class Slide:
     def __init__(self, data):
@@ -78,6 +90,7 @@ class IthomeNet:
         self.urlhead = 'http://api.ithome.com/'
         self.newsListUrl = self.urlhead + 'json/newslist/news?r=0'
         self.slideUrl = self.urlhead + 'json/slide/index'
+        self.newsContentUrl =self.urlhead +  'json/newscontent/'
         self.newsCornor = 2
         self.newImgHeight = 0
         self.newImgWidth = 0
@@ -129,6 +142,11 @@ class IthomeNet:
         t = NewList(json.loads(t))
         # thread.start_new_thread(self.getImageAsync,(t,))
         self.newslist = t
+        return t
+
+    def getNewsContent(self,newsid):
+        t = self.get(self.newsContentUrl+str(newsid))
+        t = NewsContent(json.loads(t))
         return t
 
     def getSlide(self):  # 椤堕儴婊氬姩

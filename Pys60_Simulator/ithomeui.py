@@ -21,23 +21,36 @@ itnet = ithomenet.IthomeNet()
 #所有界面状态
 class AllForm:
     def __init__(self):
+        #加载界面
+        self.loading = 0
         #主界面
         self.main = 1
         #菜单
         self.menu = 2
+        #读文章
+        self.article = 3
+
 
 class ithomeUi(object, ):
     def __init__(self, path):
         self.TitleName = "IThome"
         self.running = 1
+        ui.app.exit_key_handler = self.exit
         self.selectedIndex = 0
         self.loading = 0
         ui.app.screen = "full"
-        self.menuL = [(cn("刷新"), lambda: self.refush()),
-                      (cn("到顶部"), lambda: self.toTop()),
-                      (cn("清除缓存"), lambda: self.delCache()),
-                      (cn("退出"), lambda: self.exit2())]
 
+        self.articleMenuL = [(cn("刷新"), self.refushArticle),
+                      (cn("清除缓存"), self.delCache),
+                      (cn("退出"), self.exit2)]
+        self.mainMenu = [(cn("刷新"), self.refush),
+         (cn("到顶部"), self.toTop),
+         (cn("清除缓存"), self.delCache),
+         (cn("退出"), self.exit2)]
+
+        self.menuL = self.mainMenu
+
+        self.lock = e32.Ao_lock()
         screen = ui.app.layout(ui.EScreen)[0]
 
         self.width = screen[0]
@@ -57,7 +70,7 @@ class ithomeUi(object, ):
         self.newImgHeight = self.newsHeight - self.newsCornor * 2
         self.newImgWidth = int(self.newImgHeight/0.75)
         self.loadingImg = ph.Image.open(mypath+"image_loading.jpg").resize((self.newImgWidth,self.newImgHeight))
-
+        self.articleContent = ""
         self.maskImg = Image.new(screen, "L")
         self.maskImg.clear(0x888888)
 
@@ -79,15 +92,19 @@ class ithomeUi(object, ):
         self.minMenuWidth = 0
         self.menuHeight = 35
 
-        self.menuSpeed = 5
+        self.menuSpeed = 40
         self.RunningForm = self.allForm.main
         self.AsyncLoad(10)
         self.newsList = itnet.getNewList()
         self.SlideList = itnet.getSlide()
         self.slideChangeThread = e32.Ao_timer()
         self.genMenuList()
+        self.lastRunningForm = self.RunningForm
         self.lastX=self.selectedIndex-1
         itnet.loadImg(self.AsyncLoad)
+
+    def refushArticle(self):
+        pass
 
     def AsyncLoad(self,percent):
         self.background.blit(self.startUpImg)
@@ -151,7 +168,25 @@ class ithomeUi(object, ):
             self.imgOld.blit(self.img)
         elif(self.RunningForm ==  self.allForm.menu):
             self.drawMenu()
+        elif (self.RunningForm == self.allForm.article):
+            self.drawArticle()
+            self.imgOld.blit(self.img)
         self.loading = 0
+
+
+
+    def drawArticle(self):
+        self.background.clear(self.bgcolor)
+
+        articleName =  akntextutils2.to_array(self.newsList.newslist[self.selectedIndex].title,'dense',self.width)
+        articleTime = self.newsList.newslist[self.selectedIndex].postdate.replace('T',' ')
+        newsid= self.newsList.newslist[self.selectedIndex].newsid
+        newsauthor = self.NewsContent.newssource +'(' +self.NewsContent.newsauthor +')'
+        articleData = akntextutils2.to_array(self.NewsContent.detail,'dense',self.width)
+        for i in range(len(articleData)):
+            self.background.text((0,0),articleData[i],0)
+        self.img.blit(self.background)
+        self.__redraw()
 
     def drawSlide(self):  # 绘制顶部滚动图
         if(len(self.SlideList)<1):
@@ -242,6 +277,7 @@ class ithomeUi(object, ):
         del newListImg
 
     def toTop(self):  # 到顶部
+        self.loading = 1
         self.RunningForm = self.allForm.main
         while(self.selectedIndex>0):
             self.selectedIndex -= 1
@@ -253,6 +289,7 @@ class ithomeUi(object, ):
                 self.x = -1
             sleep(0)
             self.redraw()
+        self.loading = 0
 
     def main(self):
         self.nowtime = 0
@@ -289,6 +326,8 @@ class ithomeUi(object, ):
         if(self.RunningForm == self.allForm.main):
             while(menuPos<self.RealMenuWidth):
                 menuPos+=self.menuSpeed
+                if(menuPos>=self.RealMenuWidth):
+                    menuPos = self.RealMenuWidth
                 #menuPos = self.RealMenuWidth
                 self._drawMenu(menuPos)
                 self.__redraw()
@@ -339,20 +378,58 @@ class ithomeUi(object, ):
 
     def InvokeMenu(self):
         self.listEvent[self.menuIndex]()
+
     def key(self, event):
+        if( self.RunningForm == self.allForm.loading ):
+            return
         if (self.loading == 1):
             return
         key = event["keycode"]
         scan = event["scancode"]
         type = event["type"]
+        #ok button
+        if key==63557:
+            if (self.RunningForm == self.allForm.main):
+                #加载数据
+                #self.articleContent = self.newsList.newslist[self.selectedIndex].url
+                self.loading = 1
+                newsid = self.newsList.newslist[self.selectedIndex].newsid
+                self.NewsContent = itnet.getNewsContent(newsid)
+                self.RunningForm = self.allForm.article
+                self.lastRunningForm = self.RunningForm
+                self.loading = 0
+
+            elif (self.RunningForm == self.allForm.menu):
+                #self.InvokeMenu()
+                self.lastX = -1
+                self.RunningForm =  self.lastRunningForm
+                self.lock.signal()
+
         if scan == 164 and type == 3:
             if(self.RunningForm ==  self.allForm.main):
+                self.menuIndex = 0
+                self.menuL = self.mainMenu
+                self.genMenuList()
                 self.drawMenu()
                 self.RunningForm =  self.allForm.menu
+                self.lock.wait()
+                if(self.menuIndex!=-1):
+                    self.InvokeMenu()
+
             elif(self.RunningForm ==  self.allForm.menu):
-                self.InvokeMenu()
                 self.lastX = -1
-                self.RunningForm = self.allForm.main
+                self.RunningForm = self.lastRunningForm
+                self.lock.signal()
+            elif(self.RunningForm == self.allForm.article):
+                self.menuIndex = 0
+                self.menuL = self.articleMenuL
+                self.genMenuList()
+                self.drawMenu()
+                self.RunningForm = self.allForm.menu
+                self.lock.wait()
+                if (self.menuIndex != -1):
+                    self.InvokeMenu()
+
         if (key == 0x32 or key == 63497):
             if (self.RunningForm == self.allForm.main):
                 self.selectedIndex -= 1
@@ -387,20 +464,28 @@ class ithomeUi(object, ):
                     self.menuIndex = 0
 
         self.redraw()
+
     def exit2(self):
         if ui.query(cn("要退出吗？"), "query"):
             self.running = 0
             os.abort()
 
     def exit(self):
-        if(self.RunningForm == self.allForm.main):
+        if(self.RunningForm == self.allForm.main or self.RunningForm == self.allForm.loading ):
             if ui.query(cn("要退出吗？"), "query"):
                 self.running = 0
                 os.abort()
         elif(self.RunningForm == self.allForm.menu):
             self.closeMenu()
-            self.RunningForm = self.allForm.main
+            self.RunningForm = self.lastRunningForm
             self.lastX = -1
+            self.menuIndex = -1
+            self.lock.signal()
+            self.redraw()
+        elif (self.RunningForm == self.allForm.article):
+            self.lastX = -1
+            self.RunningForm = self.allForm.main
+            self.lastRunningForm = self.RunningForm
             self.redraw()
 
 
@@ -409,5 +494,5 @@ ithome = ithomeUi(mypath + 'splash.png')
 ithome.TitleName = cn("IT之家")
 # app.keyType=0
 ithome.main()
-ui.app.exit_key_handler = ithome.exit
+
 e32.Ao_lock().wait()
