@@ -9,10 +9,11 @@ import akntextutils2
 from graphics import *
 
 cn = lambda x: x.decode("u8")
-sleep = e32.ao_sleep
-mypath = u"..\\python\\pysoft\\ithome\\"
-if (os.name != 'nt'):
-    mypath = u"e:\\python\\pysoft\\ithome\\"
+sleep = e32.ao_sleep 
+
+import mypath
+mypath = mypath.getmypath("\\python\\pysoft\\ithome\\")
+
 cachePath = mypath + "cache\\"
 import ithomenet
 

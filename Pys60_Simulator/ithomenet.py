@@ -7,9 +7,9 @@ import graphics as ph
 import simplejson as json
 import thread
 
-mypath = u"..\\python\\pysoft\\ithome\\"
-if (os.name != 'nt'):
-    mypath = u"e:\\python\\pysoft\\ithome\\"
+import mypath
+mypath = mypath.getmypath("\\python\\pysoft\\ithome\\")
+
 cachePath = mypath + "cache\\"
 
 
