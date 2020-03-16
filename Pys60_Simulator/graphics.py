@@ -196,7 +196,7 @@ class Image:
         self.size = size
         return self
     def measure_text(self,title,font='dense'):
-        fontsize = 15
+        fontsize = 18
         if(type(font) is tuple):
             fontsize= font[1]
         w,h = getTextFontWidth(title,fontsize)

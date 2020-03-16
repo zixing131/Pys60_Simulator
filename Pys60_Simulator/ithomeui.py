@@ -37,6 +37,7 @@ class ithomeUi(object, ):
         self.TitleName = "IThome"
         self.running = 1
         ui.app.exit_key_handler = self.exit
+        #当前选择项目的index
         self.selectedIndex = 0
         self.loading = 0
         ui.app.screen = "full"
@@ -277,12 +278,9 @@ class ithomeUi(object, ):
             imgurl = self.newsList.newslist[nowIndex].image
             newimg = ph.Image.new((self.newsWidth, self.newsHeight))
             #print nowIndex,self.selectedIndex
-            if(self.x == -1):
-                if(nowIndex  == self.selectedIndex):
-                    newimg.clear(self.selectedColor)
-            else:
-                if (nowIndex+1 == self.selectedIndex):
-                    newimg.clear(self.selectedColor)
+
+            if (nowIndex == self.selectedIndex):
+                newimg.clear(self.selectedColor)
 
             # print itnet.getPic(imgurl)
             newTopImg = itnet.getPic(imgurl, (self.newImgWidth, self.newImgHeight))
@@ -305,57 +303,53 @@ class ithomeUi(object, ):
 
     def drawNewsList(self):  # 绘制下面的新闻列表
         self.NewsBasePos = (0, 0)
+        # 当前选择位置的x坐标
+        nowX = 0
         if (self.x == -1):
             self.NewsBasePos = (self.baseCornor, self.SlideHeight + self.baseCornor * 2)
+            nowX = self.NewsBasePos[1] + (self.selectedIndex - self.x -1) * (self.newsHeight + self.newsCornor * 2)
         else:
             self.NewsBasePos = (self.baseCornor, self.baseCornor)
-        nowX = self.NewsBasePos[1] + (self.selectedIndex - self.x - 1) * (self.newsHeight + self.newsCornor * 2)
+            nowX = self.NewsBasePos[1] + (self.selectedIndex - self.x) * (self.newsHeight + self.newsCornor * 2)
+
         timg=ph.Image.new((self.width,self.height-self.SlideHeight))
         timg.clear(self.bgcolor)
         self.background.blit(timg,(0,0-self.SlideHeight-self.baseCornor))
         del timg
-        self.background.rectangle((2, nowX - 2, self.width - 2, nowX + self.newsCornor * 2 - 2 + self.newsHeight), self.selectedColor,
-                           fill=self.selectedColor)
+        #绘制选择的矩形框
+        self.background.rectangle((2, nowX - 2, self.width - 2, nowX + self.newsCornor * 2 - 2 + self.newsHeight), self.selectedColor,fill=self.selectedColor)
+
         newListImg = self.genNewsListImg()
         for i in range(len(newListImg)):
+            #将新闻绘制到界面上
             self.background.blit(newListImg[i], (
             0 - self.NewsBasePos[0], 0 - (self.NewsBasePos[1] + i * (self.newsHeight + self.newsCornor * 2))))
+            #绘制新闻下面的间隔
             self.background.line((self.NewsBasePos[0], self.NewsBasePos[1] + i * (self.newsHeight + self.newsCornor * 2),
                            self.NewsBasePos[0] + self.newsWidth,
                            self.NewsBasePos[1] + i * (self.newsHeight + self.newsCornor * 2)), 0xdddddd, width=1)
         self.img.blit(self.background)
         del newListImg
 
-    def toTop(self):  # 到顶部 
+    def toTop(self):  # 到顶部
+        self.loading = 1
         self.RunningForm = self.allForm.main
         while(self.selectedIndex>0):
-            self.selectedIndex -= 1
-            if (self.selectedIndex < 0):
-                self.selectedIndex = 0
-            if (self.selectedIndex < self.x + 1):
-                self.x -= 1
-            if (self.x < -1):
-                self.x = -1
-            sleep(0)
-            self.redraw()
+            self.keyUp()
+            self.genImg()
+            self.__redraw()
+            self.imgOld.blit(self.img)
+        self.loading = 0
 
     def toBottom(self):  # 到底部
+        self.loading = 1
         self.RunningForm = self.allForm.main
-        while (self.selectedIndex < len(self.newsList.newslist)):
-            self.selectedIndex += 1
-            if (self.selectedIndex > len(self.newsList.newslist)):
-                self.selectedIndex = len(self.newsList.newslist)
-            if (self.x == -1):
-                if (self.selectedIndex > self.x + int(self.height / self.newsHeight) - 2):
-                    self.x += 1
-            else:
-                if (self.selectedIndex > self.x + int(self.height / self.newsHeight) - 1):
-                    self.x += 1
-            t = int(self.height / self.newsHeight) - 1
-            if (self.x > len(self.newsList.newslist) - t):
-                self.x = len(self.newsList.newslist) - t
-            #sleep(0)
-            self.redraw()
+        while (self.selectedIndex < len(self.newsList.newslist)-1):
+            self.keyDown()
+            self.genImg()
+            self.__redraw()
+            self.imgOld.blit(self.img)
+        self.loading = 0
 
 
     def main(self):
@@ -446,6 +440,27 @@ class ithomeUi(object, ):
     def InvokeMenu(self):
         self.listEvent[self.menuIndex]()
 
+    def keyUp(self):
+        self.selectedIndex -= 1
+        if (self.selectedIndex < 0):
+            self.selectedIndex = 0
+        if (self.selectedIndex < self.x + 1):
+            self.x -= 1
+        if (self.x < -1):
+            self.x = -1
+
+    def keyDown(self):
+        self.selectedIndex += 1
+        if (self.selectedIndex >= len(self.newsList.newslist)):
+            self.selectedIndex = len(self.newsList.newslist)-1
+
+        if (self.selectedIndex > self.x + int(self.height / self.newsHeight) - 2):
+            self.x += 1
+
+        t = int(self.height / self.newsHeight) - 1
+        if (self.x > len(self.newsList.newslist) - t):
+            self.x = len(self.newsList.newslist) - t
+
     def key(self, event):
         if( self.RunningForm == self.allForm.loading ):
             return
@@ -500,13 +515,7 @@ class ithomeUi(object, ):
         #2或上
         if (key == 0x32 or key == 63497):
             if (self.RunningForm == self.allForm.main):
-                self.selectedIndex -= 1
-                if (self.selectedIndex < 0):
-                    self.selectedIndex = 0
-                if (self.selectedIndex < self.x + 1):
-                    self.x -= 1
-                if (self.x < -1):
-                    self.x = -1
+                self.keyUp()
             elif (self.RunningForm == self.allForm.menu):
                 self.menuIndex-=1
                 if(self.menuIndex<0):
@@ -514,18 +523,7 @@ class ithomeUi(object, ):
         #8或下
         elif (key == 0x38 or key == 63498):
             if (self.RunningForm == self.allForm.main):
-                self.selectedIndex += 1
-                if (self.selectedIndex > len(self.newsList.newslist)):
-                    self.selectedIndex = len(self.newsList.newslist)
-                if (self.x == -1):
-                    if (self.selectedIndex > self.x + int(self.height / self.newsHeight) - 2):
-                        self.x += 1
-                else:
-                    if (self.selectedIndex > self.x + int(self.height / self.newsHeight) - 1):
-                        self.x += 1
-                t = int(self.height / self.newsHeight) - 1
-                if (self.x > len(self.newsList.newslist) - t):
-                    self.x = len(self.newsList.newslist) - t
+                self.keyDown()
             elif (self.RunningForm == self.allForm.menu):
                 self.menuIndex += 1
                 if (self.menuIndex > len(self.listName)-1):
