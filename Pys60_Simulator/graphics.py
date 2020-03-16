@@ -51,7 +51,7 @@ def GetFont(fill=None,font=None):
     lastfont = font
     return myfnt
 
-def getTextFontWidth(text,size=15):
+def getTextFontWidth(text,size=18):
     im = Image2.new('RGB', (320, 320), (0, 0, 0, 0))
     draw = ImageDraw.Draw(im)
     w, h = draw.textsize(text, font=GetFont(font=('dense',size)))

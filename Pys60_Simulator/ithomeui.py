@@ -444,9 +444,12 @@ class ithomeUi(object, ):
         self.selectedIndex -= 1
         if (self.selectedIndex < 0):
             self.selectedIndex = 0
-        if (self.selectedIndex < self.x + 1):
+
+        if (self.selectedIndex < self.x):
             self.x -= 1
-        if (self.x < -1):
+        if(self.x == 0):
+            self.x=-1
+        if (self.x <= -1):
             self.x = -1
 
     def keyDown(self):
