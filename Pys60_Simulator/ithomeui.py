@@ -568,19 +568,23 @@ class ithomeUi(object, ):
         self.redraw()
 
     def articleKeyUp(self):
+        self.loading = 1
         for i in range(0,self.articleStep, self.articleMinStep):
             self.articleIndex += self.articleMinStep
             self.drawArticle()
         if (self.articleIndex > self.articleMinIndex):
             self.articleIndex = self.articleMinIndex
+        self.loading = 0
 
     def articleKeyDown(self):
+        self.loading =1
         for i in range(0, self.articleStep, self.articleMinStep):
             self.articleIndex -=  self.articleMinStep
             self.drawArticle()
 
         if (self.articleIndex <= 0 - (self.articleMaxIndex - self.height)):
             self.articleIndex = 0 - (self.articleMaxIndex- self.height)
+        self.loading = 0
 
 
 
