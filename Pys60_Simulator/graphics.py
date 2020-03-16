@@ -11,8 +11,13 @@ import string
 import tkFont
 from appuifw import app as _app
 Draw=lambda x: x
-FONT_BOLD = 1
-FONT_ANTIALIAS = 2
+
+FONT_BOLD=1
+FONT_ITALIC=2
+FONT_SUBSCRIPT=4
+FONT_SUPERSCRIPT=8
+FONT_ANTIALIAS=16
+FONT_NO_ANTIALIAS=32
 
 #win=sysgraphics.GraphWin("Pys60 Simulator",240,320)
 def RGB_to_Hex(tmp):
@@ -35,9 +40,23 @@ def rgb2hex(rgbcolor):
   r, g, b = rgbcolor
   return (r << 16) + (g << 8) + b
   
+myfnt=None
+lastfont=None
 def GetFont(fill=None,font=None):
-    fnt = ImageFont.truetype("C:\\WINDOWS\\Fonts\\simsun.ttc", font[1])
-    return fnt
+    global myfnt,lastfont
+    if(font==lastfont):
+        pass
+    else:
+        myfnt = ImageFont.truetype("fonts\\S60SC.ttf", font[1])
+    lastfont = font
+    return myfnt
+
+def getTextFontWidth(text,size=15):
+    im = Image2.new('RGB', (320, 320), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(im)
+    w, h = draw.textsize(text, font=GetFont(font=('dense',size)))
+    return w,h
+
 def convertColor(bgcolor):
     if(type(bgcolor) is tuple):
         bgcolor = RGB_to_Hex(bgcolor)
@@ -177,17 +196,13 @@ class Image:
         self.size = size
         return self
     def measure_text(self,title,font='dense'):
-        myfont = None
-        height = 15
+        fontsize = 15
         if(type(font) is tuple):
-            myfont = tkFont.Font(family=font[0], size=font[1]-5)
-            height = font[1]
-        else:
-            myfont = tkFont.Font(family=font, size=15)
-        w = myfont.measure(title)
+            fontsize= font[1]
+        w,h = getTextFontWidth(title,fontsize)
         if(self.canvas):
             self.canvas.blit(self)
-        return [[0,0,w,height],w]
+        return [[0,0,w,h],w]
    
     new=staticmethod(new)
     open=staticmethod(open)

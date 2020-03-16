@@ -5,7 +5,7 @@ import appuifw as ui, e32
 import os
 import graphics as ph, base64, thread, os, random
 # from BingyiApp import *
-import akntextutils2
+#import akntextutils2
 from graphics import *
 
 cn = lambda x: x.decode("u8")
@@ -46,6 +46,7 @@ class ithomeUi(object, ):
                       (cn("退出"), self.exit2)]
         self.mainMenu = [(cn("刷新"), self.refush),
          (cn("到顶部"), self.toTop),
+         (cn("到底部"), self.toBottom),
          (cn("清除缓存"), self.delCache),
          (cn("退出"), self.exit2)]
 
@@ -94,7 +95,7 @@ class ithomeUi(object, ):
         self.menuHeight = 35
 
         self.menuSpeed = 40
-        self.RunningForm = self.allForm.main
+        self.RunningForm = self.allForm.loading
         self.AsyncLoad(10)
         self.newsList = itnet.getNewList()
         self.SlideList = itnet.getSlide()
@@ -114,16 +115,19 @@ class ithomeUi(object, ):
         x2=self.width-10
         y2=self.height-60
         self.background.rectangle((x1,y1,x2,y2),0xc3c3c3,fill=0xc3c3c3)
-
+        #print(percent)
         x2 = ((self.width-20)*(float(percent)/float(100)))+10
-        self.background.rectangle((x1, y1, x2, y2), 0x20C602,  fill = 0x20C602)
-
+        self.background.rectangle((x1, y1, x2, y2), 0x20C602,  fill = 0x20C602)  
         self.img.blit(self.background)
         self.blit(self.img)
         if(percent>=100):
+            self.loading = 0
+            self.RunningForm = self.allForm.main
+            self.lastRunningForm = self.RunningForm
             self.lastX = self.selectedIndex - 1
             self.redraw()
             self.slideChangeThread.after(3,self.slideChange)
+
     def slideChange(self):
         if(self.RunningForm == self.allForm.main):
             self.SlideIndex += 1
@@ -146,7 +150,7 @@ class ithomeUi(object, ):
     def blit(self, img):
         self.__canvas.blit(img)
 
-    def genImg(self):
+    def genImg(self): 
         if (self.x == -1):
             self.drawMain()
         else:
@@ -163,7 +167,9 @@ class ithomeUi(object, ):
             return
         self.loading = 1
         #self.img.blit(self.background, (0, 0))
-        if(self.RunningForm ==  self.allForm.main):
+        if(self.RunningForm == self.allForm.loading):
+            pass
+        elif(self.RunningForm ==  self.allForm.main):
             self.genImg()
             self.__redraw()
             self.imgOld.blit(self.img)
@@ -172,20 +178,63 @@ class ithomeUi(object, ):
         elif (self.RunningForm == self.allForm.article):
             self.drawArticle()
             self.imgOld.blit(self.img)
+        if(self.RunningForm !=  self.allForm.menu):
+            self.lastRunningForm = self.RunningForm
         self.loading = 0
 
-
+    def text_to_array(self,content, dense, width):
+        w = self.img.measure_text(content,dense)[0][2]
+        if (w < width):
+            return [content]
+        result = []
+        #print width
+        t = ''
+        for i in range(len(content)):
+            nowtext = content[i]
+            if (nowtext == '\n'):
+                result.append(t)
+                t = ''
+                continue
+            t = t + nowtext
+            w = self.img.measure_text(t,dense)[0][2]
+            if (w == width):
+                #print w
+                result.append(t)
+                t = ''
+            elif(w > width):
+                #print w
+                result.append(t[:-1])
+                i-=1
+                t = nowtext
+        if (t != ''):
+            result.append(t)
+        return result
 
     def drawArticle(self):
         self.background.clear(self.bgcolor)
 
-        articleName =  akntextutils2.to_array(self.newsList.newslist[self.selectedIndex].title,'dense',self.width)
-        articleTime = self.newsList.newslist[self.selectedIndex].postdate.replace('T',' ')
+        articleName =  self.text_to_array(self.newsList.newslist[self.selectedIndex].title,('dense',20),self.width-10)
+        articleTime = self.newsList.newslist[self.selectedIndex].postdate.replace('T',' ').split('.')[0]
         newsid= self.newsList.newslist[self.selectedIndex].newsid
         newsauthor = self.NewsContent.newssource +'(' +self.NewsContent.newsauthor +')'
-        articleData = akntextutils2.to_array(self.NewsContent.detail,'dense',self.width)
+        detial = self.NewsContent.detail.replace('<p>','  ').replace('</p>','\n')
+        articleData = self.text_to_array(detial,('dense',15),self.width-10)
+
+        nowline = 1
+        titleLineHeight=20
+        articleLineHeight = 15
+        nowY = titleLineHeight
+        for i in range(len(articleName)):
+            self.background.text((5, nowY), articleName[i],0, font=("dense",20))
+            nowY+=titleLineHeight
+
+        dateAndAuthor = articleTime+' ' +newsauthor
+        self.background.text((5, nowY-7), dateAndAuthor, 0x888888, font=("dense", 10))
+        nowY+=10
+
         for i in range(len(articleData)):
-            self.background.text((0,0),articleData[i],0)
+            self.background.text((5, nowY), articleData[i], 0)
+            nowY += articleLineHeight
         self.img.blit(self.background)
         self.__redraw()
 
@@ -243,10 +292,10 @@ class ithomeUi(object, ):
             newimg.blit(newTopImg, (0 - self.newsCornor, 0 - self.newsCornor))
             del newTopImg
             textBasePos = (self.newsCornor * 2 + self.newImgWidth , self.newsCornor)
-            textWidth = self.newsWidth - self.newImgWidth + 30
+            textWidth = self.newsWidth - self.newImgWidth - self.baseCornor
             textHeight = self.newsHeight - self.newsCornor * 2
             title = self.newsList.newslist[nowIndex].title
-            titlelist = akntextutils2.to_array(title, "dense", textWidth)
+            titlelist = self.text_to_array(title, ("dense",15), textWidth)
             for j in range(len(titlelist)):
                 newimg.text((textBasePos[0], textBasePos[1] + (j + 1) * 15), titlelist[j], 0x0,
                             ("dense", 15, FONT_ANTIALIAS))
@@ -277,8 +326,7 @@ class ithomeUi(object, ):
         self.img.blit(self.background)
         del newListImg
 
-    def toTop(self):  # 到顶部
-        self.loading = 1
+    def toTop(self):  # 到顶部 
         self.RunningForm = self.allForm.main
         while(self.selectedIndex>0):
             self.selectedIndex -= 1
@@ -290,7 +338,25 @@ class ithomeUi(object, ):
                 self.x = -1
             sleep(0)
             self.redraw()
-        self.loading = 0
+
+    def toBottom(self):  # 到底部
+        self.RunningForm = self.allForm.main
+        while (self.selectedIndex < len(self.newsList.newslist)):
+            self.selectedIndex += 1
+            if (self.selectedIndex > len(self.newsList.newslist)):
+                self.selectedIndex = len(self.newsList.newslist)
+            if (self.x == -1):
+                if (self.selectedIndex > self.x + int(self.height / self.newsHeight) - 2):
+                    self.x += 1
+            else:
+                if (self.selectedIndex > self.x + int(self.height / self.newsHeight) - 1):
+                    self.x += 1
+            t = int(self.height / self.newsHeight) - 1
+            if (self.x > len(self.newsList.newslist) - t):
+                self.x = len(self.newsList.newslist) - t
+            #sleep(0)
+            self.redraw()
+
 
     def main(self):
         self.nowtime = 0
@@ -369,7 +435,7 @@ class ithomeUi(object, ):
             color = 0xffffff
             if(i==self.menuIndex):
                 color = 0xff0000
-            imgTemp.text((5,i*self.menuHeight + self.menuHeight/2 + 5), self.listName[i],color , zt)
+            imgTemp.text((5,i*self.menuHeight + self.menuHeight/2 + 8), self.listName[i],color , zt)
 
         x=0-(menuPos - self.RealMenuWidth)
         y=0-(self.height - self.RealMenuHeight)
@@ -406,6 +472,7 @@ class ithomeUi(object, ):
                 self.RunningForm =  self.lastRunningForm
                 self.lock.signal()
 
+        #左键
         if scan == 164 and type == 3:
             if(self.RunningForm ==  self.allForm.main):
                 self.menuIndex = 0
@@ -415,7 +482,7 @@ class ithomeUi(object, ):
                 self.RunningForm =  self.allForm.menu
                 self.lock.wait()
                 if(self.menuIndex!=-1):
-                    self.InvokeMenu()
+                    self.InvokeMenu() 
 
             elif(self.RunningForm ==  self.allForm.menu):
                 self.lastX = -1
@@ -429,8 +496,8 @@ class ithomeUi(object, ):
                 self.RunningForm = self.allForm.menu
                 self.lock.wait()
                 if (self.menuIndex != -1):
-                    self.InvokeMenu()
-
+                    self.InvokeMenu() 
+        #2或上
         if (key == 0x32 or key == 63497):
             if (self.RunningForm == self.allForm.main):
                 self.selectedIndex -= 1
@@ -444,7 +511,7 @@ class ithomeUi(object, ):
                 self.menuIndex-=1
                 if(self.menuIndex<0):
                     self.menuIndex =len(self.listName)-1
-
+        #8或下
         elif (key == 0x38 or key == 63498):
             if (self.RunningForm == self.allForm.main):
                 self.selectedIndex += 1
