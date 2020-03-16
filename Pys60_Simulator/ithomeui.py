@@ -95,6 +95,14 @@ class ithomeUi(object, ):
         self.minMenuWidth = 0
         self.menuHeight = 35
 
+        #文章最顶部高度
+        self.articleMinIndex = 5
+        #文章index
+        self.articleIndex = self.articleMinIndex
+        #文章上下走动的step
+        self.articleStep = 15
+        self.articleMaxIndex = self.height + self.articleStep
+
         self.menuSpeed = 40
         self.RunningForm = self.allForm.loading
         self.AsyncLoad(10)
@@ -224,18 +232,32 @@ class ithomeUi(object, ):
         nowline = 1
         titleLineHeight=20
         articleLineHeight = 15
-        nowY = titleLineHeight + 5
+
+        nowY = titleLineHeight + self.articleIndex
+
         for i in range(len(articleName)):
+            #离屏不绘制
+            if(nowY<0 or nowY > self.height + titleLineHeight):
+                nowY += titleLineHeight
+                continue
             self.background.text((5, nowY), articleName[i],0, font=("dense",20))
             nowY+=titleLineHeight
-
-        dateAndAuthor = articleTime+' ' +newsauthor
-        self.background.text((5, nowY-7), dateAndAuthor, 0x888888, font=("dense", 10))
+        # 离屏不绘制
+        if (nowY > 0 or nowY < self.height + titleLineHeight):
+            dateAndAuthor = articleTime+' ' +newsauthor
+            self.background.text((5, nowY-7), dateAndAuthor, 0x888888, font=("dense", 10))
         nowY+=10
 
         for i in range(len(articleData)):
+            # 离屏不绘制
+            if (nowY < 0 or nowY > self.height + articleLineHeight):
+                nowY += articleLineHeight
+                continue
             self.background.text((5, nowY), articleData[i], 0)
             nowY += articleLineHeight
+
+        self.articleMaxIndex = nowY - self.articleIndex
+
         self.img.blit(self.background)
         self.__redraw()
 
@@ -478,6 +500,7 @@ class ithomeUi(object, ):
                 #加载数据
                 #self.articleContent = self.newsList.newslist[self.selectedIndex].url
                 self.loading = 1
+                self.articleIndex = self.articleMinIndex
                 newsid = self.newsList.newslist[self.selectedIndex].newsid
                 self.NewsContent = itnet.getNewsContent(newsid)
                 self.RunningForm = self.allForm.article
@@ -523,6 +546,8 @@ class ithomeUi(object, ):
                 self.menuIndex-=1
                 if(self.menuIndex<0):
                     self.menuIndex =len(self.listName)-1
+            elif (self.RunningForm == self.allForm.article):
+                self.articleKeyUp()
         #8或下
         elif (key == 0x38 or key == 63498):
             if (self.RunningForm == self.allForm.main):
@@ -531,8 +556,22 @@ class ithomeUi(object, ):
                 self.menuIndex += 1
                 if (self.menuIndex > len(self.listName)-1):
                     self.menuIndex = 0
+            elif (self.RunningForm == self.allForm.article):
+                self.articleKeyDown()
 
         self.redraw()
+
+    def articleKeyUp(self):
+        self.articleIndex += self.articleStep
+        if (self.articleIndex > self.articleMinIndex):
+            self.articleIndex = self.articleMinIndex
+
+    def articleKeyDown(self):
+        self.articleIndex -= self.articleStep
+        if (self.articleIndex <= 0 - (self.articleMaxIndex - self.height)):
+            self.articleIndex = 0 - (self.articleMaxIndex- self.height)
+
+
 
     def exit2(self):
         if ui.query(cn("要退出吗？"), "query"):
