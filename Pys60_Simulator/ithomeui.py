@@ -216,14 +216,14 @@ class ithomeUi(object, ):
         articleName =  self.text_to_array(self.newsList.newslist[self.selectedIndex].title,('dense',20),self.width-10)
         articleTime = self.newsList.newslist[self.selectedIndex].postdate.replace('T',' ').split('.')[0]
         newsid= self.newsList.newslist[self.selectedIndex].newsid
-        newsauthor = self.NewsContent.newssource +'(' +self.NewsContent.newsauthor +')'
+        newsauthor = self.NewsContent.newssource +' ( ' +self.NewsContent.newsauthor +' ) '
         detial = self.NewsContent.detail.replace('<p>','  ').replace('</p>','\n')
         articleData = self.text_to_array(detial,('dense',15),self.width-10)
 
         nowline = 1
         titleLineHeight=20
         articleLineHeight = 15
-        nowY = titleLineHeight
+        nowY = titleLineHeight + 5
         for i in range(len(articleName)):
             self.background.text((5, nowY), articleName[i],0, font=("dense",20))
             nowY+=titleLineHeight
