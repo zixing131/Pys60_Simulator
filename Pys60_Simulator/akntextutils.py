@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import tkFont
 def wrap_text_to_array(content,dense,width):
-	font = tkFont.Font(family=dense, size=15)
+	font = None
+	size = 15
+	font = tkFont.Font(family=dense, size=size)
 	w = font.measure(content)
 	if(w<width):
 		return [content]
