@@ -111,7 +111,7 @@ class Image:
     def clear(self,color=0):
         color = convertColor(color)
         if(self.mode!=None):
-           color = color+'99'
+           color = color+color[-2:]
         image2 = Image2.new("RGBA",self.size,color)
         self.image.paste(image2,(0,0,self.size[0],self.size[1]))
         if(self.canvas):

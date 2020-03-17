@@ -2,6 +2,7 @@
 # import requests
 import urllib, e32
 import hashlib
+import httplib
 import os
 import graphics as ph
 import simplejson as json
@@ -88,9 +89,10 @@ class IthomeNet:
     def __init__(self):
         self.imglist = {}
         self.urlhead = 'http://api.ithome.com/'
-        self.newsListUrl = self.urlhead + 'json/newslist/news?r=0'
-        self.slideUrl = self.urlhead + 'json/slide/index'
-        self.newsContentUrl =self.urlhead +  'json/newscontent/'
+        self.host="api.ithome.com"
+        self.newsListUrl = '/json/newslist/news?r=0'
+        self.slideUrl = '/json/slide/index'
+        self.newsContentUrl ='/json/newscontent/'
         self.newsCornor = 2
         self.newImgHeight = 0
         self.newImgWidth = 0
@@ -106,7 +108,11 @@ class IthomeNet:
         self.nowimgindex = 0
 
     def get(self, url):
-        return urllib.urlopen(url).read()
+        conn = httplib.HTTPConnection(self.host)
+        conn.request('GET', url)
+        t=conn.getresponse().read()
+        conn.close()
+        return t
 
     def asyncLoadChange(self,precent):
         if(self.asyncLoad):
@@ -226,5 +232,5 @@ class IthomeNet:
 if (__name__ == '__main__'):
     ithomenet = IthomeNet()
     t = ithomenet.getSlide()
-    ithomenet.loadImg()
+    #ithomenet.loadImg()
     print(t)
