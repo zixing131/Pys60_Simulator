@@ -1,4 +1,7 @@
 {
   "Interpreter": "Global|PythonCore|2.7-32",
-  "python.autoComplete.extraPaths": ["./Pys60_Simulator"]
+  "python.autoComplete.extraPaths": [
+    "./Pys60_Simulator"
+  ],
+  "SuppressConfigureTestFrameworkPrompt": "true"
 }

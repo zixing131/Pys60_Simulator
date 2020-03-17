@@ -7,6 +7,7 @@ except:
 from PIL import Image as Image2
 from PIL import ImageDraw
 from PIL import ImageFont
+import os
 import string 
 import tkFont
 from appuifw import app as _app
@@ -47,7 +48,10 @@ def GetFont(fill=None,font=None):
     if(font==lastfont):
         pass
     else:
-        myfnt = ImageFont.truetype("fonts\\S60SC.ttf", font[1])
+        if(os.path.exists("fonts\\S60SC.ttf")):
+            myfnt = ImageFont.truetype("fonts\\S60SC.ttf", font[1])
+        elif(os.path.exists("Pys60_Simulator\\fonts\\S60SC.ttf")):
+            myfnt = ImageFont.truetype("Pys60_Simulator\\fonts\\S60SC.ttf", font[1])
     lastfont = font
     return myfnt
 
@@ -165,7 +169,7 @@ class Image:
         draw = ImageDraw.Draw(self.image)
         fill = convertColor(fill)
         pos = list(pos)
-        draw.point( pos , fill=fill)
+        draw.point( pos , fill=fill,width=width)
         del draw
     def arc(self,pos,pi1,pi2,color,width=1):
         draw = ImageDraw.Draw(self.image)
@@ -179,10 +183,10 @@ class Image:
         pos = list(pos)
         draw.pieslice( pos ,pi1,pi2, fill=color)
         del draw
-    def ellipse(self,pos,color,fill=0x0):
+    def ellipse(self,pos,color=0x0,fill=0x0):
         draw = ImageDraw.Draw(self.image)
         color = convertColor(color)
-        pos = list(pos)
+        fill = convertColor(fill)
         draw.ellipse( pos ,color,fill)
         del draw
     def getpixel(self,(x,y)):

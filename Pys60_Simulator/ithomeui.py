@@ -6,6 +6,7 @@ import os
 import graphics as ph, base64, thread, os, random
 # from BingyiApp import *
 #import akntextutils2
+import math
 from graphics import *
 
 cn = lambda x: x.decode("u8")
@@ -30,6 +31,8 @@ class AllForm:
         self.menu = 2
         #读文章
         self.article = 3
+        #刷新的加载界面
+        self.refushLoading = 4
 
 
 class ithomeUi(object, ):
@@ -76,6 +79,8 @@ class ithomeUi(object, ):
         self.articleContent = ""
         self.maskImg = Image.new(screen, "L")
         self.maskImg.clear(0x888888)
+        self.deepMaskImg = Image.new(screen, "L")
+        self.deepMaskImg.clear(0x333333)
 
         self.newsWidth = self.width - self.baseCornor * 2
         self.SlideIndex = 0
@@ -94,7 +99,8 @@ class ithomeUi(object, ):
         self.menuIndex = 0
         self.minMenuWidth = 0
         self.menuHeight = 35
-
+        #是否在刷新界面
+        self.isRefush = 0
         #文章最顶部高度
         self.articleMinIndex = 5
         #文章index
@@ -110,6 +116,7 @@ class ithomeUi(object, ):
         self.newsList = itnet.getNewList()
         self.SlideList = itnet.getSlide()
         self.slideChangeThread = e32.Ao_timer()
+        self.refushListThread = e32.Ao_timer()
         self.genMenuList()
         self.lastRunningForm = self.RunningForm
         self.lastX=self.selectedIndex-1
@@ -150,12 +157,18 @@ class ithomeUi(object, ):
     def delCache(self):  # 清除缓存
         ui.note(cn('清除成功！'))
 
-    def refush(self):  # 刷新
+    def refushList(self):
+        self.isRefush = 1   
         self.newsList = itnet.getNewList()
         self.SlideList = itnet.getSlide()
         self.lastX = self.selectedIndex - 1
-        #itnet.loadImg(self.AsyncLoad)
-        self.redraw()
+        sleep(3)
+        self.isRefush = 0
+
+    def refush(self):  # 刷新 
+        self.refushListThread.after(0,self.refushList)
+        self.drawRefushLoading()
+        #self.redraw()
 
     def blit(self, img):
         self.__canvas.blit(img)
@@ -172,12 +185,55 @@ class ithomeUi(object, ):
     def __redraw(self, size=0):  # 重绘界面
         self.blit(self.img)
 
+    def getColor(self,idx): 
+        color = [0xeeeeee,0xdddddd,0xcccccc,0xbbbbbb,0xaaaaaa,0x999999,0x888888,0x777777] 
+        return color[idx % len(color)]
+
+    def genAllEllipseXy(self,posbase):
+        l=[]
+        r = 30 
+        for i in range(0,2*314,int(2*314/8)):
+            t = float(i)/float(100)
+            x = posbase[0]+ r * math.cos(t) 
+            y = posbase[1]+ r* math.sin(t)
+           # t = math.sqrt(abs(r ** 2 - ((i - posbase[1]) ** 2))) + posbase[0]
+            l.append((x, y))
+        return l
+
+    def drawRefushLoading(self):
+        self.loading = 1
+        self.imgOld.blit(self.img) #当前背景
+
+        self.nowR = 0
+        index = 0
+        while(self.isRefush):
+            self.background.clear(0x0)
+            self.background.blit(self.imgOld,mask=self.deepMaskImg)
+            center = [int(self.width/2),int(self.height/2)]
+            allxy = self.genAllEllipseXy(center)
+            
+            for i in allxy:
+                r = 6
+                color = self.getColor(index)
+                self.background.ellipse((i[0]-r,i[1]-r,i[0]+r,i[1]+r),color,color)
+                index+=1 
+            sleep(0.05)
+            self.img.blit(self.background)
+            self.__redraw() 
+            self.nowR +=1
+            if(self.nowR >= 10):
+                self.nowR = 0
+        
+        self.loading = 0
+
     def redraw(self):  # 重绘界面
         if(self.loading == 1):
             return
         self.loading = 1
         #self.img.blit(self.background, (0, 0))
         if(self.RunningForm == self.allForm.loading):
+            pass
+        elif(self.RunningForm == self.allForm.refushLoading):
             pass
         elif(self.RunningForm ==  self.allForm.main):
             self.genImg()
@@ -569,21 +625,27 @@ class ithomeUi(object, ):
 
     def articleKeyUp(self):
         self.loading = 1
-        for i in range(0,self.articleStep, self.articleMinStep):
-            self.articleIndex += self.articleMinStep
-            self.drawArticle()
-        if (self.articleIndex > self.articleMinIndex):
+        if (self.articleIndex >= self.articleMinIndex):
             self.articleIndex = self.articleMinIndex
+        else:
+            for i in range(0,self.articleStep, self.articleMinStep):
+                self.articleIndex += self.articleMinStep
+                self.drawArticle()
+            if (self.articleIndex > self.articleMinIndex):
+                self.articleIndex = self.articleMinIndex
         self.loading = 0
 
     def articleKeyDown(self):
         self.loading =1
-        for i in range(0, self.articleStep, self.articleMinStep):
-            self.articleIndex -=  self.articleMinStep
-            self.drawArticle()
-
         if (self.articleIndex <= 0 - (self.articleMaxIndex - self.height)):
             self.articleIndex = 0 - (self.articleMaxIndex- self.height)
+        else:
+            for i in range(0, self.articleStep, self.articleMinStep):
+                self.articleIndex -=  self.articleMinStep
+                self.drawArticle()
+
+            if (self.articleIndex <= 0 - (self.articleMaxIndex - self.height)):
+                self.articleIndex = 0 - (self.articleMaxIndex- self.height)
         self.loading = 0
 
 
