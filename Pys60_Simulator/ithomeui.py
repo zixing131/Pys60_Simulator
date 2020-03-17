@@ -111,7 +111,7 @@ class ithomeUi(object, ):
         self.articleStep = 60
         self.articleMinStep = 10
         self.articleMaxIndex = self.height + self.articleStep
-
+        self.tempImg = ph.Image.new((1, 1))
         self.menuSpeed = 40
         self.RunningForm = self.allForm.loading
         self.AsyncLoad(10)
@@ -124,8 +124,28 @@ class ithomeUi(object, ):
         self.lastX = self.selectedIndex - 1
         itnet.loadImg(self.AsyncLoad)
 
+    def refushArticleThread(self):
+        self.articleIndex = self.articleMinIndex
+
+        newsid = self.newsList.newslist[self.selectedIndex].newsid
+        self.NewsContent = itnet.getNewsContent(newsid)
+
+        self.articleTime = self.newsList.newslist[self.selectedIndex].postdate.replace('T', ' ').split('.')[0]
+        newsid = self.newsList.newslist[self.selectedIndex].newsid
+        self.newsauthor = self.NewsContent.newssource + ' ( ' + self.NewsContent.newsauthor + ' ) '
+        self.articleDetial = self.NewsContent.detail.replace('<p>', '  ').replace('</p>', '\n')
+
+        #sleep(0.5)
+        self.isRefush = 0
+        self.RunningForm = self.allForm.article
+        self.lastRunningForm = self.RunningForm
+
     def refushArticle(self):
-        pass
+        self.loading = 1
+        self.isRefush = 1
+        thread.start_new_thread(self.refushArticleThread, ())
+        self.drawRefushLoading()
+        self.loading = 0
 
     def AsyncLoad(self, percent):
         self.background.blit(self.startUpImg)
@@ -165,7 +185,7 @@ class ithomeUi(object, ):
         self.x = -1
         self.selectedIndex = 0
         self.lastX = self.selectedIndex - 1
-        sleep(0.5)
+        #sleep(0.5)
         self.isRefush = 0
 
     def refush(self):  # 刷新
@@ -203,7 +223,6 @@ class ithomeUi(object, ):
             t = float(i) / float(100)
             x = posbase[0] + r * math.cos(t)
             y = posbase[1] + r * math.sin(t)
-            # t = math.sqrt(abs(r ** 2 - ((i - posbase[1]) ** 2))) + posbase[0]
             l.append((x, y))
         return l
 
@@ -211,7 +230,6 @@ class ithomeUi(object, ):
         self.loading = 1
         self.imgOld.blit(self.img)  # 当前背景
 
-        self.nowR = 0
         index = 0
         while (self.isRefush):
             self.background.clear(0x0)
@@ -222,14 +240,19 @@ class ithomeUi(object, ):
             for i in allxy:
                 r = 6
                 color = self.getColor(index)
-                self.background.ellipse((i[0] - r, i[1] - r, i[0] + r, i[1] + r), color, color)
+                if(index%8==0):
+                    r = 8
+                    self.background.ellipse((i[0] - r, i[1] - r, i[0] + r, i[1] + r), color, color)
+                else:
+                    self.background.ellipse((i[0] - r, i[1] - r, i[0] + r, i[1] + r), color, color)
                 index += 1
-            sleep(0.05)
+            sleep(0.1)
             self.img.blit(self.background)
             self.__redraw()
-            self.nowR += 1
-            if (self.nowR >= 10):
-                self.nowR = 0
+
+        self.articleName = self.text_to_array(self.newsList.newslist[self.selectedIndex].title, ('dense', 20),
+                                              self.width - 10)
+        self.articleData = self.text_to_array(self.articleDetial, ('dense', 15), self.width - 10)
 
         self.loading = 0
 
@@ -256,7 +279,8 @@ class ithomeUi(object, ):
         self.loading = 0
 
     def text_to_array(self, content, dense, width):
-        w = self.img.measure_text(content, dense)[0][2]
+
+        w =  self.tempImg.measure_text(content, dense)[0][2]
         if (w < width):
             return [content]
         result = []
@@ -269,7 +293,7 @@ class ithomeUi(object, ):
                 t = ''
                 continue
             t = t + nowtext
-            w = self.img.measure_text(t, dense)[0][2]
+            w = self.tempImg.measure_text(t, dense)[0][2]
             if (w == width):
                 # print w
                 result.append(t)
@@ -377,7 +401,11 @@ class ithomeUi(object, ):
             title = self.newsList.newslist[nowIndex].title
             titlelist = self.text_to_array(title, ("dense", 15), textWidth)
             for j in range(len(titlelist)):
-                newimg.text((textBasePos[0], textBasePos[1] + (j + 1) * 15), titlelist[j], 0x0,
+                if(self.newsList.newslist[nowIndex].istop==1):
+                    newimg.text((textBasePos[0], textBasePos[1] + (j + 1) * 15), titlelist[j], 0xcc2222,
+                                ("dense", 15, FONT_ANTIALIAS))
+                else:
+                    newimg.text((textBasePos[0], textBasePos[1] + (j + 1) * 15), titlelist[j], 0x0,
                             ("dense", 15, FONT_ANTIALIAS))
             NewsListImg.append(newimg)
             del newimg
@@ -561,20 +589,7 @@ class ithomeUi(object, ):
                 # 加载数据
                 # self.articleContent = self.newsList.newslist[self.selectedIndex].url
                 self.loading = 1
-                self.articleIndex = self.articleMinIndex
-                newsid = self.newsList.newslist[self.selectedIndex].newsid
-                self.NewsContent = itnet.getNewsContent(newsid)
-
-                self.articleName = self.text_to_array(self.newsList.newslist[self.selectedIndex].title, ('dense', 20),
-                                                      self.width - 10)
-                self.articleTime = self.newsList.newslist[self.selectedIndex].postdate.replace('T', ' ').split('.')[0]
-                newsid = self.newsList.newslist[self.selectedIndex].newsid
-                self.newsauthor = self.NewsContent.newssource + ' ( ' + self.NewsContent.newsauthor + ' ) '
-                self.articleDetial = self.NewsContent.detail.replace('<p>', '  ').replace('</p>', '\n')
-                self.articleData = self.text_to_array(self.articleDetial, ('dense', 15), self.width - 10)
-
-                self.RunningForm = self.allForm.article
-                self.lastRunningForm = self.RunningForm
+                self.refushArticle()
                 self.loading = 0
 
             elif (self.RunningForm == self.allForm.menu):

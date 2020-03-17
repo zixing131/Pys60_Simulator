@@ -21,6 +21,7 @@ class Tops:
         self.device = data['device']
 
         self.topplat = data['topplat']
+        self.title = data['title']
         self.newsid = data['newsid']
         self.postdate = data['postdate']
         self.orderdate = data['orderdate']
@@ -34,7 +35,9 @@ class Tops:
 
 
 class News:
-    def __init__(self, data):
+    def __init__(self, data=None):
+        if(data == None):
+            return
         self.newsid = data['newsid']
         self.title = data['title']
         self.postdate = data['postdate']
@@ -47,6 +50,22 @@ class News:
         self.cid = data['cid']
         self.sid = data['sid']
         self.url = data['url']
+        self.istop = 0
+
+    def convert(self,top):
+        self.newsid = top.newsid
+        self.title = top.title
+        self.postdate = top.postdate
+        self.orderdate = top.orderdate
+        self.description =  top.description
+        self.image = top.image
+        self.hitcount = top.hitcount
+        self.commentcount = top.commentcount
+
+        self.cid = top.cid
+        self.sid = top.sid
+        self.url = top.url
+        self.istop = 1
 
 
 class NewList:
@@ -147,6 +166,11 @@ class IthomeNet:
         # t = open("e:\\1濉炵彮QQ\\ithome\\data\\newlist.txt", "rb").read()
         t = NewList(json.loads(t))
         # thread.start_new_thread(self.getImageAsync,(t,))
+
+        for i in range(len(t.toplist)):
+            tt = News()
+            tt.convert(t.toplist[i])
+            t.newslist.insert(i,tt)
         self.newslist = t
         return t
 
