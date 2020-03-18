@@ -8,6 +8,7 @@ import graphics as ph, base64, thread, os, random
 # import akntextutils2
 import math
 from graphics import *
+#import fontSize
 
 cn = lambda x: x.decode("u8")
 sleep = e32.ao_sleep
@@ -117,6 +118,7 @@ class ithomeUi(object, ):
         self.AsyncLoad(10)
         self.newsList = itnet.getNewList()
         self.SlideList = itnet.getSlide()
+        self.fontSizeCache = {}
         self.slideChangeThread = e32.Ao_timer()
         self.refushListThread = e32.Ao_timer()
         self.genMenuList()
@@ -278,33 +280,61 @@ class ithomeUi(object, ):
             self.lastRunningForm = self.RunningForm
         self.loading = 0
 
-    def text_to_array(self, content, dense, width):
+    def myMeasure_text(self,text,fot): 
+        dense = fot[1]
+        if(dense in self.fontSizeCache):
+            if(text in self.fontSizeCache[dense]):
+                return self.fontSizeCache[dense][text]
+            else:
+                w = self.tempImg.measure_text(text, fot)[0][2]
+                self.fontSizeCache[dense][text] = w
+                return w
+        else:
+            self.fontSizeCache[dense] = {}
+            w = self.tempImg.measure_text(text, fot)[0][2]
+            self.fontSizeCache[dense][text] = w
+            return w
+         
 
-        w =  self.tempImg.measure_text(content, dense)[0][2]
-        if (w < width):
+    def text_to_array(self, content, dense, width):
+        if(width<dense[1]):
+            width = dense[1]
+
+        w = self.myMeasure_text(content,dense)
+        if (w <= width):
             return [content]
         result = []
-        # print width
-        t = ''
-        for i in range(len(content)):
-            nowtext = content[i]
-            if (nowtext == '\n'):
-                result.append(t)
-                t = ''
-                continue
-            t = t + nowtext
-            w = self.tempImg.measure_text(t, dense)[0][2]
-            if (w == width):
-                # print w
-                result.append(t)
-                t = ''
-            elif (w > width):
-                # print w
-                result.append(t[:-1])
-                i -= 1
-                t = nowtext
-        if (t != ''):
-            result.append(t)
+        #先扫描一遍\n
+        #content = u'一加新 Logo 中文使用指南曝光一加 8 手机'
+        content = content.split('\n')
+
+        for contenti in content:
+            nowtext = ''
+            nowwidth = 0
+            i = 0
+            lasti = i
+            while(i<=len(contenti)):
+                if(i == 0 or nowwidth<=dense[1]):
+                    i += int(width/dense[1]) #从这里开始计算
+
+                nowtext = contenti[lasti:i]
+
+                w=self.myMeasure_text(nowtext, dense)
+                nowwidth = w
+                if (nowwidth == width):
+                    result.append(nowtext)
+                    nowwidth = 0
+                    lasti = i
+                elif (nowwidth > width):
+                    result.append(nowtext[:-1])
+                    i -= 1
+                    lasti = i
+                    nowwidth = 0
+                else:
+                    i+=1
+            if (nowtext != ''):
+                result.append(nowtext)
+
         return result
 
     def drawArticle(self):

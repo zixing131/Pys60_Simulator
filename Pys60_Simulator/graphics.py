@@ -59,7 +59,7 @@ def getTextFontWidth(text,size=18):
     im = Image2.new('RGB', (1, 1), (0, 0, 0, 0))
     draw = ImageDraw.Draw(im)
     w, h = draw.textsize(text, font=GetFont(font=('dense',size)))
-    return w,h
+    return [w,h]
 
 def convertColor(bgcolor):
     if(type(bgcolor) is tuple):
