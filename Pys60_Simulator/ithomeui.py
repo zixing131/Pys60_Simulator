@@ -317,6 +317,9 @@ class ithomeUi(object, ):
                 if(i == 0 or nowwidth<=dense[1]):
                     i += int(width/dense[1]) #从这里开始计算
 
+                else:
+                    i+=int(math.ceil((width - nowwidth)/dense[1]))
+
                 nowtext = contenti[lasti:i]
 
                 w=self.myMeasure_text(nowtext, dense)
