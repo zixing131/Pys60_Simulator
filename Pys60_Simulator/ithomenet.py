@@ -122,9 +122,13 @@ class IthomeNet:
         self.th1 = e32.Ao_timer()
         self.th2 = e32.Ao_timer()
         self.errorImg = None
+        self.newsLoadingImg = None
+        self.slideLoadingImg = None
         self.asyncLoad = None
         self.imgcount = 0
         self.nowimgindex = 0
+        self.loadingPrecent = 0
+        self.nowUrl = ['',(200,200)]
 
     def get(self, url):
         conn = httplib.HTTPConnection(self.host)
@@ -134,9 +138,8 @@ class IthomeNet:
         return t
 
     def asyncLoadChange(self,precent):
-        if(self.asyncLoad):
-            #print precent
-            self.asyncLoad(precent)
+        pass
+        #self.loadingPrecent = precent
 
     def getImageAsync(self):
         if(self.newslist==[]):
@@ -144,10 +147,11 @@ class IthomeNet:
         for i in self.newslist.newslist:
             imgurl = i.image
             # print imgurl
-            self.getPic(imgurl, (self.newImgWidth, self.newImgHeight))
+            self.savePic(imgurl, (self.newImgWidth, self.newImgHeight))
             self.nowimgindex += 1
             p = (float(90)/float(self.imgcount)) * self.nowimgindex + 10
             self.asyncLoadChange(p)
+            self.nowUrl = [imgurl, (self.newImgWidth, self.newImgHeight)]
 
 
     def getSlideImageAsync(self):
@@ -155,15 +159,16 @@ class IthomeNet:
             return
         for i in self.slidelist:
             imgurl = i.image
-            self.getPic(imgurl, (self.SlideWidth, self.SlideHeight))
+            self.savePic(imgurl, (self.SlideWidth, self.SlideHeight))
             self.nowimgindex += 1
             p = (float(90) / float(self.imgcount)) * self.nowimgindex + 10
             self.asyncLoadChange(p)
+            self.nowUrl = [imgurl,(self.SlideWidth, self.SlideHeight)]
 
 
-    def getNewList(self):  # 鏂伴椈鍒楄〃
+    def getNewList(self): 
         t = self.get(self.newsListUrl)
-        # t = open("e:\\1濉炵彮QQ\\ithome\\data\\newlist.txt", "rb").read()
+        # t = open("e:\\1塞班QQ\\ithome\\data\\newlist.txt", "rb").read()
         t = NewList(json.loads(t))
         # thread.start_new_thread(self.getImageAsync,(t,))
 
@@ -179,9 +184,9 @@ class IthomeNet:
         t = NewsContent(json.loads(t))
         return t
 
-    def getSlide(self):  # 椤堕儴婊氬姩
+    def getSlide(self):  
         t = self.get(self.slideUrl)
-        # t = open("e:\\1濉炵彮QQ\\ithome\\data\\slide.txt", "rb").read()
+        # t = open("e:\\1塞班QQ\\ithome\\data\\slide.txt", "rb").read()
         t = [Slide(i) for i in json.loads(t)]
         self.slidelist = t
         return t
@@ -199,11 +204,99 @@ class IthomeNet:
             return self.imglist[key]
         return None
 
-    def loadImg(self,AsyncLoad):
-        self.asyncLoad = AsyncLoad
+    def loadImg(self): 
+        self.loadingPrecent = 10
         self.imgcount = len(self.newslist.newslist) + len(self.slidelist)
-        self.th1.after(0, self.getImageAsync)
-        self.th2.after(0, self.getSlideImageAsync)
+        #self.getImageAsync()
+        thread.start_new_thread(self.getImageAsync,())
+        #self.th1.after(0, self.getImageAsync)
+        #self.getSlideImageAsync()
+        thread.start_new_thread(self.getSlideImageAsync,())
+        #self.th2.after(0, self.getSlideImageAsync)
+        self.loadingPrecent = 100
+
+    def savePic(self, picurl, size): 
+        key = self.Url2FileName(picurl)
+        t = self.getLocalPic(key)
+        if (t != None):
+            return
+        imgpath = cachePath + key + ".jpg"
+        # imgpath = cachePath + "02365e66cb2e9ef6e27a1f0c24af90a3.jpg"
+        # return imgpath
+        try: 
+            img = self.get(picurl) 
+            open(imgpath, 'wb').write(img) 
+            return
+        except:
+            return
+
+    def resizePic(self,picurl,size):
+        if (self.errorImg == None):
+            self.errorImg = ph.Image.open(mypath + "error_image.jpg").resize((self.newImgWidth, self.newImgHeight))
+        key = self.Url2FileName(picurl)
+        t = self.getLocalPic(key)
+        if (t != None):
+            return t
+        imgpath = cachePath + key + ".jpg"
+        # imgpath = cachePath + "02365e66cb2e9ef6e27a1f0c24af90a3.jpg"
+        # return imgpath
+        try:
+            if (os.path.exists(imgpath)):
+                f = open(imgpath, 'rb')
+                data = f.read(2)
+                f.close()
+                if (data == '' or data == None or data.encode('hex').lower() != 'ffd8'):
+                    req = urllib.urlopen(picurl)
+                    img = req.read()
+                    open(imgpath, 'wb').write(img)
+                    t1 = ph.Image.open(imgpath)
+                    t = t1.resize(size)
+                    del t1
+                    t.save(imgpath)
+                    self.imglist[key] = t
+                    del t
+                    return self.imglist[key]
+                t1 = ph.Image.open(imgpath)
+                t = t1.resize(size)
+                del t1
+                self.imglist[key] = t
+                del t
+                return self.imglist[key]
+
+        except:
+            self.errorImg.resize(size)
+            self.imglist[key] = self.errorImg
+            return self.errorImg
+
+    def getLocalPicByUrl(self,picurl,typ): #1 ： newsLoadingImg ， 2：slideLoadingImg
+        if(self.newsLoadingImg==None):
+            self.newsLoadingImg = ph.Image.open(mypath + "image_loading.jpg").resize((self.newImgWidth, self.newImgHeight))
+        if (self.slideLoadingImg == None):
+            self.slideLoadingImg = ph.Image.open(mypath + "image_loading2.jpg").resize(
+                (self.SlideWidth, self.SlideHeight))
+        key = self.Url2FileName(picurl)
+        t = self.getLocalPic(key)
+        if (t != None):
+            return t
+        else:
+            imgpath = cachePath + key + ".jpg"
+            if (os.path.exists(imgpath)):
+                try:
+                    t1 = ph.Image.open(imgpath)
+                    size = (self.newImgWidth, self.newImgHeight)
+                    if(typ==2):
+                        size = (self.SlideWidth, self.SlideHeight)
+                    t = t1.resize(size)
+                    del t1
+                    self.imglist[key] = t
+                    del t
+                    return self.imglist[key]
+                except:
+                    pass
+        if(typ == 1):
+            return self.newsLoadingImg
+        elif(typ==2):
+            return self.slideLoadingImg
 
     def getPic(self, picurl, size):
         if(self.errorImg == None):
@@ -237,8 +330,7 @@ class IthomeNet:
                 self.imglist[key] = t
                 del t
                 return self.imglist[key]
-            req = urllib.urlopen(picurl)
-            img = req.read()
+            img = self.get(picurl)
             open(imgpath, 'wb').write(img)
             t1 = ph.Image.open(imgpath)
             t = t1.resize(size)

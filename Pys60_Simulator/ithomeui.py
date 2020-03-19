@@ -115,16 +115,17 @@ class ithomeUi(object, ):
         self.tempImg = ph.Image.new((1, 1))
         self.menuSpeed = 40
         self.RunningForm = self.allForm.loading
-        self.AsyncLoad(10)
+        self.drawAsyncLoad(10)
         self.newsList = itnet.getNewList()
         self.SlideList = itnet.getSlide()
         self.fontSizeCache = {}
         self.slideChangeThread = e32.Ao_timer()
-        self.refushListThread = e32.Ao_timer()
+        #self.refushListThread = e32.Ao_timer()
         self.genMenuList()
         self.lastRunningForm = self.RunningForm
         self.lastX = self.selectedIndex - 1
-        itnet.loadImg(self.AsyncLoad)
+        itnet.loadImg() 
+        self.AsyncLoad()
 
     def refushArticleThread(self):
         self.articleIndex = self.articleMinIndex
@@ -149,7 +150,7 @@ class ithomeUi(object, ):
         self.drawRefushLoading()
         self.loading = 0
 
-    def AsyncLoad(self, percent):
+    def drawAsyncLoad(self,precent):
         self.background.blit(self.startUpImg)
         x1 = 10
         y1 = self.height - 80
@@ -157,17 +158,36 @@ class ithomeUi(object, ):
         y2 = self.height - 60
         self.background.rectangle((x1, y1, x2, y2), 0xc3c3c3, fill=0xc3c3c3)
         # print(percent)
-        x2 = ((self.width - 20) * (float(percent) / float(100))) + 10
+        x2 = ((self.width - 20) * (float(precent) / float(100))) + 10
         self.background.rectangle((x1, y1, x2, y2), 0x20C602, fill=0x20C602)
         self.img.blit(self.background)
         self.blit(self.img)
-        if (percent >= 100):
-            self.loading = 0
-            self.RunningForm = self.allForm.main
-            self.lastRunningForm = self.RunningForm
-            self.lastX = self.selectedIndex - 1
-            self.redraw()
-            self.slideChangeThread.after(3, self.slideChange)
+
+    def AsyncLoad(self):
+
+        lastprecent = 0
+        nowprecent  = itnet.loadingPrecent
+
+        while(1):
+
+            nowprecent = itnet.loadingPrecent
+            if(lastprecent == nowprecent and lastprecent<100 and nowprecent<100):
+                sleep(0.1)
+                e32.ao_yield()
+                continue
+            itnet.resizePic(itnet.nowUrl[0], itnet.nowUrl[1])
+            self.drawAsyncLoad(nowprecent)
+            if (nowprecent >= 100):
+                self.loading = 0
+                self.RunningForm = self.allForm.main
+                self.lastRunningForm = self.RunningForm
+                self.lastX = self.selectedIndex - 1
+                self.redraw()
+                self.slideChangeThread.after(3, self.slideChange)
+                break
+            lastprecent = nowprecent
+            sleep(0.1)
+            e32.ao_yield()
 
     def slideChange(self):
         if (self.RunningForm == self.allForm.main):
@@ -387,7 +407,7 @@ class ithomeUi(object, ):
         if (self.SlideIndex >= len(self.SlideList)):
             self.SlideIndex = 0
         imgurl = self.SlideList[self.SlideIndex].image
-        self.SlideImg = itnet.getPic(imgurl, (self.SlideWidth, self.SlideHeight))
+        self.SlideImg = itnet.getLocalPicByUrl(imgurl, 2)
         # self.SlideImg.clear(0xff0000)
         timg = ph.Image.new((self.width, self.SlideHeight + self.baseCornor))
         timg.clear(self.bgcolor)
@@ -422,7 +442,7 @@ class ithomeUi(object, ):
                 newimg.clear(self.selectedColor)
 
             # print itnet.getPic(imgurl)
-            newTopImg = itnet.getPic(imgurl, (self.newImgWidth, self.newImgHeight))
+            newTopImg = itnet.getLocalPicByUrl(imgurl,1)
 
             # newTopImg = self.loadingImg
             # newTopImg1.clear(0xff0000)
