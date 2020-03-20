@@ -15,6 +15,15 @@ function bind(target, type, callback) {
 		}, false);
 	}
 }
+
+function getViewPortWidth() {
+    return document.documentElement.clientWidth || document.body.clientWidth;
+}
+
+function getViewPortHeight() {
+    return document.documentElement.clientHeight || document.body.clientHeight;
+}
+
 function getById(id) {
 	return document.getElementById(id);
 }

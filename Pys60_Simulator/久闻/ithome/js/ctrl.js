@@ -1,4 +1,5 @@
-var page_list = 1, page_comments = 1, list_top = 0, ref_page = 'list'; //当前页码
+var page_list = 1, page_comments = 1, list_top = 0, ref_page = 'list' ,last_page = 'list'; //当前页码
+var isloading = 0;
 const info = { //应用属性
 	appname: 'IT之家s60v3客户端',
 	version: '0.0.1',
@@ -44,8 +45,24 @@ function showPage(id) { //显示id和隐藏其它页面
 		'loading'
 	];
 	pages.forEach(function(item) {
-		if (id === item) {
+		
+		if(id === 'loading')
+		{  
 			getById(id).style.display = 'block';
+			//getById(last_page).style.display = 'block';
+			isloading = 1;
+			menu.setRightSoftkeyLabel('取消', function() { //右键取消
+			showPage(last_page);
+			});
+			menu.setLeftSoftkeyLabel('  ', function(){});  //左键复位
+			
+			return;
+		};
+		
+		if (id === item) {
+			last_page = id;
+			getById(id).style.display = 'block';
+			isloading = 0;
 			if (id === 'list') {
 				setTitle();
 				menu.setRightSoftkeyLabel('', null); //右键退出
@@ -86,6 +103,9 @@ function setTitle(str) { //设置标题栏
 	getById('topic').textContent = str || 'IT之家-新闻资讯';
 }
 function displayList(url) { //显示文章列表
+	
+	showPage('loading');//显示加载动画
+	
 	ref_page = 'list';
 	ajax_get('http://api.ithome.com/json/newslist/news?r=0', function(error, data) {
 		if (error) {
@@ -112,6 +132,7 @@ function displayList(url) { //显示文章列表
 			}
 			*/
 			showPage('list');
+			 showPage('loading');//显示加载动画
 			if (/next/.test(url)) {
 				document.body.scrollTop += 20;
 			}
@@ -119,6 +140,7 @@ function displayList(url) { //显示文章列表
 	});
 }
 function displayArticle(item) { //显示文章正文
+	showPage('loading');//显示加载动画
 	item = JSON.parse(unescape(item))
 	ref_page = 'article';
 	url='http://api.ithome.com/json/newscontent/'+item.newsid
@@ -297,11 +319,13 @@ window.onload = function() { //应用载入之后开始执行。
 	menu.append(menu_about);
 	menu.append(menu_checkVersion);
 	
+	
 	var timer = setTimeout(function() {
 		document.body.removeChild(getById('wellcome')); //关闭欢迎界面
 		displayList();
-		//showPage('loading');
+		
 		menu.showSoftkeys();
+		
 		clearTimeout(timer);
 	}, 0);
 };

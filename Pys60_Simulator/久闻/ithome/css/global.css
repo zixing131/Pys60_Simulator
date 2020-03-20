@@ -1,5 +1,5 @@
 html, body {
-	background:#eee;
+	background:#eee; 
 }
 header,footer,article,section,aside,nav,figure {
 	display:block;
@@ -47,15 +47,16 @@ header,footer,article,section,aside,nav,figure {
  
 #loading{
 		z-index:1; 
-		position: absolute;
-		left:0;top:0;
+		position: fixed;
+		left:0;top:0;right:0;bottom:0;
 		width:100%;
 		height:100%; 
 		z-index:99;
-		background:url(../img/loading_red.gif) center no-repeat #000;
-		opacity:0.6;
-		display:none;
+		background:url(../img/loading_red.gif) center no-repeat;
+		opacity: 1.0;
+		display:none; 
 	} 
+	
 /*wellcome*/
 #wellcome, #about, #reg_form, #login_form {
 	position: absolute;
