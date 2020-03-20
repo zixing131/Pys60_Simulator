@@ -4,6 +4,7 @@ html, body {
 header,footer,article,section,aside,nav,figure {
 	display:block;
 }
+ 
 .display-flex {
 	display:-webkit-box;
 	display:box;
@@ -43,6 +44,18 @@ header,footer,article,section,aside,nav,figure {
 	background:red;
 	color:#fff;
 }
+ 
+#loading{
+		z-index:1; 
+		position: absolute;
+		left:0;top:0;
+		width:100%;
+		height:100%; 
+		z-index:99;
+		background:url(../img/loading_red.gif) center no-repeat #000;
+		opacity:0.6;
+		display:none;
+	} 
 /*wellcome*/
 #wellcome, #about, #reg_form, #login_form {
 	position: absolute;
@@ -99,7 +112,7 @@ h1#topic {
 	margin-left:95px;
 }
 #list li div h3 {
-	height:2.3em;
+	height:3.6em;
 	overflow:hidden;
 	margin-bottom:5px;
 }

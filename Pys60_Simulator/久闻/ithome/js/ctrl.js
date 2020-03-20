@@ -40,7 +40,8 @@ function showPage(id) { //显示id和隐藏其它页面
 		'about',
 		'list',
 		'article',
-		'comments'
+		'comments',
+		'loading'
 	];
 	pages.forEach(function(item) {
 		if (id === item) {
@@ -299,6 +300,7 @@ window.onload = function() { //应用载入之后开始执行。
 	var timer = setTimeout(function() {
 		document.body.removeChild(getById('wellcome')); //关闭欢迎界面
 		displayList();
+		//showPage('loading');
 		menu.showSoftkeys();
 		clearTimeout(timer);
 	}, 0);
