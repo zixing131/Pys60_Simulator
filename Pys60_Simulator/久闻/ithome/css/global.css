@@ -1,0 +1,184 @@
+html, body {
+	background:#eee;
+}
+header,footer,article,section,aside,nav,figure {
+	display:block;
+}
+.display-flex {
+	display:-webkit-box;
+	display:box;
+	display:-webkit-flex-box;
+	display:flex-box;
+	display:-webkit-flex;
+	display:flex;
+}
+.center {
+	-webkit-box-align:center;
+	box-align:center;
+	-webkit-flex-align:center;
+	flex-align:center;
+	-webkit-align-items: center;
+	align-items: center;
+}
+.flex1 {
+	-webkit-box-flex: 1;
+	box-flex: 1;
+	-webkit-flex: 1;
+	flex: 1;
+}
+
+#alert_div {
+	position:absolute;
+	z-index: 98;
+	width:100%;
+	top:0;left:0;
+	padding:10px 0;
+	text-align: center;
+}
+.success {
+	background:green;
+	color:#fff;
+}
+.error {
+	background:red;
+	color:#fff;
+}
+/*wellcome*/
+#wellcome, #about, #reg_form, #login_form {
+	position: absolute;
+	left:0;top:0;
+	width:100%;
+	height:100%;
+	background:#eee;
+}
+#wellcome {
+	z-index:99;
+	background:url(../img/wellcome.png) center no-repeat #AE0018;
+}
+#about, #reg_form, #login_form {
+	z-index:2;
+}
+
+#login_form,#reg_form,#list,#about,#article {
+	display:none;
+}
+input, textarea {
+	border:solid 2px #999;
+}
+input:focus, textarea:focus {
+	border-color:#07c;
+}
+h1#topic {
+	padding:10px;
+	background:#333;
+	color:#fff;
+}
+#list li {
+	border-bottom:solid 1px #ddd;
+}
+#list li:last-of-type {
+	border-bottom:none;
+}
+#list li a {
+	display:block;
+	padding:10px 5px;
+	overflow:auto;
+}
+#list li a:hover {
+	background:#07c;
+	color:#fff;
+}
+#list li a:hover span {
+	color:#eee;
+}
+#list li img {
+	float: left;
+	width:90px;
+}
+#list li div {
+	margin-left:95px;
+}
+#list li div h3 {
+	height:2.3em;
+	overflow:hidden;
+	margin-bottom:5px;
+}
+#list li p span {
+	display:inline-block;
+	width:50%;
+	color:#999;
+}
+#next_button {
+	text-align: center;
+}
+#content {
+	padding:5px;
+	font-size:1.2em;
+	word-break: break-all;
+}
+#content p {
+	line-height:1.7em;
+	margin-bottom:1em;
+	text-indent: 2em;
+}
+#content img {
+	display:block;
+	max-width:100%;
+	margin: 1em auto;
+}
+.info {
+	margin-top:5px;
+	color:#999;
+	font-size:12px;
+	text-align: center;
+}
+#author {
+	margin:0 10px;
+}
+.bottom {
+	color:#aaa;
+	padding:10px;
+	text-align: center;
+	border-top:solid 1px #ddd;
+}
+.form h3 {
+	margin:10px;
+}
+.form div {
+	margin-bottom:10px;
+}
+.form label {
+	display:block;
+	margin-bottom:5px;
+	margin-left:5%;
+}
+.form input {
+	width:90%;
+	margin-left:5%;
+	padding:5px 0;
+} 
+
+#about h3,#about p {
+	padding:10px;
+	border-bottom:solid 1px #ddd;
+}
+
+#comments > li {
+	padding:10px;
+	border-bottom:solid 1px #ddd;
+}
+#comments > li > img {
+	float:left;
+	width:40px;height:40px;
+}
+#comments > li > div {
+	margin-left:50px;
+}
+#comments p {
+	margin-top:5px;
+}
+#comments span {
+	color:#999;
+	margin-right:10px;
+	font-size:12px;
+}
