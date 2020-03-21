@@ -144,7 +144,7 @@ function displayArticle(item) { //显示文章正文
 	item = JSON.parse(unescape(item))
 	//getById('content').className = item.newsid;
 	//displayComments('')
-	//return;
+	//return; // http://dyn.ithome.com/api/comment/getnewscomment?sn=4c70d4f5c7bdb61f&cid=48966977 
 	
 	ref_page = 'article';
 	url='http://api.ithome.com/json/newscontent/'+item.newsid
