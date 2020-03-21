@@ -4,7 +4,7 @@ const info = { //应用属性
 	appname: 'IT之家s60v3客户端',
 	version: '0.0.1',
 	summary: '“IT之家”是业内领先的IT资讯和数码产品类网站。IT之家快速精选泛科技新闻，分享即时的IT业界动态和紧跟潮流的数码产品资讯，提供给力的PC和手机技术文章、丰富的系统应用美化资源，以及享不尽的智能阅读。',
-	thanks: '感谢塞班s60v3吧吧群的小伙伴们一直以来的支持~',
+	thanks: '感谢塞班s60v3吧吧群(群号:140369358)的小伙伴们一直以来的支持~',
 	website: 'www.ithome.com'
 };
 const CMD = { //菜单执行的命令
@@ -112,6 +112,10 @@ function displayList(url) { //显示文章列表
 			alert(error);
 		} else {
 			const articles = [];
+			data.toplist.forEach(function(item) { 
+				articles.push('<li><a href="javascript:displayArticle(\''+escape(JSON.stringify(item))+'\')">'+ '<img  src="'+item.image+'" alt="图片" />'+'<div><h3 style="color:red">[置顶]'+item.title+'</h3><p><span>评论('+item.commentcount+')</span><span>人气('+item.hitcount+')</span></p></div></a></li>');
+			});
+			
 			data.newslist.forEach(function(item) { 
 				articles.push('<li><a href="javascript:displayArticle(\''+escape(JSON.stringify(item))+'\')">'+ '<img  src="'+item.image+'" alt="图片" />'+'<div><h3>'+item.title+'</h3><p><span>评论('+item.commentcount+')</span><span>人气('+item.hitcount+')</span></p></div></a></li>');
 			});
@@ -155,8 +159,8 @@ function displayArticle(item) { //显示文章正文
 		} else {
 			setTitle(item.title);
 			getById('dateline').textContent = dateline(item.postdate);
-			getById('author').textContent = data.newssource+'('+data.newsauthor+')';
-			getById('comment_num').textContent = '评论('+item.commentcount+')';
+			getById('author').textContent = data.newssource+'('+data.newsauthor+')'; 
+			getById('comment_num').innerHTML = '<a href="javascript:displayComments('+item.newsid+')">评论('+item.commentcount+')</a>';
 			getById('content').innerHTML = UBB(data.detail);
 			getById('content').className = item.newsid;
 			showPage('article');
