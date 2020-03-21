@@ -175,7 +175,7 @@ h1#topic {
 	padding:10px;
 	border-bottom:solid 1px #ddd;
 }
-
+ 
 #comments > li {
 	padding:10px;
 	border-bottom:solid 1px #ddd;
@@ -190,6 +190,8 @@ h1#topic {
 #comments p {
 	margin-top:5px;
 }
+
+
 #comments span {
 	color:#999;
 	margin-right:10px;

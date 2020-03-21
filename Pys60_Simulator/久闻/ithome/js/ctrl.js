@@ -113,7 +113,7 @@ function displayList(url) { //显示文章列表
 		} else {
 			const articles = [];
 			data.newslist.forEach(function(item) { 
-				articles.push('<li><a href="javascript:displayArticle(\''+escape(JSON.stringify(item))+'\')">'+ '<img src="'+item.image+'" alt="截图" />'+'<div><h3>'+item.title+'</h3><p><span>评论('+item.commentcount+')</span><span>人气('+item.hitcount+')</span></p></div></a></li>');
+				articles.push('<li><a href="javascript:displayArticle(\''+escape(JSON.stringify(item))+'\')">'+ '<img  src="'+item.image+'" alt="图片" />'+'<div><h3>'+item.title+'</h3><p><span>评论('+item.commentcount+')</span><span>人气('+item.hitcount+')</span></p></div></a></li>');
 			});
 			if (url && /next/.test(url)) { //提供了url说明是下一页
 				getById('list').innerHTML += articles.join('');
@@ -142,6 +142,10 @@ function displayList(url) { //显示文章列表
 function displayArticle(item) { //显示文章正文
 	showPage('loading');//显示加载动画
 	item = JSON.parse(unescape(item))
+	//getById('content').className = item.newsid;
+	//displayComments('')
+	//return;
+	
 	ref_page = 'article';
 	url='http://api.ithome.com/json/newscontent/'+item.newsid
 	list_top = document.body.scrollTop;
@@ -160,14 +164,16 @@ function displayArticle(item) { //显示文章正文
 	});
 }
 function displayComments(url) { //显示评论列表TODO
-	ref_page = 'comments';
+	showPage('loading');//显示加载动画
+	ref_page = 'comments'; 
 	ajax_get('http://dyn.ithome.com/api/comment/getnewscomment?sn='+getCommentSn(getById('content').className), function(error, data) {
 		if (error) {
 			alert(error);
 		} else {
 			const comments = [];
-			data.hlist.forEach(function(item) {
-				comments.push('<li><img src="'+item.user.avatar+'" alt="头像" /><div><h3>'+item.user.nickname+'</h3><p><span>'+dateline(item.dateline)+'</span><span>'+item.model+'</span></p><p>'+item.content+'</p></div></li>');
+			data.clist.forEach(function(item) {
+				item = item.M;
+				comments.push('<li><img src="'+getHeadUrl(item.Ui)+'" alt="头像" onerror=\"onerror=null;src=\'img/avatar_default_rect.png\'\" />  <div><h3>'+item.N+'</h3><p><span>'+dateline(item.T)+'</span><span>'+item.Ta+'</span></p><p>'+item.C+'</p></div></li>');
 			});
 			if (url && /next/.test(url)) { //提供了url说明是下一页
 				getById('comments').innerHTML += comments.join('');
@@ -179,10 +185,11 @@ function displayComments(url) { //显示评论列表TODO
 			if (next_button_comments) { //原来有next按钮
 				next_button_comments.parentNode.removeChild(next_button_comments);
 			}
+			/*
 			if (page_comments < data.pager.pages) {
 				getById('comments').innerHTML += '<li id="next_button_comments"><a href="javascript:displayComments(\'/'+data.pager.last_dateline+'/next/'+data.pager.next_page+'\')">加载更多……</a></li>';
 				page_comments = data.pager.page;
-			}
+			}*/
 			showPage('comments');
 		}
 	});
@@ -318,10 +325,7 @@ window.onload = function() { //应用载入之后开始执行。
 	}
 	menu.append(menu_about);
 	menu.append(menu_checkVersion);
-	
-	var tt = getCommentSn(478944);
-	alert(tt);
-	
+	 
 	var timer = setTimeout(function() {
 		document.body.removeChild(getById('wellcome')); //关闭欢迎界面
 		displayList();

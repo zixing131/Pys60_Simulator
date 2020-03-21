@@ -34,10 +34,11 @@ function getCommentSn(newsid)
 function getHeadUrl(Ui)
 {
 	var url1 = 'http://avatar.ithome.com/avatars/';
-	var url2='_avatar.jpg'; 
+	var url2='_60.jpg'; 
 	var ret = '';
 	Ui = PrefixInteger(Ui,9); 
 	ret = Ui[0]+Ui[1]+Ui[2]+'/'+Ui[3]+Ui[4]+'/'+Ui[5]+Ui[6]+'/'+Ui[7]+Ui[8];	
+	//alert(url1+ret+url2);
 	return url1+ret+url2;
 }
 
