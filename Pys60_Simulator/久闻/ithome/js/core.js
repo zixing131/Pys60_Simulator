@@ -15,7 +15,7 @@ function bind(target, type, callback) {
 		}, false);
 	}
 }
-
+ 
 function getViewPortWidth() {
     return document.documentElement.clientWidth || document.body.clientWidth;
 }

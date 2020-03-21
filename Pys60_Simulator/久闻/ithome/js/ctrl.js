@@ -132,7 +132,7 @@ function displayList(url) { //显示文章列表
 			}
 			*/
 			showPage('list');
-			 showPage('loading');//显示加载动画
+			//showPage('loading');//显示加载动画
 			if (/next/.test(url)) {
 				document.body.scrollTop += 20;
 			}
@@ -161,12 +161,12 @@ function displayArticle(item) { //显示文章正文
 }
 function displayComments(url) { //显示评论列表TODO
 	ref_page = 'comments';
-	ajax_get('http://api2.9smart.cn/comments/'+getById('content').className+ (url?'/'+url:''), function(error, data) {
+	ajax_get('http://dyn.ithome.com/api/comment/getnewscomment?sn='+getCommentSn(getById('content').className), function(error, data) {
 		if (error) {
 			alert(error);
 		} else {
 			const comments = [];
-			data.comments.forEach(function(item) {
+			data.hlist.forEach(function(item) {
 				comments.push('<li><img src="'+item.user.avatar+'" alt="头像" /><div><h3>'+item.user.nickname+'</h3><p><span>'+dateline(item.dateline)+'</span><span>'+item.model+'</span></p><p>'+item.content+'</p></div></li>');
 			});
 			if (url && /next/.test(url)) { //提供了url说明是下一页
@@ -319,6 +319,8 @@ window.onload = function() { //应用载入之后开始执行。
 	menu.append(menu_about);
 	menu.append(menu_checkVersion);
 	
+	var tt = getCommentSn(478944);
+	alert(tt);
 	
 	var timer = setTimeout(function() {
 		document.body.removeChild(getById('wellcome')); //关闭欢迎界面
