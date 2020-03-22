@@ -1,0 +1,84 @@
+<style type="text/css">
+<!--
+.style1 {
+	font-size: 24px;
+	font-weight: bold;
+}
+-->
+</style>
+<p align="center" class="style1">Location Service API - Example Widget   Documentation</p>
+<hr />
+<h3><strong>About this document</strong></h3>
+<p>This document describes the Location Widget application for S60 5th Edition   SDK. Target audience are developers developing location aware applications and looking for location  services from the series 60 platform. </p>
+<h3><strong>About this Product</strong></h3>
+<p>Widgets are lightweight Web applications developed using the same well-known   standards-based Web technologies &ndash; AJAX, CSS, HTML and JavaScript &ndash; used to   create Web pages. Developers can use it as a reference and testers can use it to   test the relevant functionality. This widget is intended for S60 5th Edition   SDK. Developers should be able to develop professional applications.</p>
+<h3><strong>Product intent</strong></h3>
+<p>Example Widget Application is designed to run on S60 5th Edition SDK. It will be   designed such that a developer takes it as a reference to create useful   applications for any functionality supported on SDK. It will be designed to let   the testers to test the functionality</p>
+<h3><strong>Product limitations</strong></h3>
+<p>Example widget is not intended to give full featured implementation. This   example will implement the Messaging Service APIs. It gives only messaging   functionalities. It only lists the Draft messages from the Draft folder. </p>
+<h3><strong>Specification</strong></h3>
+<p>The example widget uses the WRT 1.0 API. The Web Runtime (WRT) environment   supports the following Internet technology standards:<br />
+    <br />
+  HTML 4.01<br />
+  The   basic HTML standards are supported.<br />
+  <br />
+  XHTML 1.0<br />
+  The basic XHTML   standards are supported.<br />
+  <br />
+  CSS Level 2 revision 1 (CSS   2.1)<br />
+  <br />
+  JavaScript 1.5 (ECMA-262 3rd Edition) <br />
+  The standard JavaScript   features are supported. The WRT environment also provides some additional   features that are mobile device specific. <br />
+  The following additional   JavaScript features are supported in the WRT environment:</p>
+<ul>
+  <li>Utilizing the underlying user input features of the mobile device to   interact with the user </li>
+  <li>Self-updating widgets </li>
+  <li>UI navigation using either a cursor or tabs </li>
+  <li>Rotating the screen: portrait and landscape orientation </li>
+  <li>Launching S60 mobile applications </li>
+  <li>Localization framework with automatic detection of the device language   settings </li>
+  <li>Getting information on physical device functionality and controlling such   features. </li>
+</ul>
+<h3><strong>Example Description</strong></h3>
+<p>The LocationWidget demonstrates service APIs for Location-Based  Services (LBS). These applications that leverage the user&rsquo;s current physical  location to provide an enhanced service or experience. The support for this  technical capability in mobile devices represents an opportunity for  application developers to create services widely used and highly valued.  Location information can be used for a variety of purposes; some of them are as  listed below:</p>
+<ul>
+  <li>Providing directions to the nearest restaurant</li>
+  <li>Monitoring the locations of snowplowing vehicles</li>
+</ul>
+<p>The wide-open nature of the market means there is room for  entrepreneurial innovation.</p>
+The Location service API provides the consumer with  a user-friendly interface to access location services offered by series 60,  while hiding the complexities involved in accessing the services. Keeping a  simple location interface to access location services benefits the application  development process.
+<h3><strong>Use Cases</strong></h3>
+<ul>
+  <li>A  service API for getting current location of the device. </li>
+  <li>A  service API for tracking location change of the device.</li>
+  <li>A  service API for mathematical operations between two locations.<br />
+  </li>
+</ul>
+<h3><strong>User Interface</strong></h3>
+<p>1. Use the file - Open option to open the widget under   &lt;Installed-5th-Edition-SDK&gt;\S60WidgetExamples\LocationWidget.wgz.</p>
+<p>2. Go to Application folder and click on the LocationWidget to start. Once   you start the widget, it will ask your application permission to access   data and then start the application.</p>
+<p align="center"><img src="docfiles/locw1.jpg" alt="Location Widget main page" width="361" height="579" /></p>
+<p align="left">&nbsp;</p>
+<p align="left">3. <strong>GetLocation</strong> or <strong>GetLocationAsync:</strong>When you click of these buttons, it will give you location information of your device. Please refer the bellow image to get more idea about the location details. </p>
+<p align="center"><img src="docfiles/locw2.jpg" alt="Location details" width="363" height="581" /></p>
+<p align="left">&nbsp;</p>
+<p align="left">4. You can also trace your current location by pressing <strong>Trace</strong> button. Informs  the consumer of any change in current location. It will keep tracing the location in every second. </p>
+<p><strong>Note:</strong> Device should be Location aware(that is, &nbsp;it should have some location service provider  in form of GPS, AGPS, &nbsp;Bluetooth)</p>
+<p align="center"><img src="docfiles/locw3.jpg" alt="Location tracing" width="362" height="581" /></p>
+<p align="left">&nbsp;</p>
+<p align="left">5. To cancel the Location tracing call, you can use <strong>CancelNotification</strong> button, which will cancel the locaiton tracing event. It also cancel the event for Get Location. </p>
+<p align="center"><img src="docfiles/locw5.jpg" alt="Location Tracing ang Get Locaitonn Cancel" width="358" height="279" /></p>
+<p align="center">&nbsp;</p>
+<p align="left">6. <strong>Calculate </strong>button performs  specific calculations on user provided data. There are three options for the location calculations.</p>
+<ul>
+  <li>FindDistance</li>
+  <li>FindBearingTo</li>
+  <li>MoveCoordinates </li>
+</ul>
+<p align="center"><img src="docfiles/locw4.jpg" alt="Location canculate" width="361" height="285" /></p>
+<h3 align="left"><strong>Internationalization</strong></h3>
+<p>Example Widget Application does not support internationalization</p>
+<h3><strong>References</strong></h3>
+<a href="http://www.forum.nokia.com/main/resources/technologies/browsing/widgets.html">Web   Runtime environment and widgets</a><br />
+<a href="http://www.forum.nokia.com/info/sw.nokia.com/id/fd9cc12e-5eed-40ec-a439-c77f845fed73/Web_Developers_Library.html">Web   Developer's Library 1.0</a>
+<p align="left">&nbsp;</p>

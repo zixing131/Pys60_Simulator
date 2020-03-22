@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Java console Widget</title>
+<meta name="Author" content="Krupa N" />
+  <meta name="Keywords" content="JavaScript Console Widget" />
+  <meta name="Description" content="Example Widget for Nokia Symbian^3 SDK" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<style type="text/css">
+<!--
+.style1 {
+	font-size: 24px;
+	font-weight: bold;
+}
+-->
+</style>
+</head>
+
+<body>
+<p align="center" class="style1">Contacts  Service API - Example Widget Documentation </p>
+<hr />
+<h3><strong>About this document</strong></h3>
+<p>
+ This document describes the ContactSample Example Widget application for Nokia Symbian^3 SDK .
+ Read this document if you are a web developer, testing professional, or the product manager working on this product.
+</p>
+
+<h3><strong>About this Product</strong></h3>
+<p>
+Widgets are lightweight Web applications developed using the same well-known standards-based Web technologies – AJAX, CSS, HTML and JavaScript – used to
+create Web pages. Developers can use it as a reference and testers can use it to test the relevant functionality. widget is intended for Nokia Symbian^3 SDK . Developers should be able to develop professional applications.</p>
+
+<h3><strong>Product intent</strong></h3>
+<p>
+Example Widget Application is designed to run on Nokia Symbian^3 SDK. It will be designed such that a developer takes it as a reference to create useful applications for any functionality supported on SDK. It will be designed to let the testers to test the functionality</p>
+
+<h3><strong>Product limitations</strong></h3>
+<p>
+Example widget is not intended to give full featured implementation. This example will implement the WRT 1.0 APIs. It runs a javascript with errors and shows the error either on console or log to a file depending on the option set in browser</p>
+
+<h2><strong>Specification</strong></h2>
+<p>
+The example widget uses the WRT 1.0 API.
+The Web Runtime (WRT) environment supports the following Internet technology standards:<br />
+<br />
+HTML 4.01<br />
+The basic HTML standards are supported.<br />
+<br />
+XHTML 1.0<br />
+The basic XHTML standards are supported.<br />
+<br />
+CSS Level 2 revision 1 (CSS 2.1)<br />
+<br />
+JavaScript 1.5 (ECMA-262 3rd Edition)
+<br />
+The standard JavaScript features are supported. The WRT environment also provides some additional features that are mobile device specific.
+<br />
+The following additional JavaScript features are supported in the WRT environment:</p>
+<ul>
+	<li>Utilizing the underlying user input features of the mobile device to interact with the user</li>
+	<li>Self-updating widgets</li>    
+<li>UI navigation using either a cursor or tabs</li>
+<li>Rotating the screen: portrait and landscape orientation</li>
+<li>Launching Symbian mobile applications</li>
+<li>Localization framework with automatic detection of the device language settings</li>
+<li>Getting information on physical device functionality and controlling such features.</li>
+</ul>
+</p>
+
+<h3><strong>Example Description</strong></h3>
+<p>
+The Contact API Sample widget demonstrates the Contact API support given by the SDK. The widget opens up with some options with following USE CASES.
+<p>
+<p><strong>Use Cases</strong>
+<ul>
+  <li>Add Contact </li>
+  <li>DeleteContact </li>
+  <li>GetContactList</li>
+  <li>ImportContact</li>
+  <li>Export Contact</li>
+  <li>AddGroup</li>
+  <li>DeleteGroup</li>
+  <li>GetGroupList</li>
+  <li>OrganiseGroup</li>
+</ul>
+<h3><strong>Installing and Running the Widget</strong></h3>
+<ol>
+<li>Use the file - Open option to open the widget under &lt;Installed_SDK_Dir&gt;\examples\widget\ContactWidget.wgz</li>
+<br />
+<img src="docfiles/contact1.PNG" /><br /></p>
+<li>The SDK recognises and installs the widget. Run the widget from the installations folder.</li>
+<br />
+<img src="docfiles/contact2.PNG" /><img src="docfiles/contact3.PNG"  /><br /></p>
+<li>Start the Widget from the installed folder i.e., Menu &gt;&gt; Application. </li> 
+<li>Once the widget is started we get to see the following options. </li>
+<br /></p>
+<img src="docfiles/contact4.PNG"  /><br /></p>
+<li>Clicking on the &quot;AddContact&quot; button will add a dummy contact to the phone book. That can be viewed by either going to Phone Book application of the emulator application or by clicking on the &quot;GetContactlist&quot; button. </li>
+<br />
+<img src="docfiles/contact6.PNG"  /><br /></p>
+  <li>Use the option &quot;DeleteContact&quot; to delete any entry in the contact. To make sure weather the contact has been deleted or not we can verify anytime by using &quot;GetContact&quot; option. </li>
+<li>We can even import contact from any text file by using the &quot;ImportContact&quot; button. This option prompts for a Dialogue box which ask for the file from which a contact has to be imported. <br/> <img src="docfiles/contact7.PNG" /></li> </p>
+<li>The sameway we can export a contact to a file using the option &quot;ExportContact&quot;. </li> </p>
+  <li>Similar to contacts we have functionalities for groups also like. 
+    <ol>
+      <li>AddGroup - to add a new group.</li>
+      <li>DeleteGroup - To delete a already created group.</li>
+      <li>GetGroupList - to fetch the group list.</li>
+      <li>OrganiseGroup - to Organise a group.     </li>
+    </ol>
+  </li>
+</ol>
+</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<B>
+<H2>Internationalization</H2>
+</B>
+<p>Example Widget Application does not support internationalization</p>
+
+
+<B><H2>References</H2></B>
+<A HREF="http://www.forum.nokia.com/main/resources/technologies/browsing/widgets.html">Web Runtime environment and widgets</A><BR>
+<A HREF="http://www.forum.nokia.com/info/sw.nokia.com/id/fd9cc12e-5eed-40ec-a439-c77f845fed73/Web_Developers_Library.html">Web Developer's Library 1.0</A>
+</body>
+</html>

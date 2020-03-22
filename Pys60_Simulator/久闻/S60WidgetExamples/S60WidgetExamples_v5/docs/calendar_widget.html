@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Java console Widget</title>
+<meta name="Author" content="Krupa N" />
+  <meta name="Keywords" content="JavaScript Console Widget" />
+  <meta name="Description" content="Example Widget for S60 SDK" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<style type="text/css">
+<!--
+.style1 {
+	font-size: 24px;
+	font-weight: bold;
+}
+-->
+</style>
+</head>
+
+<body>
+<p align="center" class="style1">Calendar  Service API - Example Widget Documentation </p>
+<hr />
+<h3><strong>About this document</strong></h3>
+<p>
+ This document describes the calendar service API Example Widget application for S60 5th Edition SDK .
+ Read this document if you are a web developer, testing professional, or the product manager working on this product.
+</p>
+
+<h3><strong>About this Product</strong></h3>
+<p>
+Widgets are lightweight Web applications developed using the same well-known standards-based Web technologies – AJAX, CSS, HTML and JavaScript – used to
+create Web pages. Developers can use it as a reference and testers can use it to test the relevant functionality. widget is intended for S60 5th Edition SDK . Developers should be able to develop professional applications.</p>
+
+<h3><strong>Product intent</strong></h3>
+<p>
+Example Widget Application is designed to run on S60 5th Edition SDK. It will be designed such that a developer takes it as a reference to create useful applications for any functionality supported on SDK. It will be designed to let the testers to test the functionality</p>
+
+<h3><strong>Product limitations</strong></h3>
+<p>
+Example widget is not intended to give full featured implementation. This example will implement the WRT 1.0 APIs. It runs a javascript with errors and shows the error either on console or log to a file depending on the option set in browser</p>
+
+<h2><strong>Specification</strong></h2>
+<p>
+The example widget uses the WRT 1.0 API.
+The Web Runtime (WRT) environment supports the following Internet technology standards:<br />
+<br />
+HTML 4.01<br />
+The basic HTML standards are supported.<br />
+<br />
+XHTML 1.0<br />
+The basic XHTML standards are supported.<br />
+<br />
+CSS Level 2 revision 1 (CSS 2.1)<br />
+<br />
+JavaScript 1.5 (ECMA-262 3rd Edition)
+<br />
+The standard JavaScript features are supported. The WRT environment also provides some additional features that are mobile device specific.
+<br />
+The following additional JavaScript features are supported in the WRT environment:</p>
+<ul>
+	<li>Utilizing the underlying user input features of the mobile device to interact with the user</li>
+	<li>Self-updating widgets</li>    
+<li>UI navigation using either a cursor or tabs</li>
+<li>Rotating the screen: portrait and landscape orientation</li>
+<li>Launching S60 mobile applications</li>
+<li>Localization framework with automatic detection of the device language settings</li>
+<li>Getting information on physical device functionality and controlling such features.</li>
+</ul>
+</p>
+
+<h3><strong>Example Description</strong></h3>
+<p>
+The calendar service API Sample widget demonstrates the Calendar API support given by the SDK. The widget opens up with some options with following USE CASES.
+<p>
+<p><strong>Use Cases</strong>
+<ul>
+  <li>AddCalendar</li>
+  <li>AddMeeting </li>
+  <li>GetCalendar</li>
+  <li>GetMeeting</li>
+  <li>DeleteCalendar</li>
+  <li>DeleteEntryIndefaultCalendar</li>
+  <li>ImportCalendar</li>
+  <li>ExportCalendar</li>
+  <li>ImportAsync</li>
+  <li>ExportAsync</li>
+  <li>RequestNotification</li>
+  <li>CancelImportAsync</li>
+  <li>CancelExportAsync</li>
+  <li>CancelRequestNotification</li>
+</ul>
+<h3><strong>Installing and Running the Widget</strong></h3>
+<ol>
+<li>Use the file - Open option to open the widget under &lt;Installed-5th-Edition-SDK&gt;\S60WidgetExamples\CalendarWidget.wgz</li>
+<br />
+<img src="docfiles/calendar1.JPG" width="468" height="758" /><br />
+<li>The SDK recognises and installs the widget. Run the widget from the installations folder.</li>
+<br />
+<img src="docfiles/contact2.PNG" width="464" height="746" />i<img src="docfiles/calendar2.JPG" width="468" height="761" /><br />
+<li>Start the Widget from the installed folder i.e., Menu &gt;&gt; Application. </li> 
+<li>Once the widget is started we get to see the following options. </li>
+<br />
+<img src="docfiles/calendar3.JPEG" width="468" height="758" /><br />
+<li>Clicking on the &quot;AddCalendar&quot; button will add a dummy calendar entry to the widget.The added calendar entry can be viewed by clicking on the &quot;GetCalendar&quot; option. </li>
+<br />
+<img src="docfiles/contact5.PNG" /><img src="docfiles/calendar4.JPEG" width="468" height="758" /><img src="docfiles/calendar5.JPEG" width="468" height="761" /><br />
+  <li>Use the option &quot;DeleteCalendar&quot; to delete any entry previously added. To make sure weather the entry has been deleted or not we can verify anytime by using &quot;GetCalendar&quot; option. </li>
+  <li>We can even import calendar from a text file. Just place a txt file by name &quot;calendarFile.txt &quot;in the path &quot;S60_5th_Edition_SDK_v0.9\epoc32\winscw\c\Data&quot; . If the file is not present then a Alert message is shown on the screen as displayed</li>
+  <li>.<img src="docfiles/calendar6.JPEG" width="468" height="758" /><img src="docfiles/calendar7.JPEG" width="468" height="758" /></li>
+  <li>The same way we can export a calender entry by clicking on &quot;ExportCalendar&quot; button. A text file by the name &quot;calendarFile&quot; will be created in the path &quot;S60_5th_Edition_SDK_v0.9\epoc32\winscw\c\Data&quot;. </li>
+  <li>For Asyncronous Import and Export and there cancelation we can use the following buttons:
+    <ol>
+      <li>ImportAsync</li>
+      <li>ExportAsync</li>
+      <li>CancelImportAsync</li>
+      <li>CancelExportAsyn</li>
+    </ol>
+  </li>
+  <li>Any update on entry or deletion of calendar entries can be notified to the Widget through &quot;RequestNotification &quot; and &quot;CancelRequestNotification&quot; buttons. </li>
+</ol>
+<p>&nbsp;</p>
+<B>
+<H2>Internationalization</H2>
+</B>
+<p>Example Widget Application does not support internationalization</p>
+
+
+<B><H2>References</H2></B>
+<A HREF="http://www.forum.nokia.com/main/resources/technologies/browsing/widgets.html">Web Runtime environment and widgets</A><BR>
+<A HREF="http://www.forum.nokia.com/info/sw.nokia.com/id/fd9cc12e-5eed-40ec-a439-c77f845fed73/Web_Developers_Library.html">Web Developer's Library 1.0</A>
+</body>
+</html>

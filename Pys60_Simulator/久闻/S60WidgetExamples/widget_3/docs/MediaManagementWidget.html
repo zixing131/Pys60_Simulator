@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Media Management Widget</title>
+<meta name="Author" content="Krupa N" />
+  <meta name="Keywords" content="Media Management Widget" />
+  <meta name="Description" content="Example Widget for Nokia Symbian^3 SDK" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<style type="text/css">
+<!--
+.style1 {
+	font-size: 24px;
+	font-weight: bold;
+}
+-->
+</style>
+</head>
+
+<body>
+<p align="center" class="style1">Media Management Service API - Example Widget Documentation</p>
+<hr />
+<h3><strong>About this document</strong></h3>
+<p>
+ This document describes the Media Management  Widget application for Nokia Symbian^3 SDK.
+ Read this document if you are a web developer, testing professional, or the product manager working on this product.
+</p>
+
+<h3><strong>About this Product</strong></h3>
+<p>
+Widgets are lightweight Web applications developed using the same well-known standards-based Web technologies – AJAX, CSS, HTML and JavaScript – used to
+create Web pages. Developers can use it as a reference and testers can use it to test the relevant functionality. widget is intended for Nokia Symbian^3 SDK. Developers should be able to develop professional applications.</p>
+
+<h3><strong>Product intent</strong></h3>
+<p>
+Example Widget Application is designed to run on S60 SDK. It will be designed such that a developer takes it as a reference to create useful applications for any functionality supported on SDK. It will be designed to let the testers to test the functionality</p>
+
+<h3><strong>Product limitations</strong></h3>
+<p>
+Example widget is not intended to give full featured implementation. This example implements the Media Managemnet service API. It retrieves the list of media files from the S60 gallery depending on the file type like sound, images, videos, music and streaming url. This widget specifically retrieves only the sound files. Hence , the precondition is that there are some sound files available in the sound folder of the S60 gallery. The list of media files are listed using the IDataSource.GetList() method. This widget also implements the functionality of cancelling the asynchronous request using the IDataSource.Cancel() method. </p>
+
+<h3><strong>Specification</strong></h3>
+<p>This widget demonstrates the use of Media Management Service API. Please see the attcahed specification <a href="docfiles/MediaManagementServiceAPIforS60WebRuntime[1].doc">MediaManagement Service API for web run time</a> </p>
+<p>The Web Runtime (WRT) environment supports the following Internet technology standards:<br />
+  <br />
+HTML 4.01<br />
+The basic HTML standards are supported.<br />
+<br />
+XHTML 1.0<br />
+The basic XHTML standards are supported.<br />
+<br />
+CSS Level 2 revision 1 (CSS 2.1)<br />
+<br />
+JavaScript 1.5 (ECMA-262 3rd Edition)
+<br />
+The standard JavaScript features are supported. The WRT environment also provides some additional features that are mobile device specific.
+<br />
+The following additional JavaScript features are supported in the WRT environment:</p>
+<ul>
+	<li>Utilizing the underlying user input features of the mobile device to interact with the user</li>
+	<li>Self-updating widgets</li>    
+<li>UI navigation using either a cursor or tabs</li>
+<li>Rotating the screen: portrait and landscape orientation</li>
+<li>Launching Symbian mobile applications</li>
+<li>Localization framework with automatic detection of the device language settings</li>
+<li>Getting information on physical device functionality and controlling such features.</li>
+</ul>
+</p>
+
+<h3><strong>Example Description</strong></h3>
+<p>The example widget retrieves the media files from the  gallery. A service object is first created of type Mediamanagement with the following syntax
+<p><strong>so =  device.getServiceObject(&ldquo;Service.MediaManagement&rdquo;, &ldquo;IDataSource&rdquo;);</strong>
+<p>This service object is then used to call the the method getList() , a asynchronous method which returns list  of media objects and meta-data from the S60 Media Gallery.
+<p>syntax looks like 
+<p><strong>result = so.IDataSource.GetList(  criteria, callback);
+</strong>
+<p>where criteria is an object that specifies  &ldquo;what&rdquo; media information should be returned and &ldquo;how&rdquo; the returned list should  be filtered and sorted. The criteria object has three properties Type, Filter, and Sort.
+<p>The  callback argument is the name of a  function to be executed when GetList() has results or status information to return.  Define a callback function for any asynchronous call with the method signature  below
+<p><strong>callback(transID, eventCode, result)
+</strong>
+<p>the result is parsed and displayed as a list of media files with their properties like file type, size, date, name and path , author, composer, mimetype etc.
+<p>The asynchronous call can also be cancelled by the method call IDataSource.cancel().If a cancel is sent, but the asynchronous request has already  completed, then result.ErrorCode will be SErrNotFound.
+
+<p><strong>Use Cases</strong>
+<ul>
+<li>Get a list of media files of type &quot;sound &quot; from the s60 gallery with an asynchronous request.</li>
+<li>Cancel the request of getting the media files  </li>
+<br />
+<h3><strong>Installing and Running the Widget</strong></h3>
+<ol>
+<li>Before starting the SDK , put some sound files in the SDK directory , &lt;Installed_SDK_Dir&gt;\epoc32\winscw\c\Data\Sounds.</li>
+<li>Use the file - Open option to open the widget under &lt;Installed_SDK_Dir&gt;\examples\widget\MediaManagementWidget.wgz.</li>
+  <img src="docfiles/media2.JPG"  /><br />
+  <li>The SDK recognises and installs the widget. Run the widget from the installations folder.  </li>
+  <br /> <img src="docfiles/contact2.PNG"    /> <img src="docfiles/media3.JPG" alt="run"  /></p>
+  <li>Click on the &quot;GetMediaList&quot;. The list of sound files are shown on the screen with the file properties.</li>
+<p><img src="docfiles/media4.JPG" alt="get list" /></p>
+</ol>
+
+<ol start="5">
+  <li>Click on &quot;CancelGetList&quot;. The request is cancelled and the blank screen is seen.<br />
+  </li>
+</ol>
+</p>
+
+<img src="docfiles/media5.JPG" alt="cancel"  /><B>
+<H2>Internationalization</H2></B>
+<p>Example Widget Application does not support internationalization</p>
+
+
+<B><H2>References</H2></B>
+<A HREF="http://www.forum.nokia.com/main/resources/technologies/browsing/widgets.html">Web Runtime environment and widgets</A><BR>
+
+</body>
+</html>

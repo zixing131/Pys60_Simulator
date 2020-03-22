@@ -1,0 +1,77 @@
+<style type="text/css">
+<!--
+.style1 {	font-size: 24px;
+	font-weight: bold;
+}
+-->
+</style>
+<p align="center" class="style1">System Information  Service API - Example Widget   Documentation</p>
+<hr />
+<h3><strong>About this document</strong></h3>
+<p>This document describes the System informationWidget application for S60 5th Edition   SDK. Target audience are developers using  other run-time environments interested in SysInfo services.</p>
+<h3><strong>About this Product</strong></h3>
+<p>Widgets are lightweight Web applications developed using the same well-known   standards-based Web technologies &ndash; AJAX, CSS, HTML and JavaScript &ndash; used to   create Web pages. Developers can use it as a reference and testers can use it to   test the relevant functionality. This widget is intended for S60 5th Edition   SDK. Developers should be able to develop professional applications.</p>
+<h3><strong>Product intent</strong></h3>
+<p>Example Widget Application is designed to run on S60 5th Edition SDK. It is designed such that a developer takes it as a reference to create useful   applications for any functionality supported on SDK. It will be designed to let   the testers to test the functionality.</p>
+<h3><strong>Product limitations</strong></h3>
+<p>Example widget is not intended to give full featured implementation. This   example will implement the System info Service APIs. Only  few SA&rsquo;s are modifiable and will support notifications.</p>
+<h3><strong>Specification</strong></h3>
+<p>The example widget uses the WRT 1.0 API. The Web Runtime (WRT) environment   supports the following Internet technology standards:<br />
+    <br />
+  HTML 4.01<br />
+  The   basic HTML standards are supported.<br />
+  <br />
+  XHTML 1.0<br />
+  The basic XHTML   standards are supported.<br />
+  <br />
+  CSS Level 2 revision 1 (CSS   2.1)<br />
+  <br />
+  JavaScript 1.5 (ECMA-262 3rd Edition) <br />
+  The standard JavaScript   features are supported. The WRT environment also provides some additional   features that are mobile device specific. <br />
+  The following additional   JavaScript features are supported in the WRT environment:</p>
+<ul>
+  <li>Utilizing the underlying user input features of the mobile device to   interact with the user </li>
+  <li>Self-updating widgets </li>
+  <li>UI navigation using either a cursor or tabs </li>
+  <li>Rotating the screen: portrait and landscape orientation </li>
+  <li>Launching S60 mobile applications </li>
+  <li>Localization framework with automatic detection of the device language   settings </li>
+  <li>Getting information on physical device functionality and controlling such   features. </li>
+</ul>
+<h3><strong>Example Description</strong></h3>
+<p>The SysInfoWidget demonstrates service APIs for system information. APIs provide read and write access to system information and allow registrating to system events identified by System Attributes. The  system information of a SysInfo SAPI is classified into eight entities below:</p>
+<ul>
+  <li>Battery</li>
+  <li>Network</li>
+  <li>General</li>
+  <li>Features</li>
+  <li>Display</li>
+  <li>Connectifity</li>
+  <li>MemoryDevice</li>
+</ul>
+<p><strong>Use Cases</strong></p>
+<ul>
+  <li>GetInfo  API reads a system attribute. </li>
+  <li>SetInfo  API modifies system attribute.</li>
+  <li>GetNotification  API registers a callback function for listening to changes in a system  attribute.</li>
+  <li>Cancel  API stops any ongoing asynchronous requests identified by TransactionID.<br />
+  </li>
+</ul>
+<h3><strong>User Interface</strong></h3>
+<p>1. Use the file - Open option to open the widget under   &lt;Installed-5th-Edition-SDK&gt;\S60WidgetExamples\SysInfoWidget.wgz.</p>
+<p>2. Go to Application folder and click on the SysInfoWidget to start. Once   you start the widget, it will ask your application permission to access   data and then start the application.</p>
+<p align="left">3. <strong>GetSysInfo </strong>allows you to get selected system information. Once you click on it, it will ask you to provide System entry and system key name for which you want to get information.</p>
+<p align="center"><img src="docfiles/si1.jpg" alt="Enter entity name" width="370" height="228" />  <img src="docfiles/si2.jpg" alt="Enter sub entity name" width="367" height="229" /></p>
+<p align="left">For example: Other Entity and key value could be &quot;Battery&quot; and &quot;BatteryStrength&quot;, &quot;Connectivity&quot; and &quot;Bluetooth&quot;.</p>
+<p align="left">4. Once you select that, it will display the system information of the selected entity. You can also select any of the entity listed above in this document. </p>
+<p align="center"><img src="docfiles/si3.jpg" alt="System information of the entity" width="360" height="390" /></p>
+<p>5. <strong>SetSysInfo</strong> allows you to set selected information for given entity and its key. As described in step-3, provide entity and its key and it will ask you to enter value of that system property. Provide proper value and set the property. </p>
+<p align="center"><img src="docfiles/si4.jpg" alt="System property value" width="360" height="226" /> </p>
+<p align="left">&nbsp;</p>
+<p align="left">6. If you set notification for any given property, it will let you know (give you notification) for that property value change. <strong>GetSysInfoAsync</strong> and <strong>CancelGetSysInfoAsync</strong> are for ASYNC call go to get system information propeties.</p>
+<h3 align="left"><strong>Internationalization</strong></h3>
+<p>Example Widget Application does not support internationalization</p>
+<h3><strong>References</strong></h3>
+<a href="http://www.forum.nokia.com/main/resources/technologies/browsing/widgets.html">Web   Runtime environment and widgets</a><br />
+<a href="http://www.forum.nokia.com/info/sw.nokia.com/id/fd9cc12e-5eed-40ec-a439-c77f845fed73/Web_Developers_Library.html">Web   Developer's Library 1.0</a>
+<p align="left">&nbsp;</p>

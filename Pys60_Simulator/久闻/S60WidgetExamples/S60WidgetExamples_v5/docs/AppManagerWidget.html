@@ -1,0 +1,98 @@
+<style type="text/css">
+<!--
+.style1 {font-size: 24px;
+	font-weight: bold;
+}
+-->
+</style>
+<p align="center" class="style1">Application Manager Service API - Example Widget   Documentation</p>
+<hr />
+<h3><strong>About this document</strong></h3>
+<p>This document describes the Application Manager Widget application for S60 5th Edition   SDK. Target audience are developers who wants to develop application rapidly using application management functionalities.</p>
+<h3><strong>About this Product</strong></h3>
+<p>Widgets are lightweight Web applications developed using the same well-known   standards-based Web technologies &ndash; AJAX, CSS, HTML and JavaScript &ndash; used to   create Web pages. Developers can use it as a reference and testers can use it to   test the relevant functionality. This widget is intended for S60 5th Edition   SDK. Developers should be able to develop professional applications.</p>
+<h3><strong>Product intent</strong></h3>
+<p>Example Widget Application is designed to run on S60 5th Edition SDK. It is designed such that a developer takes it as a reference to create useful   applications for any functionality supported on SDK. It will be designed to let   the testers to test the functionality.</p>
+<h3><strong>Product limitations</strong></h3>
+<p>Example widget is not intended to give full featured implementation.</p>
+<h3><strong>Specification</strong></h3>
+<p>The example widget uses the WRT 1.0 API. The Web Runtime (WRT) environment   supports the following Internet technology standards:<br />
+    <br />
+  HTML 4.01<br />
+  The   basic HTML standards are supported.<br />
+  <br />
+  XHTML 1.0<br />
+  The basic XHTML   standards are supported.<br />
+  <br />
+  CSS Level 2 revision 1 (CSS   2.1)<br />
+  <br />
+  JavaScript 1.5 (ECMA-262 3rd Edition) <br />
+  The standard JavaScript   features are supported. The WRT environment also provides some additional   features that are mobile device specific. <br />
+  The following additional   JavaScript features are supported in the WRT environment:</p>
+<ul>
+  <li>Utilizing the underlying user input features of the mobile device to   interact with the user </li>
+  <li>Self-updating widgets </li>
+  <li>UI navigation using either a cursor or tabs </li>
+  <li>Rotating the screen: portrait and landscape orientation </li>
+  <li>Launching S60 mobile applications </li>
+  <li>Localization framework with automatic detection of the device language   settings </li>
+  <li>Getting information on physical device functionality and controlling such   features. </li>
+</ul>
+<h3><strong>Example Description</strong></h3>
+<p>Application  Manager Service API enables the user to:</p>
+<ul>
+  <li>Retrieve  information about the applications installed</li>
+  <li>Retrieve  information about the user installed package</li>
+  <li>To  install an application, launch any one of the installed application</li>
+  <li>Applications  on different platforms take advantage of these APIs for finding and launching an  installed application</li>
+</ul>
+<h3>Use Cases </h3>
+<p>Following section  lists the functional use cases taken as requirements:</p>
+<p><ul>
+    <li>Install  the application</li>
+    <li>Get User  installed package</li>
+    <li>Get Handler  application based on specific MIME type and Document</li>
+    <li>Launch  the application based on any one of the following MIME type, Document, UID.</li>
+    <li>Launch  the application in Chained (Embedded) or Standalone mode</li>
+  </ul>
+  </p>
+<h3><strong>User Interface</strong></h3>
+<p>1. Use the file - Open option to open the widget under   &lt;Installed-5th-Edition-SDK&gt;\S60WidgetExamples\AppManagerWidget.wgz.</p>
+<p>2. Go to Application folder and click on the AppManagerWidget to start. Once   you start the widget, it will ask your application permission to access   data and then start the application.</p>
+<p align="center"><img src="docfiles/am8.jpg" alt="main screen" width="360" height="379" /></p>
+<p align="left">3.<strong>GetList: </strong>This API helps the user to do the following:</p>
+<ul>
+  <li>Get user installed package </li>
+  <li>Get Handler application based on the following:
+    <ul>
+      <li>Document name</li>
+      <li>MIME Type </li>
+    </ul>
+  </li>
+</ul>
+<p align="left">.Its range is &ldquo;UserInstalledPackage&rdquo;, &rdquo;Application. Enter valid range and it will display the list of application. </p>
+<p align="center"><img src="docfiles/am1.jpg" alt="Enter Range" width="363" height="284" />&nbsp;</p>
+<p align="center"><img src="docfiles/am2.jpg" alt="List of applications" width="368" height="299" /></p>
+<p align="left">4. You can get Filterd list by providing MINE type. It will display filtered application using the specified type </p>
+<p align="center"><img src="docfiles/am3.jpg" alt="mime type" width="361" height="215" /></p>
+<p align="center"><img src="docfiles/am4.jpg" alt="filtered list" width="362" height="155" /></p>
+<p>5. <strong>LaunchDoc: </strong>Launches the application based on the given document. By providing valid path and document mime type, it will launch document. It  supports launching in both modes depending on the application capability:</p>
+<ul><li>Standalone&nbsp;  Mode</li>
+  <li>Chained Mode(Embedded Mode) </li>
+</ul>
+<p align="center">	<img src="docfiles/am5.jpg" alt="launch doc" width="363" height="224" /></p>
+<p align="center"><img src="docfiles/am6.jpg" alt="mime type" width="360" height="222" /></p>
+<p><strong>Note:</strong> But the Valid  instance of IAppManager interface should be instantiated. In  Asynchronous mode, it sends the notification when the launched application dies. In  LaunchDoc either Document or MimeType should be present.</p>
+<p align="left">6. <strong>LaunchApp:</strong> Launches the application based on the UID. It supports  launching in both modes depending on the application capability:</p>
+<ul><li>Standalone&nbsp;  Mode</li>
+  <li>Chained Mode(Embedded Mode) </li>
+</ul>
+<p align="left">Developer gives valid UID of the application to launch the application. In  Asynchronous mode, it sends the notification when the launched application dies.</p>
+<p align="center"><img src="docfiles/am7.jpg" alt="UID screen" width="360" height="218" /></p>
+<p>&nbsp;</p>
+<h3 align="left"><strong>Internationalization</strong></h3>
+<p>Example Widget Application does not support internationalization</p>
+<h3><strong>References</strong></h3>
+<a href="http://www.forum.nokia.com/main/resources/technologies/browsing/widgets.html">Web   Runtime environment and widgets</a><br />
+<a href="http://www.forum.nokia.com/info/sw.nokia.com/id/fd9cc12e-5eed-40ec-a439-c77f845fed73/Web_Developers_Library.html">Web   Developer's Library 1.0</a>
+<p align="left">&nbsp;</p>

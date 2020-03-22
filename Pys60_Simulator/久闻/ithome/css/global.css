@@ -124,6 +124,11 @@ h1#topic {
 #next_button {
 	text-align: center;
 }
+
+#next_button_comments {
+	text-align: center;
+}
+ 
 #content {
 	padding:5px;
 	font-size:1.2em;

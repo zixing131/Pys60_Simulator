@@ -1,0 +1,77 @@
+ <style type="text/css">
+<!--
+.style1 {
+	font-size: 24px;
+	font-weight: bold;
+}
+-->
+</style>
+<p align="center" class="style1 style1">Logging Service API - Example Widget Documentation </p>
+<hr />
+<h3><strong>About this document</strong></h3>
+<p>This document describes the Logging  Widget application for   Nokia Symbian^3 SDK. Read this document if you are a web developer, testing professional, or   the product manager working on this product. Application Developers  looking to log, read events from the event logs using symbian logging Classes.</p>
+<h3><strong>About this Product</strong></h3>
+<p>Widgets are lightweight Web applications developed using the same well-known   standards-based Web technologies &ndash; AJAX, CSS, HTML and JavaScript &ndash; used to   create Web pages. Developers can use it as a reference and testers can use it to   test the relevant functionality. This widget is intended for S60 5.0 SDK. Developers   should be able to develop professional applications.</p>
+<h3><strong>Product intent</strong></h3>
+<p>Example Widget Application is designed to run on Nokia Symbian SDK. It will be designed   such that a developer takes it as a reference to create useful applications for   any functionality supported on SDK. It will be designed to let the testers to   test the functionality</p>
+<h3><strong>Product limitations</strong></h3>
+<p>Example widget is not intended to give full featured implementation. This   example will implement the Messaging Service APIs. It gives only messaging functionalities. It only lists the Draft messages from the Draft folder. </p>
+<h3><strong>Specification</strong></h3>
+<p>The example widget uses the WRT 1.0 API. The Web Runtime (WRT) environment   supports the following Internet technology standards:<br />
+    <br />
+  HTML 4.01<br />
+  The   basic HTML standards are supported.<br />
+  <br />
+  XHTML 1.0<br />
+  The basic XHTML   standards are supported.<br />
+  <br />
+  CSS Level 2 revision 1 (CSS   2.1)<br />
+  <br />
+  JavaScript 1.5 (ECMA-262 3rd Edition) <br />
+  The standard JavaScript   features are supported. The WRT environment also provides some additional   features that are mobile device specific. <br />
+  The following additional   JavaScript features are supported in the WRT environment:</p>
+<ul>
+  <li>Utilizing the underlying user input features of the mobile device to   interact with the user </li>
+  <li>Self-updating widgets </li>
+  <li>UI navigation using either a cursor or tabs </li>
+  <li>Rotating the screen: portrait and landscape orientation </li>
+  <li>Launching Symbian mobile applications </li>
+  <li>Localization framework with automatic detection of the device language   settings </li>
+  <li>Getting information on physical device functionality and controlling such   features. </li>
+</ul>
+<h3><strong>Example Description</strong></h3>
+<p> Logging widget gives usability of Logging service APIs with simple user interface. Widget allow user to display/add/delete application logs (Call Log/Messaging Log etc.) with the simple user interface. Application  developer can use it to add, read and delete events happening in the system. Keeping the  interface simple benefits the application development process greatly. </p>
+<p><strong>Use Cases</strong></p>
+<ul>
+  <li>Add log (Sync and Async). Create  new types of log entries.</li>
+  <li>Delete log (Sync and Async). Delete the entries to the event log. </li>
+  <li>Display Logs (Sync and Async). Iterating  through the Log events list obtained.<br />
+  </li>
+</ul>
+<h3><strong>User Interface </strong></h3>
+<ol>
+	<li> Use the file - Open option to open the widget under   &lt;Installed_SDK_Dir&gt;\examples\widget\LoggingWidget.wgz. </p>
+		<p><img src="docfiles/inlwideg.JPG"/><br /></p> 
+	<li>The SDK recognises and installs the widget. Run the widget from the 
+      installations folder.</li> <br /> <img src="docfiles/contact2.PNG"    />  <img src="docfiles/log2.JPG" /><br /> 
+	<li>Go to Application folder and click on the LoggingWidget to start. Once you start the widget, it will ask your application permission to access data.</p> </li>
+		<img src="docfiles/mw0.JPG" alt="Application Permission to Access data"/>
+<li>Once your widget is started, you can see the following user ineterface with the list of options.
+</p>
+<img src="docfiles/lw1.jpg" alt="Logging Widget main screen" />
+<li>Once your widget is started, you can see the following user ineterface with the list of options.</p> </li>
+<li>Add log by pressing 'AddLog' or 'AddLogAsyn' button. It will add dummy event to the event log. here in this case, we are adding sms log to the event log.</p> </li>	
+<li>You can view list of logs using 'GetLogList' or 'GetLogListAsync'. It will display logs in following format. </p> </li>
+</br>
+<img src="docfiles/lw2.jpg" alt="Get log list" /> </p>
+<li> Delete log by pressing 'DeleteLog' or 'DeleteLogAsync' button. It will ask you to enter event log id. Enter event log id from the event log list.</p> </li>
+	<img src="docfiles/lw3.jpg" alt="Enter event log id" />
+</p>
+</ol>
+
+<h2><strong>Internationalization</strong></h2>
+<p>Example Widget Application does not support internationalization</p>
+<h2><strong>References</strong></h2>
+<a href="http://www.forum.nokia.com/main/resources/technologies/browsing/widgets.html">Web   Runtime environment and widgets</a><br />
+<a href="http://www.forum.nokia.com/info/sw.nokia.com/id/fd9cc12e-5eed-40ec-a439-c77f845fed73/Web_Developers_Library.html">Web   Developer's Library 1.0</a>
+<p align="left">&nbsp;</p>

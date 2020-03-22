@@ -102,24 +102,31 @@ function showPage(id) { //显示id和隐藏其它页面
 function setTitle(str) { //设置标题栏
 	getById('topic').textContent = str || 'IT之家-新闻资讯';
 }
-function displayList(url) { //显示文章列表
+
+lastnewsTime = '';
+
+function displayList(hash) { //显示文章列表
 	
-	showPage('loading');//显示加载动画
-	
+	showPage('loading');//显示加载动画 
 	ref_page = 'list';
-	ajax_get('http://api.ithome.com/json/newslist/news?r=0', function(error, data) {
+	ajax_get('http://api.ithome.com/json/listpage/news/'+hash, function(error, data) {
 		if (error) {
 			alert(error);
 		} else {
+			
 			const articles = [];
-			data.toplist.forEach(function(item) { 
-				articles.push('<li><a href="javascript:displayArticle(\''+escape(JSON.stringify(item))+'\')">'+ '<img  src="'+item.image+'" alt="图片" />'+'<div><h3 style="color:red">[置顶]'+item.title+'</h3><p><span>评论('+item.commentcount+')</span><span>人气('+item.hitcount+')</span></p></div></a></li>');
-			});
+			if(data.toplist)
+			{
+				data.toplist.forEach(function(item) { 
+					articles.push('<li><a href="javascript:displayArticle(\''+escape(JSON.stringify(item))+'\')">'+ '<img  src="'+item.image+'" alt="图片" />'+'<div><h3 style="color:red">[置顶]'+item.title+'</h3><p><span>'+humanedate(item.postdate)+'</span><span>评论('+item.commentcount+')</span></p></div></a></li>');
+				});
+			}
 			
 			data.newslist.forEach(function(item) { 
-				articles.push('<li><a href="javascript:displayArticle(\''+escape(JSON.stringify(item))+'\')">'+ '<img  src="'+item.image+'" alt="图片" />'+'<div><h3>'+item.title+'</h3><p><span>评论('+item.commentcount+')</span><span>人气('+item.hitcount+')</span></p></div></a></li>');
+				articles.push('<li><a href="javascript:displayArticle(\''+escape(JSON.stringify(item))+'\')">'+ '<img  src="'+item.image+'" alt="图片" />'+'<div><h3>'+item.title+'</h3><p><span>'+humanedate(item.postdate)+'</span><span>评论('+item.commentcount+')</span></p></div></a></li>');
+				lastnewsTime = item.orderdate; 
 			});
-			if (url && /next/.test(url)) { //提供了url说明是下一页
+			if (hash!=0) { //提供了url说明是下一页
 				getById('list').innerHTML += articles.join('');
 			} else {
 				getById('list').innerHTML = articles.join('');
@@ -129,15 +136,20 @@ function displayList(url) { //显示文章列表
 			if (next_button) { //原来有next按钮
 				next_button.parentNode.removeChild(next_button);
 			}
-			/*
-			if (page_list < data.pager.pages) {
-				getById('list').innerHTML += '<li id="next_button"><a href="javascript:displayList(\''+data.pager.last_dateline+'/next/'+data.pager.next_page+'\')">加载更多……</a></li>';
-				page_list = data.pager.page;
+			
+			if(data.newslist.length>0)
+			{
+				getById('list').innerHTML += '<li id="next_button"><a href="javascript:displayList(\''+get_next(lastnewsTime)+'\')">加载更多……</a></li>';
 			}
-			*/
+			else
+			{
+				getById('list').innerHTML += '<div class="bottom">我们是有底线的</div>';
+				
+			} 
+			
 			showPage('list');
 			//showPage('loading');//显示加载动画
-			if (/next/.test(url)) {
+			if (hash!=0) {
 				document.body.scrollTop += 20;
 			}
 		}
@@ -147,7 +159,7 @@ function displayArticle(item) { //显示文章正文
 	showPage('loading');//显示加载动画
 	item = JSON.parse(unescape(item))
 	//getById('content').className = item.newsid;
-	//displayComments('')
+	//displayComments('0')
 	//return; // http://dyn.ithome.com/api/comment/getnewscomment?sn=4c70d4f5c7bdb61f&cid=48966977 
 	
 	ref_page = 'article';
@@ -160,26 +172,35 @@ function displayArticle(item) { //显示文章正文
 			setTitle(item.title);
 			getById('dateline').textContent = dateline(item.postdate);
 			getById('author').textContent = data.newssource+'('+data.newsauthor+')'; 
-			getById('comment_num').innerHTML = '<a href="javascript:displayComments('+item.newsid+')">评论('+item.commentcount+')</a>';
+			getById('comment_num').innerHTML = '<a href="javascript:displayComments(0)">评论('+item.commentcount+')</a>';
 			getById('content').innerHTML = UBB(data.detail);
 			getById('content').className = item.newsid;
 			showPage('article');
 		}
 	});
 }
-function displayComments(url) { //显示评论列表TODO
+
+lastCommentCi = ''
+
+function displayComments(Ci) { //显示评论列表TODO 
 	showPage('loading');//显示加载动画
-	ref_page = 'comments'; 
-	ajax_get('http://dyn.ithome.com/api/comment/getnewscomment?sn='+getCommentSn(getById('content').className), function(error, data) {
+	ref_page = 'comments';
+	url =  'http://dyn.ithome.com/api/comment/getnewscomment?sn='+getCommentSn(getById('content').className);
+	if(Ci!=0)
+	{
+		url=url+'&cid='+Ci;
+	}
+	ajax_get(url, function(error, data) {
 		if (error) {
 			alert(error);
 		} else {
 			const comments = [];
 			data.clist.forEach(function(item) {
 				item = item.M;
-				comments.push('<li><img src="'+getHeadUrl(item.Ui)+'" alt="头像" onerror=\"onerror=null;src=\'img/avatar_default_rect.png\'\" />  <div><h3>'+item.N+'</h3><p><span>'+dateline(item.T)+'</span><span>'+item.Ta+'</span></p><p>'+item.C+'</p></div></li>');
+				comments.push('<li><img src="'+getHeadUrl(item.Ui)+'" alt="头像" onerror=\"onerror=null;src=\'img/avatar_default_rect.png\'\" />  <div><h3>'+item.N+' ('+item.SF+')</h3><p><span>'+dateline(item.T)+'</span><span>'+item.Ta+'</span></p><p>'+item.C+'</p></div></li>');
+				lastCommentCi = item.Ci;
 			});
-			if (url && /next/.test(url)) { //提供了url说明是下一页
+			if(Ci!=0) { //提供了url说明是下一页
 				getById('comments').innerHTML += comments.join('');
 			} else {
 				getById('comments').innerHTML = comments.join('');
@@ -189,11 +210,16 @@ function displayComments(url) { //显示评论列表TODO
 			if (next_button_comments) { //原来有next按钮
 				next_button_comments.parentNode.removeChild(next_button_comments);
 			}
-			/*
-			if (page_comments < data.pager.pages) {
-				getById('comments').innerHTML += '<li id="next_button_comments"><a href="javascript:displayComments(\'/'+data.pager.last_dateline+'/next/'+data.pager.next_page+'\')">加载更多……</a></li>';
-				page_comments = data.pager.page;
-			}*/
+			 
+			if (data.clist.length>0) {
+				getById('comments').innerHTML += '<li id="next_button_comments"><a href="javascript:displayComments(\''+lastCommentCi+'\')">加载更多……</a></li>'; 
+			} 
+			else
+			{
+				getById('comments').innerHTML += '<div class="bottom">我们是有底线的</div>';
+				
+			} 
+			
 			showPage('comments');
 		}
 	});
@@ -201,7 +227,7 @@ function displayComments(url) { //显示评论列表TODO
 
 function selectMenu(id) { //选择了菜单项
 	if (id === CMD.refersh) { //点击刷新
-		displayList('?_='+new Date().getTime());
+		displayList(0);
 	} else if (id === CMD.about) { //点击关于
 		showPage('about');
 		menu.setRightSoftkeyLabel('返回', function() {
@@ -244,7 +270,7 @@ function selectMenu(id) { //选择了菜单项
 					alert(error);
 				} else {
 					alert('评论成功。');
-					displayComments('?_='+new Date().getTime());
+					displayComments('0');
 				}
 			});
 		}
@@ -314,7 +340,7 @@ function selectMenu(id) { //选择了菜单项
 		widget.setPreferenceForKey(null, 'auth');
 		alert('注销成功！');
 	} else if (id === CMD.comments) { //查看评论页面
-		displayComments('?_='+new Date().getTime());
+		displayComments('0');
 	}
 }
 window.onload = function() { //应用载入之后开始执行。
@@ -332,7 +358,7 @@ window.onload = function() { //应用载入之后开始执行。
 	 
 	var timer = setTimeout(function() {
 		document.body.removeChild(getById('wellcome')); //关闭欢迎界面
-		displayList();
+		displayList(0);
 		
 		menu.showSoftkeys();
 		

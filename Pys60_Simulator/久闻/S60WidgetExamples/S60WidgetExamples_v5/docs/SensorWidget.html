@@ -1,0 +1,73 @@
+<style type="text/css">
+<!--
+.style1 {
+	font-size: 24px;
+	font-weight: bold;
+}
+-->
+</style>
+<p align="center" class="style1">Sensor Service API - Example Widget   Documentation</p>
+<hr />
+<h3><strong>About this document</strong></h3>
+<p>This document describes the Sensor Widget application for S60 5th Edition   SDK. Target audience are developers developing sensor applications and using other run-time environment interested in sensor service API. </p>
+<h3><strong>About this Product</strong></h3>
+<p>Widgets are lightweight Web applications developed using the same well-known   standards-based Web technologies &ndash; AJAX, CSS, HTML and JavaScript &ndash; used to   create Web pages. Developers can use it as a reference and testers can use it to   test the relevant functionality. This widget is intended for S60 5th Edition   SDK. Developers should be able to develop professional applications.</p>
+<h3><strong>Product intent</strong></h3>
+<p>Example Widget Application is designed to run on S60 5th Edition SDK. It will   be designed such that a developer takes it as a reference to create useful   applications for any functionality supported on SDK. It will be designed to let   the testers to test the functionality</p>
+<h3><strong>Product limitations</strong></h3>
+<p>Example widget is not intended to give full featured implementation. This   example will implement the Sensor Service APIs. It gives only sensor   functionalities.</p>
+<h3><strong>Specification</strong></h3>
+<p>The example widget uses the WRT 1.0 API. The Web Runtime (WRT) environment   supports the following Internet technology standards:<br />
+    <br />
+  HTML 4.01<br />
+  The   basic HTML standards are supported.<br />
+  <br />
+  XHTML 1.0<br />
+  The basic XHTML   standards are supported.<br />
+  <br />
+  CSS Level 2 revision 1 (CSS   2.1)<br />
+  <br />
+  JavaScript 1.5 (ECMA-262 3rd Edition) <br />
+  The standard JavaScript   features are supported. The WRT environment also provides some additional   features that are mobile device specific. <br />
+  The following additional   JavaScript features are supported in the WRT environment:</p>
+<ul>
+  <li>Utilizing the underlying user input features of the mobile device to   interact with the user </li>
+  <li>Self-updating widgets </li>
+  <li>UI navigation using either a cursor or tabs </li>
+  <li>Rotating the screen: portrait and landscape orientation </li>
+  <li>Launching S60 mobile applications </li>
+  <li>Localization framework with automatic detection of the device language   settings </li>
+  <li>Getting information on physical device functionality and controlling such   features. </li>
+</ul>
+<h3><strong>Example Description</strong></h3>
+<p>The SensorWidget demonstrates service APIs for Sensors. Sensor Service API provides access to the various methods provided by S60  sensor channel subsystem. These include finding available sensor channels,  registering to receive notification on data from various sensors or channel  property changes and setting and getting channel properties.</p>
+<p>Sensor channel provides abstraction of various physical sensors  that exist in the device. The user can map data from one physical sensor to  several channels. </p>
+<h3><strong>Use Cases</strong></h3>
+<p>Widget gives following fuctionalities:</p>
+<ul>
+  <li>Find Sensor Channel(s).</li>
+  <li>Register  to receive a notification when a channel property is changed</li>
+  <li>Stop  listening to any previously registered notification(s)</li>
+  <li>Get  sensor channel properties</li>
+</ul>
+<h3><strong>User Interface</strong></h3>
+<p>1. Use the file - Open option to open the widget under   &lt;Installed-5th-Edition-SDK&gt;\S60WidgetExamples\SensorWidget.wgz.</p>
+<p>2. Go to Application folder and click on the SensorWidget to start. Once   you start the widget, it will ask your application permission to access data and   then start the application.</p>
+<p align="center"><img src="docfiles/mw0.JPG" alt="Security Permission" width="369" height="630" /></p>
+<p align="left">&nbsp;</p>
+<p align="left">3. This is the main screen of the application.</p>
+<p align="center"><img src="docfiles/sw1.jpg" width="365" height="311" /> </p>
+<p align="center">&nbsp;</p>
+<p align="left">&nbsp;</p>
+<p align="left">4. <strong>FindSensorChannel: </strong>It will finds available sensor channels. and displays some details about the channels like ChannelId, ContextType, Quantity etc. Please refer the bellow image for more details.</p>
+<p align="center"><img src="docfiles/sw2.jpg" width="362" height="577" /></p>
+<p align="left">&nbsp;</p>
+<p align="left">5. You can Register for Notification by pressing <strong>RegisterForNotification</strong> button, which will register to receive a notification when a channel  property is changed. To cancel the notification call, you can use <strong>Cancel</strong><strong> </strong>button. </p>
+<p align="left">6. <strong>GetChannelProperty:</strong> This API gets the specifed property of a sensor  channel.</p>
+<p align="center"><img src="docfiles/sw3.jpg" alt="get channel properties" width="365" height="583" /></p>
+<h3 align="left"><strong>Internationalization</strong></h3>
+<p>Example Widget Application does not support internationalization</p>
+<h3><strong>References</strong></h3>
+<a href="http://www.forum.nokia.com/main/resources/technologies/browsing/widgets.html">Web   Runtime environment and widgets</a><br />
+<a href="http://www.forum.nokia.com/info/sw.nokia.com/id/fd9cc12e-5eed-40ec-a439-c77f845fed73/Web_Developers_Library.html">Web   Developer's Library 1.0</a>
+<p align="left">&nbsp;</p>

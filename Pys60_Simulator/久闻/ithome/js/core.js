@@ -16,6 +16,11 @@ function bind(target, type, callback) {
 	}
 }
  
+ 
+ function PrefixInteger(num, n) {
+		return (Array(n).join(0) + num).slice(-n);
+	}
+	
 function getViewPortWidth() {
     return document.documentElement.clientWidth || document.body.clientWidth;
 }
@@ -105,6 +110,31 @@ function UBB(str) {
 function dateline(datetime) {
 	return datetime.split('.')[0].replace('T',' ');
 }
+
+function humanedate(datetime) {
+	datetime = datetime.split('.')[0];
+	datetime = datetime.replace(/-/g,'/');
+	datetime = datetime.replace('T',' ');  
+	var nowtime = new Date();
+	var timestamp = new Date(datetime);
+	var cha = (nowtime - timestamp)/1000
+	 if(cha<180){
+        return "刚刚";
+    }else if(cha<3600){
+        return Math.floor(cha/60)+" 分钟前";
+    }else if(cha<86400){
+        return Math.floor(cha/3600)+" 小时前";
+    }else if(cha<172800){
+        return "昨天 "+PrefixInteger(timestamp.getHours(),2)+':'+PrefixInteger(timestamp.getMinutes(),2);
+    }else if(cha<259200){
+        return "前天 "+PrefixInteger(timestamp.getHours(),2)+':'+PrefixInteger(timestamp.getMinutes(),2);
+    }else if(cha<345600){
+        return Math.floor(cha/86400)+" 天前";
+    }else{
+        return timestamp.getFullYear()+'-'+(timestamp.getMonth()+1)+'-'+timestamp.getDate();
+    }
+}
+
 
 function myalert(type, str) {
 	var alert_div = getById('alert_div');

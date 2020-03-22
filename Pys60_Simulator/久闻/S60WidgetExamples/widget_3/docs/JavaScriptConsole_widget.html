@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Java console Widget</title>
+<meta name="Author" content="Krupa N" />
+  <meta name="Keywords" content="JavaScript Console Widget" />
+  <meta name="Description" content="Example Widget for Nokia Symbian^3 SDK" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<style type="text/css">
+<!--
+.style1 {
+	font-size: 24px;
+	font-weight: bold;
+}
+-->
+</style>
+</head>
+
+<body>
+<p align="center" class="style1">JavaScript Console  - Example Widget Documentation</p>
+<hr />
+<h3><strong>About this document</strong></h3>
+<p>
+ This document describes the JavaScript Console Example Widget application for Nokia Symbian^3 SDK.
+ Read this document if you are a web developer, testing professional, or the product manager working on this product.
+</p>
+
+<h3><strong>About this Product</strong></h3>
+<p>
+Widgets are lightweight Web applications developed using the same well-known standards-based Web technologies – AJAX, CSS, HTML and JavaScript – used to
+create Web pages. Developers can use it as a reference and testers can use it to test the relevant functionality. widget is intended for Nokia Symbian^3 SDK. Developers should be able to develop professional applications.</p>
+
+<h3><strong>Product intent</strong></h3>
+<p>
+Example Widget Application is designed to run on Nokia Symbian SDK. It will be designed such that a developer takes it as a reference to create useful applications for any functionality supported on SDK. It will be designed to let the testers to test the functionality</p>
+
+<h3><strong>Product limitations</strong></h3>
+<p>
+Example widget is not intended to give full featured implementation. This example will implement the WRT 1.0 APIs. It runs a javascript with errors and shows the error either on console or log to a file depending on the option set in browser</p>
+
+<h2><strong>Specification</strong></h2>
+<p>
+The example widget uses the WRT 1.0 API.
+The Web Runtime (WRT) environment supports the following Internet technology standards:<br />
+<br />
+HTML 4.01<br />
+The basic HTML standards are supported.<br />
+<br />
+XHTML 1.0<br />
+The basic XHTML standards are supported.<br />
+<br />
+CSS Level 2 revision 1 (CSS 2.1)<br />
+<br />
+JavaScript 1.5 (ECMA-262 3rd Edition)
+<br />
+The standard JavaScript features are supported. The WRT environment also provides some additional features that are mobile device specific.
+<br />
+The following additional JavaScript features are supported in the WRT environment:</p>
+<ul>
+	<li>Utilizing the underlying user input features of the mobile device to interact with the user</li>
+	<li>Self-updating widgets</li>    
+<li>UI navigation using either a cursor or tabs</li>
+<li>Rotating the screen: portrait and landscape orientation</li>
+<li>Launching Symbian mobile applications</li>
+<li>Localization framework with automatic detection of the device language settings</li>
+<li>Getting information on physical device functionality and controlling such features.</li>
+</ul>
+</p>
+
+<h3><strong>Example Description</strong></h3>
+<p>
+The JavaScript Console widget demonstrates the javascript console support given by the SDK. The widget opens up the browser for the user to set the javascript console options. The widget also allows the user to run a script which has errors and this script is already given with the widget. On running the script with errors, the user can either see the error on console or in a log file according to the option set in the browser java script console options.
+
+<h3><strong>Use Cases</strong></h3>
+<ul>
+<li>Open the browser from the widget to set the java console options</li>
+<li>Run the error script when the java console option is set to "To console"</li>
+<li>Run the error script when the java console option is set to "Log to file"</li>
+<li>Run the error script when the java console option is set to "No Notification"</li>
+<br />
+<h3><strong>Installing and Running the Widget</strong></h3>
+<ol>
+<li>Use the file - Open option to open the widget under &lt;Installed_SDK_Dir&gt;\examples\widget\JavaConsole.wgz.</li>
+<br />
+<img src="docfiles/js1.JPG" alt="installation" />
+<br /> </p>
+<li>The SDK recognises and installs the widget. Run the widget from the installations folder.</li>
+<br />
+ <img src="docfiles/contact2.PNG" alt="installation2" /> <img src="docfiles/js3.JPG" alt="installation3" /> 
+</p>
+<li>Select the "open browser" option. If the widget is running on a device,Browser is opened from the widget. Go to Settings -> General -> JavaScript Error Notification. Set any one option. Exit the browser.</li> 
+</P><li>If the widget is running on an emulator, exit the widget, set the java console options in the browser. Then restart the widget. </li>
+<br />
+
+ <img src="docfiles/js4.JPG" alt="java console option" />
+ <br />
+<li>Widget returns to the foreground in case of a device. In case of running on a emulator, start the widget . Select the "run Script" option. Click on the submit button to run the script. </li>
+<br />
+<li>If the selected option is "log to console", output will be as shown,</li>
+ <img src="docfiles/js5.JPG" alt="script error" />
+ <br />
+<li>If the selected option is "log to file", the error will be logged in the file &lt;Installed_SDK_Dir&gt;\epoc32\winscw\c\Data\jslog_widget.log</li>
+</ol>
+</p>
+
+<B><H2>Internationalization</H2></B>
+<p>Example Widget Application does not support internationalization</p>
+
+
+<B><H2>References</H2></B>
+<A HREF="http://www.forum.nokia.com/main/resources/technologies/browsing/widgets.html">Web Runtime environment and widgets</A><BR>
+<A HREF="http://www.forum.nokia.com/info/sw.nokia.com/id/fd9cc12e-5eed-40ec-a439-c77f845fed73/Web_Developers_Library.html">Web Developer's Library 1.0</A>
+</body>
+</html>
