@@ -1,13 +1,13 @@
 var page_list = 1, page_comments = 1, list_top = 0, ref_page = 'list' ,last_page = 'list'; //当前页码
 var isloading = 0;
-const info = { //应用属性
+var info = { //应用属性
 	appname: 'IT之家s60v3客户端',
 	version: '0.0.1',
 	summary: '“IT之家”是业内领先的IT资讯和数码产品类网站。IT之家快速精选泛科技新闻，分享即时的IT业界动态和紧跟潮流的数码产品资讯，提供给力的PC和手机技术文章、丰富的系统应用美化资源，以及享不尽的智能阅读。',
 	thanks: '感谢塞班s60v3吧吧群(群号:140369358)的小伙伴们一直以来的支持~',
 	website: 'www.ithome.com'
 };
-const CMD = { //菜单执行的命令
+var CMD = { //菜单执行的命令
 	refersh : 1, //刷新
 	about: 2, //关于
 	comment: 3, //评论写
@@ -17,7 +17,7 @@ const CMD = { //菜单执行的命令
 	logout: 7, //注销
 	comments: 8 //查看评论
 };
-const menu_refersh = new MenuItem('刷新', CMD.refersh),
+var menu_refersh = new MenuItem('刷新', CMD.refersh),
 	  menu_about = new MenuItem('关于', CMD.about),
 	  menu_reg = new MenuItem('注册', CMD.reg),
 	  menu_login = new MenuItem('登录', CMD.login),
@@ -35,7 +35,7 @@ menu_logout.onSelect = selectMenu;
 menu_checkVersion.onSelect = selectMenu;
 //-----------------------------------------------
 function showPage(id) { //显示id和隐藏其它页面
-	const pages = [
+	var pages = [
 		'login_form',
 		'reg_form',
 		'about',
@@ -44,18 +44,19 @@ function showPage(id) { //显示id和隐藏其它页面
 		'comments',
 		'loading'
 	];
-	pages.forEach(function(item) {
-		
+	pages.myforEach(function(item) { 
+	  
 		if(id === 'loading')
 		{  
+			//alert(item);
 			getById(id).style.display = 'block';
 			//getById(last_page).style.display = 'block';
 			isloading = 1;
-			menu.setRightSoftkeyLabel('取消', function() { //右键取消
-			showPage(last_page);
-			});
-			menu.setLeftSoftkeyLabel('  ', function(){});  //左键复位
 			
+			menu.setRightSoftkeyLabel('取消', function() {showPage(last_page); });
+			
+			setLeftSoftkeyLabel('  ', function(){});  //左键复位
+			//alert(111);
 			return;
 		};
 		
@@ -66,7 +67,7 @@ function showPage(id) { //显示id和隐藏其它页面
 			if (id === 'list') {
 				setTitle();
 				menu.setRightSoftkeyLabel('', null); //右键退出
-				menu.setLeftSoftkeyLabel('', null); //左键复位
+				setLeftSoftkeyLabel('', null); //左键复位
 				menu.remove(menu_comment);
 				menu.remove(menu_comments);
 				menu.append(menu_about);
@@ -74,7 +75,7 @@ function showPage(id) { //显示id和隐藏其它页面
 				menu.append(menu_refersh);
 			} else if (id === 'article') {
 				document.body.scrollTop = 0;
-				menu.setLeftSoftkeyLabel('', null); //左键复位
+				setLeftSoftkeyLabel('', null); //左键复位
 				menu.setRightSoftkeyLabel('返回', function() {
 					document.body.scrollTop = list_top;
 					setTitle();
@@ -87,7 +88,7 @@ function showPage(id) { //显示id和隐藏其它页面
 				menu.remove(menu_refersh);
 			} else if (id === 'comments') {
 				document.body.scrollTop = 0;
-				menu.setLeftSoftkeyLabel('', null); //左键复位
+				setLeftSoftkeyLabel('', null); //左键复位
 				menu.setRightSoftkeyLabel('返回', function() {
 					document.body.scrollTop = list_top;
 					showPage('article');
@@ -97,7 +98,8 @@ function showPage(id) { //显示id和隐藏其它页面
 		} else {
 			getById(item).style.display = 'none';
 		}
-	});
+	}); 
+	
 }
 function setTitle(str) { //设置标题栏
 	getById('topic').textContent = str || 'IT之家-新闻资讯';
@@ -105,24 +107,23 @@ function setTitle(str) { //设置标题栏
 
 lastnewsTime = '';
 
-function displayList(hash) { //显示文章列表
-	
+function displayList(hash) { //显示文章列表 
 	showPage('loading');//显示加载动画 
-	ref_page = 'list';
+	ref_page = 'list';  
 	ajax_get('http://api.ithome.com/json/listpage/news/'+hash, function(error, data) {
 		if (error) {
 			alert(error);
 		} else {
 			
-			const articles = [];
+			var articles = [];
 			if(data.toplist)
 			{
-				data.toplist.forEach(function(item) { 
+				data.toplist.myforEach(function(item) { 
 					articles.push('<li><a href="javascript:displayArticle(\''+escape(JSON.stringify(item))+'\')">'+ '<img  src="'+item.image+'" alt="图片" />'+'<div><h3 style="color:red">[置顶]'+item.title+'</h3><p><span>'+humanedate(item.postdate)+'</span><span>评论('+item.commentcount+')</span></p></div></a></li>');
 				});
 			}
 			
-			data.newslist.forEach(function(item) { 
+			data.newslist.myforEach(function(item) { 
 				articles.push('<li><a href="javascript:displayArticle(\''+escape(JSON.stringify(item))+'\')">'+ '<img  src="'+item.image+'" alt="图片" />'+'<div><h3>'+item.title+'</h3><p><span>'+humanedate(item.postdate)+'</span><span>评论('+item.commentcount+')</span></p></div></a></li>');
 				lastnewsTime = item.orderdate; 
 			});
@@ -132,7 +133,7 @@ function displayList(hash) { //显示文章列表
 				getById('list').innerHTML = articles.join('');
 			}
 			//删掉next按钮
-			const next_button = getById('next_button');
+			var next_button = getById('next_button');
 			if (next_button) { //原来有next按钮
 				next_button.parentNode.removeChild(next_button);
 			}
@@ -186,6 +187,7 @@ function displayComments(Ci) { //显示评论列表TODO
 	showPage('loading');//显示加载动画
 	ref_page = 'comments';
 	url =  'http://dyn.ithome.com/api/comment/getnewscomment?sn='+getCommentSn(getById('content').className);
+	 
 	if(Ci!=0)
 	{
 		url=url+'&cid='+Ci;
@@ -194,8 +196,8 @@ function displayComments(Ci) { //显示评论列表TODO
 		if (error) {
 			alert(error);
 		} else {
-			const comments = [];
-			data.clist.forEach(function(item) {
+			var comments = [];
+			data.clist.myforEach(function(item) {
 				item = item.M;
 				comments.push('<li><img src="'+getHeadUrl(item.Ui)+'" alt="头像" onerror=\"onerror=null;src=\'img/avatar_default_rect.png\'\" />  <div><h3>'+item.N+' ('+item.SF+')</h3><p><span>'+dateline(item.T)+'</span><span>'+item.Ta+'</span></p><p>'+item.C+'</p></div></li>');
 				lastCommentCi = item.Ci;
@@ -206,7 +208,7 @@ function displayComments(Ci) { //显示评论列表TODO
 				getById('comments').innerHTML = comments.join('');
 			}
 			//删掉next按钮
-			const next_button_comments = getById('next_button_comments');
+			var next_button_comments = getById('next_button_comments');
 			if (next_button_comments) { //原来有next按钮
 				next_button_comments.parentNode.removeChild(next_button_comments);
 			}
@@ -233,7 +235,7 @@ function selectMenu(id) { //选择了菜单项
 		menu.setRightSoftkeyLabel('返回', function() {
 			showPage('list');
 		}); //右键返回
-		menu.setLeftSoftkeyLabel('隐藏', function() {
+		setLeftSoftkeyLabel('隐藏', function() {
 			showPage('list');
 		});
 	} else if (id === CMD.checkVersion) {
@@ -253,10 +255,10 @@ function selectMenu(id) { //选择了菜单项
 			}
 		});
 	} else if (id === CMD.comment) { //发布评论
-		const content = prompt('评论内容：');
+		var content = prompt('评论内容：');
 		if (content) {
-			const so = device.getServiceObject('Service.SysInfo', 'ISysInfo');
-			const result = so.ISysInfo.GetInfo({Entity: 'Device', Key: 'PhoneModel'});
+			var so = device.getServiceObject('Service.SysInfo', 'ISysInfo');
+			var result = so.ISysInfo.GetInfo({Entity: 'Device', Key: 'PhoneModel'});
 			var model = '网页';
 			if (result.ErrorCode == 0) {
 				model = result.ReturnValue.StringData;
@@ -277,8 +279,8 @@ function selectMenu(id) { //选择了菜单项
 	} else if (id === CMD.reg) { //选择注册
 		showPage('reg_form');
 		getByName('reg_email')[0].focus();
-		menu.setLeftSoftkeyLabel('提交', function() {
-			const email = getByName('reg_email')[0].value,
+		setLeftSoftkeyLabel('提交', function() {
+			var email = getByName('reg_email')[0].value,
 				  password = getByName('reg_password')[0].value,
 				  repassword = getByName('reg_repassword')[0].value,
 				  nickname = getByName('reg_nickname')[0].value;
@@ -310,8 +312,8 @@ function selectMenu(id) { //选择了菜单项
 	} else if (id === CMD.login) { //选择登录
 		showPage('login_form');
 		getByName('login_email')[0].focus();
-		menu.setLeftSoftkeyLabel('提交', function() {
-			const email = getByName('login_email')[0].value,
+		setLeftSoftkeyLabel('提交', function() {
+			var email = getByName('login_email')[0].value,
 				  password = getByName('login_password')[0].value;
 			if (!email || !password) {
 				alert('请填写用户名和密码。');
@@ -343,6 +345,7 @@ function selectMenu(id) { //选择了菜单项
 		displayComments('0');
 	}
 }
+
 window.onload = function() { //应用载入之后开始执行。
 	getById('about').innerHTML = '<h3>'+info.appname+'</h3><p>版本：'+info.version+'</p><p>简介：'+info.summary+'</p><p>感谢：'+info.thanks+'</p><p>官方网站：'+info.website+'</p>';
 	widget.setNavigationEnabled(false); //设置成按键控制
@@ -354,14 +357,12 @@ window.onload = function() { //应用载入之后开始执行。
 		menu.append(menu_login);
 	}
 	menu.append(menu_about);
-	menu.append(menu_checkVersion);
+	menu.append(menu_checkVersion); 
 	 
 	var timer = setTimeout(function() {
 		document.body.removeChild(getById('wellcome')); //关闭欢迎界面
-		displayList(0);
-		
-		menu.showSoftkeys();
-		
+		displayList(0); 
+		menu.showSoftkeys(); 
 		clearTimeout(timer);
 	}, 0);
 };

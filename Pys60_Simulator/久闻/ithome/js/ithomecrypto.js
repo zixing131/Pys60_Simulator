@@ -24,8 +24,13 @@ function decryptByDES(ciphertext, key){
 
 
 function getCommentSn(newsid)
-{
-	return m49921c(newsid.toString());
+{ 
+	var bArr2 = '(#i@x*l%'; 
+    var encryptd = m49914a2(newsid,bArr2);
+	 
+	var hash = fmtBytes(str2UTF8(hexCharCodeToStr(CryptoJS.enc.Base64.parse(encryptd).toString())));
+	// console.log(hash);
+    return hash;
 }
 
  function PrefixInteger(num, n) {
@@ -46,7 +51,11 @@ function getHeadUrl(Ui)
 function m49921c(str)
 {
     var bArr2 = '(#i@x*l%'; 
-	return m49912a(str,bArr2);
+	
+	var encryptd = m49914a2(str,bArr2);
+	var hash = fmtBytes(str2UTF8(hexCharCodeToStr(CryptoJS.enc.Base64.parse(encryptd).toString())));
+ 
+	return hash;
 }
 
 function m49912a(str,str2)
@@ -56,35 +65,38 @@ function m49912a(str,str2)
 
 function m49914a(str,str2,z)
 {
-	length = str.length;
-	if (length < 8) {
-		i = 8 - length;
+	le = str.length;
+	if (le < 8) {
+		i = 8 - le;
 	} else {
-		var i2 = length % 8;
+		var i2 = le % 8;
 		i = i2 != 0 ? 8 - i2 : 0;
 	}
 	
 	var str3 = str;
 	for (var i3 = 0; i3 < i; i3++) {
-		str3 = str3 + "\u0000";
+		str3 = str3 + String.fromCharCode(0);
 	}
-	return encryptByDES(str3,str2);
+	return encryptByDES2(str3,str2);
 }
 
 function m49914a2(str,str2,z)
 {
-	length = str.length;
-	if (length < 8) {
-		i = 8 - length;
+	str = str +''; 
+	i=0;
+	le = str.length; 
+	if (le < 8) {
+		i = 8 - le; 
 	} else {
-		var i2 = length % 8;
-		i = i2 != 0 ? 8 - i2 : 0;
-	}
-	
+		var i2 = le % 8;
+		i = i2 != 0 ? 8 - i2 : 0; 
+	}  
 	var str3 = str;
+	
 	for (var i3 = 0; i3 < i; i3++) {
-		str3 = str3 + "\u0000";
-	}
+		str3 = str3 + String.fromCharCode(0);
+		//alert(str3.length);
+	}  
 	return encryptByDES2(str3,str2);
 }
  
@@ -108,9 +120,10 @@ function get_next(time_str) {
 	time_str = time_str.replace('T',' ');  
 	//console.log(time_str);
 	
-	var timestamp = Date.parse(time_str); 
+	var timestamp = Date.parse(time_str);
 	var bArr2 = 'w^s(1#a@'; 
     var encryptd = m49914a2(timestamp.toString(),bArr2);
+	 
 	var hash = fmtBytes(str2UTF8(hexCharCodeToStr(CryptoJS.enc.Base64.parse(encryptd).toString())));
 	// console.log(hash);
     return hash;
@@ -143,7 +156,7 @@ function fmtBytes(arg5) {
 function str2UTF8(str){
     var bytes = new Array(); 
     var len,c; 
-    len = 16;
+    len = str.length; 
     for(var i = 0; i < len; i++){
         c = str.charCodeAt(i);
         var s = parseInt(c).toString(2); 

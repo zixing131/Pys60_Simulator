@@ -1,3 +1,19 @@
+ 
+Array.prototype.myforEach = function myforEach(val,i){
+	  for(var i=0;i<this.length;i++){
+		  val.call(window,this[i],i,this);
+	  }
+  };
+
+function setLeftSoftkeyLabel(v,k)
+{
+	if(typeof menu.setLeftSoftkeyLabel != "function"){
+		   
+	}
+	else{
+		menu.setLeftSoftkeyLabel(v,k);
+	}
+}
 function bind(target, type, callback) {
 	if (target.length && target.tagName !== 'FORM') {
 		for(var i = 0, len = target.length; i < len; i ++) {
@@ -17,10 +33,10 @@ function bind(target, type, callback) {
 }
  
  
- function PrefixInteger(num, n) {
-		return (Array(n).join(0) + num).slice(-n);
-	}
-	
+function PrefixInteger(num, n) {
+	return (Array(n).join(0) + num).slice(-n);
+}
+
 function getViewPortWidth() {
     return document.documentElement.clientWidth || document.body.clientWidth;
 }
@@ -38,7 +54,7 @@ function getByName(name) {
 function ajax(method, url, data, callback, progress, type) {
 	method = method.toUpperCase();
 	type = type || 'json';
-	const xhr = new XMLHttpRequest();
+	var xhr = new XMLHttpRequest(); 
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState === 4) {
 			if (xhr.status === 200) {
@@ -46,7 +62,7 @@ function ajax(method, url, data, callback, progress, type) {
 					callback(false, xhr.responseXML);
 				} else if (type === 'json') {
 					try {
-						const text = eval('(' + xhr.responseText + ')');
+						var text = eval('(' + xhr.responseText + ')');
 						if (text.error) {
 							callback(text.error);
 						} else {
@@ -64,7 +80,7 @@ function ajax(method, url, data, callback, progress, type) {
 		}
 	};
 	if (data) {
-		const urlstr = [];
+		var urlstr = [];
 		for(var i in data) {
 			urlstr.push(i + '=' + encodeURIComponent(data[i]));
 		}
@@ -104,6 +120,7 @@ function UBB(str) {
 	str = str.replace(/\[a=(.+?)\](.+?)\[\/a\]/mg,'<a href="$2">$1</a>');
 	str = str.replace(/\[a\](.+?)\[\/a\]/mg,'<a href="$1">$1</a>');
 	str = str.replace(/\[download=(.+)\](.+?)\[\/download\]/mg,'<a href="/download?url=$2">$1</a>');
+	str = str.replace(/https/mg,'http');
 	return str;
 }
  
@@ -150,3 +167,4 @@ function myalert(type, str) {
 		timer = null;
 	}, 2000);
 }
+
