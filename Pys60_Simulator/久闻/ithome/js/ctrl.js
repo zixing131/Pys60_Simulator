@@ -2,7 +2,7 @@ var page_list = 1, page_comments = 1, list_top = 0, ref_page = 'list' ,last_page
 var isloading = 0;
 var info = { //应用属性
 	appname: 'IT之家s60v3客户端',
-	version: '0.0.1',
+	version: '0.0.0.8',
 	summary: '“IT之家”是业内领先的IT资讯和数码产品类网站。IT之家快速精选泛科技新闻，分享即时的IT业界动态和紧跟潮流的数码产品资讯，提供给力的PC和手机技术文章、丰富的系统应用美化资源，以及享不尽的智能阅读。',
 	thanks: '感谢塞班s60v3吧吧群(群号:140369358)的小伙伴们一直以来的支持~',
 	website: 'www.ithome.com'
@@ -10,16 +10,14 @@ var info = { //应用属性
 var CMD = { //菜单执行的命令
 	refersh : 1, //刷新
 	about: 2, //关于
-	comment: 3, //评论写
-	reg: 4, //注册
+	comment: 3, //评论写 
 	login: 5, //登录
 	checkVersion : 6, //检查新版本
 	logout: 7, //注销
 	comments: 8 //查看评论
 };
 var menu_refersh = new MenuItem('刷新', CMD.refersh),
-	  menu_about = new MenuItem('关于', CMD.about),
-	  menu_reg = new MenuItem('注册', CMD.reg),
+	  menu_about = new MenuItem('关于', CMD.about), 
 	  menu_login = new MenuItem('登录', CMD.login),
 	  menu_logout = new MenuItem('注销', CMD.logout),
 	  menu_checkVersion = new MenuItem('检查新版本', CMD.checkVersion),
@@ -28,16 +26,14 @@ var menu_refersh = new MenuItem('刷新', CMD.refersh),
 menu_refersh.onSelect = selectMenu;
 menu_about.onSelect = selectMenu;
 menu_comments.onSelect = selectMenu;
-menu_comment.onSelect = selectMenu;
-menu_reg.onSelect = selectMenu;
+menu_comment.onSelect = selectMenu; 
 menu_login.onSelect = selectMenu;
 menu_logout.onSelect = selectMenu;
 menu_checkVersion.onSelect = selectMenu;
 //-----------------------------------------------
 function showPage(id) { //显示id和隐藏其它页面
 	var pages = [
-		'login_form',
-		'reg_form',
+		'login_form', 
 		'about',
 		'list',
 		'article',
@@ -53,9 +49,9 @@ function showPage(id) { //显示id和隐藏其它页面
 			//getById(last_page).style.display = 'block';
 			isloading = 1;
 			
-			menu.setRightSoftkeyLabel('取消', function() {showPage(last_page); });
+			menu.setRightSoftkeyLabel('取消', function() {isloading = 0;resetLRkey();showPage(last_page); });
 			
-			setLeftSoftkeyLabel('  ', function(){});  //左键复位
+			menu.setLeftSoftkeyLabel('  ', function(){});  //左键复位
 			//alert(111);
 			return;
 		};
@@ -66,7 +62,7 @@ function showPage(id) { //显示id和隐藏其它页面
 			isloading = 0;
 			if (id === 'list') {
 				setTitle();
-				menu.setRightSoftkeyLabel('', null); //右键退出
+				setRightSoftkeyLabel('', null); //右键退出
 				setLeftSoftkeyLabel('', null); //左键复位
 				menu.remove(menu_comment);
 				menu.remove(menu_comments);
@@ -76,12 +72,12 @@ function showPage(id) { //显示id和隐藏其它页面
 			} else if (id === 'article') {
 				document.body.scrollTop = 0;
 				setLeftSoftkeyLabel('', null); //左键复位
-				menu.setRightSoftkeyLabel('返回', function() {
+				setRightSoftkeyLabel('返回', function() {
 					document.body.scrollTop = list_top;
 					setTitle();
 					showPage('list');
 				}); //右键返回
-				if (widget.preferenceForKey('auth')) {menu.append(menu_comment);}
+				if (widget.preferenceForKey('userhash')) {menu.append(menu_comment);}
 				menu.append(menu_comments);
 				menu.remove(menu_about);
 				menu.remove(menu_checkVersion);
@@ -89,7 +85,7 @@ function showPage(id) { //显示id和隐藏其它页面
 			} else if (id === 'comments') {
 				document.body.scrollTop = 0;
 				setLeftSoftkeyLabel('', null); //左键复位
-				menu.setRightSoftkeyLabel('返回', function() {
+				setRightSoftkeyLabel('返回', function() {
 					document.body.scrollTop = list_top;
 					showPage('article');
 				}); //右键返回
@@ -227,119 +223,124 @@ function displayComments(Ci) { //显示评论列表TODO
 	});
 }
 
+function compareVer(oldver,newver)
+{
+	var a = oldver.split('.');
+	var b = newver.split('.');
+	
+	for(var i = 0;i<a.length;i++)
+	{
+		if(b[i]>a[i])
+		{
+			return true;
+		}
+		else if(b[i]===a[i])
+		{
+			continue;
+		}
+		else if(b[i]<a[i])
+		{
+			return false;
+		}
+	}
+	return false;
+}
+
+function checkUpdate()
+{ 
+	showPage('loading');
+	url='http://sss.wmm521.cn/symbian/ithome_ver.json?_='+(new Date().getTime());
+	 
+	ajax_get(url, function(error, data) {
+			 
+			if (error) {
+				alert(error);
+			} else if (compareVer(info.version,data.version)) {
+				//有新版本
+				alert('有新版本，版本号：'+data.version);
+				widget.openURL(data.downloadUrl);
+			} else {
+				alert('您的版本已经是最新版本。');
+			}
+			showPage(ref_page);
+		});
+}
+//checkUpdate();
 function selectMenu(id) { //选择了菜单项
 	if (id === CMD.refersh) { //点击刷新
 		displayList(0);
 	} else if (id === CMD.about) { //点击关于
 		showPage('about');
-		menu.setRightSoftkeyLabel('返回', function() {
+		setRightSoftkeyLabel('返回', function() {
 			showPage('list');
 		}); //右键返回
 		setLeftSoftkeyLabel('隐藏', function() {
 			showPage('list');
 		});
-	} else if (id === CMD.checkVersion) {
-		if (!widget.preferenceForKey('auth')) {
-			alert('请先登录。');
-			return false;
-		}
-		ajax_get('http://api2.9smart.cn/app/585c784e7e60ff70cc99e7ab?_='+new Date().getTime(), function(error, data) {
-			if (error) {
-				alert(error);
-			} else if (data.app.version !== info.version) {
-				//有新版本
-				alert('有新版本，版本号：'+data.app.version);
-				widget.openURL('http://api2.9smart.cn/clients/9news/s60v3fp2.wgz');
-			} else {
-				alert('您的版本已经是最新版本。');
-			}
-		});
+	} else if (id === CMD.checkVersion) { 
+		checkUpdate();
 	} else if (id === CMD.comment) { //发布评论
 		var content = prompt('评论内容：');
 		if (content) {
-			var so = device.getServiceObject('Service.SysInfo', 'ISysInfo');
-			var result = so.ISysInfo.GetInfo({Entity: 'Device', Key: 'PhoneModel'});
-			var model = '网页';
-			if (result.ErrorCode == 0) {
-				model = result.ReturnValue.StringData;
-			}
-			ajax_post('http://api2.9smart.cn/comments/'+getById('content').className+'?auth='+widget.preferenceForKey('auth'), {
-				type: 'news',
-				content: content,
-				model: model
-			}, function(error, data) {
+			//var so = device.getServiceObject('Service.SysInfo', 'ISysInfo');
+			//var result = so.ISysInfo.GetInfo({Entity: 'Device', Key: 'PhoneModel'});
+			//var model = '网页';
+			showPage('loading');
+			ajax_post2('http://dyn.ithome.com/ithome/postcomment.aspx', getCommentParam(getById('content').className,content),function(error, data) {
 				if (error) {
 					alert(error);
-				} else {
-					alert('评论成功。');
+					showPage(ref_page);
+				} else { 
+					alert(data);
 					displayComments('0');
 				}
 			});
 		}
-	} else if (id === CMD.reg) { //选择注册
-		showPage('reg_form');
-		getByName('reg_email')[0].focus();
-		setLeftSoftkeyLabel('提交', function() {
-			var email = getByName('reg_email')[0].value,
-				  password = getByName('reg_password')[0].value,
-				  repassword = getByName('reg_repassword')[0].value,
-				  nickname = getByName('reg_nickname')[0].value;
-			if (!email || !password || !repassword || !nickname) {
-				alert('请填写完整！');
-				return false;
-			}
-			ajax_post('http://api2.9smart.cn/users', {
-				email: email,
-				password: password,
-				repassword: repassword,
-				nickname: nickname
-			}, function(error, data) {
-				if (error) {
-					alert(error);
-				} else {
-					alert('注册成功！');
-					widget.setPreferenceForKey(data.auth, 'auth');
-					menu.append(menu_logout);
-					menu.remove(menu_login);
-					menu.remove(menu_reg);
-					showPage(ref_page);
-				}
-			});
-		});
-		menu.setRightSoftkeyLabel('返回', function() { //右键返回上一页
-			showPage(ref_page);
-		});
-	} else if (id === CMD.login) { //选择登录
+	}  else if (id === CMD.login) { //选择登录
 		showPage('login_form');
 		getByName('login_email')[0].focus();
 		setLeftSoftkeyLabel('提交', function() {
-			var email = getByName('login_email')[0].value,
-				  password = getByName('login_password')[0].value;
+			var email = getByName('login_email')[0].value,  password = getByName('login_password')[0].value;
 			if (!email || !password) {
 				alert('请填写用户名和密码。');
 				return false;
 			}
-			ajax_post('http://api2.9smart.cn/user?_='+(new Date().getTime()), {email: email, password: password}, function(error, data) {
+			var userhash = getUserHash(email,password);
+			var url = getUserDataUrl(userhash);
+			showPage('loading');
+			ajax_get( url,function(error, data) {
 				if (error) {
 					alert(error);
 				} else {
-					alert('登录成功！');
-					widget.setPreferenceForKey(data.auth, 'auth');
-					menu.append(menu_logout);
-					menu.remove(menu_login);
-					menu.remove(menu_reg);
-					showPage(ref_page);
+					if(data.ok === 1)
+					{ 
+						alert("登陆成功");
+						widget.setPreferenceForKey(userhash, 'userhash');
+						widget.setPreferenceForKey(data.userinfo.username, 'email');
+						widget.setPreferenceForKey(getMd5(password), 'password'); 
+						widget.setPreferenceForKey(data.userinfo.nickname, 'nickname');
+						menu.append(menu_logout);
+						menu.remove(menu_login); 
+						showPage(ref_page);
+					}
+					else
+					{
+						alert(data.msg);
+						showPage(ref_page);
+					} 
 				}
 			});
 		});
-		menu.setRightSoftkeyLabel('返回', function() {
+		setRightSoftkeyLabel('返回', function() {
 			showPage(ref_page);
 		});
 	} else if (id === CMD.logout) {
-		menu.remove(menu_logout);
-		menu.append(menu_reg);
+		menu.remove(menu_logout); 
 		menu.append(menu_login);
-		widget.setPreferenceForKey(null, 'auth');
+		widget.setPreferenceForKey(null, 'userhash');
+		widget.setPreferenceForKey(null, 'email');
+		widget.setPreferenceForKey(null, 'password');
+		widget.setPreferenceForKey(null, 'nickname');
 		alert('注销成功！');
 	} else if (id === CMD.comments) { //查看评论页面
 		displayComments('0');
@@ -350,10 +351,9 @@ window.onload = function() { //应用载入之后开始执行。
 	getById('about').innerHTML = '<h3>'+info.appname+'</h3><p>版本：'+info.version+'</p><p>简介：'+info.summary+'</p><p>感谢：'+info.thanks+'</p><p>官方网站：'+info.website+'</p>';
 	widget.setNavigationEnabled(false); //设置成按键控制
 	menu.append(menu_refersh);
-	if (widget.preferenceForKey('auth')) {
+	if (widget.preferenceForKey('userhash')) {
 		menu.append(menu_logout);
-	} else {
-		menu.append(menu_reg);
+	} else { 
 		menu.append(menu_login);
 	}
 	menu.append(menu_about);

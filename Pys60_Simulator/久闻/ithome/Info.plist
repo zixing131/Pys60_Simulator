@@ -7,7 +7,7 @@
         <key>Identifier</key>
         <string>net.ithome.news</string>
         <key>Version</key>
-        <string>0.0.1</string>
+        <string>0.0.0.8</string>
         <key>MainHTML</key>
         <string>index.html</string>
         <key>AllowNetworkAccess</key>

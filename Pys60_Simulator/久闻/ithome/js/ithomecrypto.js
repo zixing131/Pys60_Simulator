@@ -22,6 +22,64 @@ function decryptByDES(ciphertext, key){
     return result_value;
 }
 
+//获取登陆的url
+function getLoginUrl(userhash)
+{
+	var urlhead = 'http://my.ruanmei.com/api/User/Login?userHash=';
+	var urlend = '&extra=4|ithome_symbian'; // ithome_android
+	 
+	return urlhead+userhash+urlend;
+	
+}
+  
+function getCommentParam(newsid,data)
+{
+	username = widget.preferenceForKey('email');
+	password = widget.preferenceForKey('password');
+	nickname = widget.preferenceForKey('nickname');
+	devicename = 'Symbian';
+	
+	str = {
+		'u':username,
+		'p':password,
+		'newsid':newsid,
+		'commentNick':nickname,
+		'commentContent':data,
+		'parentCommentID':0,
+		'ppcid':0,
+		'type':'comment',
+		'ver':'708',
+		'ServerDontDecode':true,
+		'client':8,
+		'device':devicename
+	};
+	//str='u='+username+'&p='+password+'&newsid='+newsid+'&commentNick='+nickname+'&commentContent='+data+'&parentCommentID=0&ppcid=0&type=comment&ver=708&ServerDontDecode=true&client=8&device='+devicename;
+	return str;
+}
+
+function getUserDataUrl(userhash)
+{
+	var urlhead = 'http://my.ruanmei.com/api/User/Get?userHash=';
+	var urlend = '&extra=4|ithome_symbian&appver=708&device=symbian'; // ithome_android
+	return urlhead+userhash+urlend;
+}
+
+function getMd5(str)
+{
+	return CryptoJS.MD5(str).toString();
+}
+
+function getUserHash(username,pwd)
+{
+	pwd = CryptoJS.MD5(pwd).toString();
+	user = username+'\f'+pwd;
+	var bArr2 = '(#i@x*l%'; 
+    var encryptd = m49914a2(user,bArr2);
+	
+	var hash = fmtBytes(str2UTF8(hexCharCodeToStr(CryptoJS.enc.Base64.parse(encryptd).toString())));
+	// console.log(hash);
+    return hash;
+}
 
 function getCommentSn(newsid)
 { 

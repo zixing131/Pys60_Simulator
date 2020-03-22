@@ -4,9 +4,19 @@ Array.prototype.myforEach = function myforEach(val,i){
 		  val.call(window,this[i],i,this);
 	  }
   };
-
+lastLeftName = '';
+lastLeftFunction = '';
+lastRightName = '';
+lastRightFunction = '';
+function resetLRkey()
+{
+	setLeftSoftkeyLabel(lastLeftName,lastLeftFunction);
+	setRightSoftkeyLabel(lastRightName,lastRightFunction);
+}
 function setLeftSoftkeyLabel(v,k)
 {
+	lastLeftName = v;
+	lastLeftFunction = k;
 	if(typeof menu.setLeftSoftkeyLabel != "function"){
 		   
 	}
@@ -14,6 +24,20 @@ function setLeftSoftkeyLabel(v,k)
 		menu.setLeftSoftkeyLabel(v,k);
 	}
 }
+
+function setRightSoftkeyLabel(v,k)
+{
+	lastRightName = v;
+	lastRightFunction = k;
+	if(typeof menu.setRightSoftkeyLabel != "function"){
+		   
+	}
+	else{
+		menu.setRightSoftkeyLabel(v,k);
+	}
+}
+
+
 function bind(target, type, callback) {
 	if (target.length && target.tagName !== 'FORM') {
 		for(var i = 0, len = target.length; i < len; i ++) {
@@ -55,13 +79,18 @@ function ajax(method, url, data, callback, progress, type) {
 	method = method.toUpperCase();
 	type = type || 'json';
 	var xhr = new XMLHttpRequest(); 
-	xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = function() { 
+		if(isloading===0)
+		{
+			return;
+		};
 		if (xhr.readyState === 4) {
 			if (xhr.status === 200) {
 				if (type === 'xml') {
 					callback(false, xhr.responseXML);
 				} else if (type === 'json') {
 					try {
+						
 						var text = eval('(' + xhr.responseText + ')');
 						if (text.error) {
 							callback(text.error);
@@ -105,6 +134,11 @@ function ajax_get(url, callback, type) {
 function ajax_post(url, data, callback, progress) {
 	ajax('POST', url, data, callback, progress, 'json');
 }
+
+function ajax_post2(url, data, callback, progress) {
+	ajax('POST', url, data, callback, progress, 'txt');
+}
+
 function ajax_put(url, data, callback) {
 	ajax('PUT', url, data, callback, null, 'json');
 }
