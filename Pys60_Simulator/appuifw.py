@@ -8,6 +8,7 @@ except:
 import tkMessageBox
 
 screen = (240, 320)
+#screen = (320, 240)
 from threading import Timer
 from PIL import ImageTk
 import time
@@ -227,7 +228,7 @@ class Canvas():
             # self.timer = Timer(0,self.redraw,())
             # self.timer.start()
         except Exception, ex:
-            print(ex)
+            print("appuifw 230 ",ex)
 
 
 class Text(object):

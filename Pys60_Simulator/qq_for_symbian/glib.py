@@ -89,6 +89,7 @@ def FillRoundRect(self, left, top, w, h, xr, yr, col = 0):
 
 def drawString(self, font, col, x, y, str, anchor = (LEFT | TOP)):
     tup = self.measure_text(str, font)[0]
+    print x,y,str
     if anchor == (LEFT | TOP) : 
         self.text((x, (y + tup[3] - tup[1])), str, col, font)
     elif anchor == (LEFT | VCENTER) : 

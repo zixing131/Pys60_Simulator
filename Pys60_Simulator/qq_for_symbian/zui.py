@@ -6,7 +6,7 @@ import e32
 import glib
 
 ui.app.screen = "full"
-FONT = ('dense', 18)
+FONT = 'dense'
 SCRX, SCRY = ui.app.layout(ui.EScreen)[0]
 WM_PAINT = 0
 WM_KEYDOWN = 3
@@ -137,7 +137,7 @@ class Window(object):
         else:
             return self.parent.WndProc(WM_GETSTATE, 1, 0)
 
-    def redraw(self, v):
+    def redraw(self, v=''):
         self.WndProc(WM_PAINT, 0, 0)
 
     def event(self, key):
