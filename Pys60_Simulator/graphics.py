@@ -144,7 +144,7 @@ class Image:
         self.image = self.image.convert('RGB')
         self.image.save(path)
         
-    def text(self,pos,text,fill = 0x0,font=('sence',15)):
+    def text(self,pos,text,fill = 0x0,font=('dense',15)):
         color = fill
         #print(pos,text,color,font)
         draw = ImageDraw.Draw(self.image)

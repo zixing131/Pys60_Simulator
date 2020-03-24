@@ -12,5 +12,7 @@
         <string>index.html</string>
         <key>AllowNetworkAccess</key>
         <true/>
+		<key>MiniViewEnabled</key>
+		<false/>
     </dict>
 </plist>

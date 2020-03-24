@@ -21,38 +21,37 @@ cachePath = mypath + "cache\\"
 class QQSkin:
     def __init__(self):
         #三角箭头颜色
-        self.ArrowColor ='#2996CE'
-        #文字颜色
-        self.textColor = '#A5D7F7'
-        #背景颜色
-        self.bgColor = '#215D84'
-        #分隔栏颜色1
-        self.splitColor1='#105584'
+        self.ArrowColor = 0x2996CE
+        # 文字颜色
+        self.textColor = 0xA5D7F7
+        # 背景颜色
+        self.bgColor = 0x215D84
+        # 分隔栏颜色1
+        self.splitColor1 = 0x105584
         # 分隔栏颜色2
-        self.splitColor2 = '#216994'
-        #选中行背景颜色
-        self.selectedBgColor = '#CEEBFF'
-        #选中行文字颜色
-        self.selectedTextColor = '#002052'
-        #菜单背景颜色
-        self.menuBgColor = '#0F334F'
-        #菜单文字颜色
-        self.menuTextColor = '#A5D5F3'
-        #菜单选中背景颜色
-        self.menuSelectedBgColor = '#2982BD'
-        #菜单选中文字颜色
-        self.menuSelectedTextColor = '#FFFFFF'
+        self.splitColor2 = 0x216994
+        # 选中行背景颜色
+        self.selectedBgColor = 0xCEEBFF
+        # 选中行文字颜色
+        self.selectedTextColor = 0x002052
+        # 菜单背景颜色
+        self.menuBgColor = 0x0F334F
+        # 菜单文字颜色
+        self.menuTextColor = 0xA5D5F3
+        # 菜单选中背景颜色
+        self.menuSelectedBgColor = 0x2982BD
+        # 菜单选中文字颜色
+        self.menuSelectedTextColor = 0xFFFFFF
 
-        #菜单包围颜色1（外层）
-        self.menuBgAroundColor1 = '#031421'
-        #菜单包围颜色2（内层）
-        self.menuBgAroundColor2 = '#21597D'
+        # 菜单包围颜色1（外层）
+        self.menuBgAroundColor1 = 0x031421
+        # 菜单包围颜色2（内层）
+        self.menuBgAroundColor2 = 0x21597D
 
-
-        #底栏颜色
-        self.barBgColor = '#082842'
-        #底栏文字颜色
-        self.barTextColor = '#A5D7F7'
+        # 底栏颜色
+        self.barBgColor = 0x082842
+        # 底栏文字颜色
+        self.barTextColor = 0xA5D7F7
 
 qqSkin = QQSkin()
 
@@ -113,6 +112,7 @@ class QQUi(object, ):
         self.maskImg.clear(0x888888)
         self.deepMaskImg = Image.new(screen, "L")
         self.deepMaskImg.clear(0x333333)
+        self.tempImg = ph.Image.new((1, 1))
         self.minMenuWidth = 0
         self.menuHeight = 30
         self.menuSpeed = 40
@@ -215,7 +215,7 @@ class QQUi(object, ):
         self.nowtime += 0.1
 
     def textLen(self, content=u'', font='dense'):
-        length = self.img.measure_text(content, font)[0]
+        length = self.tempImg.measure_text(content, font)[0]
         return length[2]
 
     def genMenuList(self):
@@ -259,7 +259,7 @@ class QQUi(object, ):
     def getMenuWidth(self):
         l = self.minMenuWidth
         for i in self.listName:
-            t = self.textLen(i)
+            t = self.textLen(i,('dense',17))
             if (l < t):
                 l = t
             if (l > self.width):
@@ -282,7 +282,7 @@ class QQUi(object, ):
             if (i == self.menuIndex):
                 color = qqSkin.menuSelectedTextColor
                 imgTemp.rectangle((3,i * self.menuHeight + 3,self.RealMenuWidth - 3,i * self.menuHeight + self.menuHeight+3),qqSkin.menuSelectedBgColor,qqSkin.menuSelectedBgColor)
-            imgTemp.text((5, i * self.menuHeight + self.menuHeight / 2 + 12), self.listName[i], color, zt)
+            imgTemp.text((5, i * self.menuHeight + self.menuHeight / 2 + 11), self.listName[i], color, ('dense',15))
 
         x = 0 - (menuPos - self.RealMenuWidth + 3)
         y = 0 - (self.height - self.RealMenuHeight - 5)
