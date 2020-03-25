@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*- 
 # import _appuifw
 # from _appuifw import *
+import key_codes
+
 try:  # import as appropriate for 2.x vs. 3.x
     import tkinter as tk
 except:
@@ -38,6 +40,10 @@ class Canvas():
         self.cv.pack(fill=tk.BOTH, expand=tk.YES)
         self.cv.bind_all(sequence="<KeyPress>", func=self.processKeyPressEvent)
         self.cv.bind_all(sequence="<KeyRelease>", func=self.processKeyUpEvent)
+        self.cv.bind_all(sequence="<Button-1>", func=self.mouseLeftButtonEvent) #鼠标左键按下
+        self.cv.bind_all(sequence="<ButtonRelease-1>", func=self.mouseLeftButtonReleaseEvent)  #鼠标左键释放
+
+
         self.lastimg = None
         self.menu_key_handler = None
         self.size = screen
@@ -47,6 +53,7 @@ class Canvas():
         # self.timer.start()
         self.lastkeytime = time.time()
         self.allEvents = []
+        self.allTouchEvents = []
 
     # def rectangle():
     def callEvents(self, evt):
@@ -132,6 +139,20 @@ class Canvas():
             pass
             # print("鼠标： %s" % evt.num)
 
+    def mouseLeftButtonEvent(self,event):
+        #print event,event.x,event.y
+        for evt in self.allTouchEvents:
+            if(evt[0]  == key_codes.EButton1Down):
+                if( evt[2][0][0] <= event.x and  evt[2][1][0] >= event.x and evt[2][0][1] <= event.y and  evt[2][1][1] >= event.y):
+                    evt[1]((event.x,event.y))
+
+    def mouseLeftButtonReleaseEvent(self,event):
+        #print event, event.x, event.y
+        for evt in self.allTouchEvents:
+            if (evt[0] == key_codes.EButton1Up):
+                if( evt[2][0][0] <= event.x and  evt[2][1][0] >= event.x and evt[2][0][1] <= event.y and  evt[2][1][1] >= event.y):
+                    evt[1]((event.x, event.y))
+
     #
     # print(evt.type)
     # 处理键盘事件，ke为控件传递过来的键盘事件对象
@@ -214,7 +235,10 @@ class Canvas():
         pass
 
     def bind(self, key, event,point = 0):
-        self.allEvents.append((key, event))
+        if(key == key_codes.EButton1Down or key == key_codes.EButton1Up):
+            self.allTouchEvents.append((key, event,point))
+        else:
+            self.allEvents.append((key, event))
 
     def update(self):
         self.redraw()
