@@ -118,17 +118,26 @@ class Image:
         self.image.paste(image2,(0,0,self.size[0],self.size[1]))
         if(self.canvas):
             self.canvas.blit(self)
-    def blit(self,img,target=(0,0),mask=None,source=(0,0)):
-        pos=target 
-        pos=(0-pos[0],0-pos[1])
+    def blit(self,img,source=None,target=None,mask=None):
+
+        if(source==None):
+            source = (0,0,img.size[0],img.size[1])
+        if(target == None):
+            target = (0, 0, img.size[0], img.size[1])
+        if(len(source)==2):
+            source = (source[0],source[1],img.size[0],img.size[1])
+        if (len(target) == 2):
+            target = (target[0], target[1], img.size[0], img.size[1])
+
+        pos=(target[0]-source[0],target[1]-source[1])
         if(mask!=None):
             try:
-                self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+img.size[0]),int(pos[1]+img.size[1])),mask = mask.image)
+                self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+source[2]),int(pos[1]+source[3])),mask = mask.image)
             except Exception,ex:
                 print(ex)
-                self.image.paste(img.image, (pos[0], pos[1], pos[0] + img.size[0], pos[1] + img.size[1]))
+                self.image.paste(img.image, (pos[0], pos[1], pos[0] +source[2], pos[1] + source[3]))
         else:
-           self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+img.size[0]),int(pos[1]+img.size[1])))
+           self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+source[2]),int(pos[1]+source[3])))
         if(self.canvas):
             self.canvas.blit(self)
     def line(self,pos,bgcolor=0,width=0,outline=0):

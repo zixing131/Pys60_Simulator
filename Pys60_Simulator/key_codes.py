@@ -96,3 +96,5 @@ EScancodeDownArrow = wx.WXK_DOWN
 EKeyStar = 0
 #EScancodeEdit=EStdKeyLeftShift
 #EScancodeMenu=EStdKeyApplication0
+EButton1Down = 0xd1
+EButton1Up = 0xd2

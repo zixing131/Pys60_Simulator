@@ -8,6 +8,7 @@ except:
 import tkMessageBox
 
 screen = (240, 320)
+screen = (360, 640)
 #screen = (320, 240)
 from threading import Timer
 from PIL import ImageTk
@@ -212,7 +213,7 @@ class Canvas():
     def clear(self, color):
         pass
 
-    def bind(self, key, event):
+    def bind(self, key, event,point = 0):
         self.allEvents.append((key, event))
 
     def update(self):
