@@ -25,8 +25,8 @@ class CKeyConfig(object, ) :
         self.body.bind(key_codes.EKeyRightArrow, self.nextitem)
         self.body.bind(key_codes.EKeyLeftArrow, self.previtem)
 
-
-
+    def setkeycodedata(self,a):
+        pass
 
     def itemevent(self):
         it = self.body.current()
@@ -140,8 +140,17 @@ class CKeyConfig(object, ) :
         self.curfunctind = ind
         self.listbox_update()
 
+    def hotkeys_on(self):
+        pass
 
+    def timeout_tick(self):
+        pass
 
+    def hotkeys_off(self):
+        pass
+
+    def hotkeys_clear(self):
+        pass
 
     def settimeout(self, to):
         if to is None : 
@@ -320,7 +329,10 @@ class CKeyConfig(object, ) :
             self.data_restore()
         self.app_restore()
 
-
+    def hotkeys_set(self):
+        pass
+    def hotkeys_unbind_old(self):
+        pass
 
 
     def execute(self):

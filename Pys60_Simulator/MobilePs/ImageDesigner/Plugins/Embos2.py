@@ -3,10 +3,10 @@
 import graphics
 __version_info__ = (u'internal', '90度浮雕'.decode('utf8'), u'1.3', u'1.0')
 cc = 0
-def Execute(.0, ProgressCallback):
+def Execute(_0, ProgressCallback):
 
 
-    sourceim, MASK = .0
+    sourceim, MASK = _0
     cc = 0
     image = graphics.Image.new(sourceim.size)
     a, b, c = (0, 1, 0)

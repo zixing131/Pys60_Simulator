@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import graphics
 __version_info__ = (u'internal', '边缘检测'.decode('utf8'), u'1.0', u'1.0')
-def Execute(.0, ProgressCallback):
-    sourceim, MASK = .0
+def Execute(_0, ProgressCallback):
+    sourceim, MASK = _0
     image = graphics.Image.new(sourceim.size)
     a, b, c = (1, 0, 1)
     d, e, f = (0, -4, 0)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 # import _appuifw
 # from _appuifw import *
-import key_codes
+from key_codes import *
 
 try:  # import as appropriate for 2.x vs. 3.x
     import tkinter as tk
@@ -13,11 +13,19 @@ screen = (240, 320)
 #screen = (360, 640)
 #screen = (320, 240)
 from threading import Timer
+
+
+FFormEditModeOnly = 2
+FFormDoubleSpaced = 4
+EEventKeyDown=3
+EEventKeyUp = 2
+EEventKey=1
+
 from PIL import ImageTk
 import time
 import thread
 import os
-
+import graphics
 EScreen = 1
 EHLeftVTop = 0
 root = tk.Tk()
@@ -26,10 +34,28 @@ def on_closing():
     abort()
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
+def available_fonts():
+    return ['dense','normal']
 
+class Form(list):
+    def __init__(self,optcont,flags):
+        pass
+    def bind(self,keycode,nextitem):
+        pass
+    def __getitem__(self, item):
+        return [[1 for i in range(10)] for i in range(10)]
 
-class Canvas():
+class Listbox():
+    def __init__(self,lst,itemevent):
+        pass
+    def bind(self,keycode,nextitem):
+        pass
+    def set_list(self,lst,it):
+        pass
+
+class Canvas(graphics.Image):
     def __init__(self, redraw_callback=None, event_callback=None, resize_callback=None):
+        graphics.Image.__init__(self, screen, None,self)
         self.redraw_callback = redraw_callback
         self.event_callback = event_callback
         self.root = root
@@ -235,7 +261,7 @@ class Canvas():
 
     #
     # print(evt.type)
-    def blit(self, img, target=(0, 0)):
+    def blit(self, img, target=(0, 0),scale =False):
         try:
             img = ImageTk.PhotoImage(image=img.image, master=self.cv)
             self.lastimg = img
@@ -446,6 +472,8 @@ class popup:
 def InfoPopup():
     return popup()
 
+def popup_menu(name,den):
+    return 0
 
 import e32
 

@@ -2,8 +2,8 @@
 
 import graphics
 __version_info__ = (u'internal', '模糊效果2'.decode('utf8'), u'1.0', u'1.0')
-def Execute(.0, ProgressCallback):
-    sourceim, MASK = .0
+def Execute(_0, ProgressCallback):
+    sourceim, MASK = _0
     image = graphics.Image.new(sourceim.size)
     a, b, c = (1, 2, 1)
     d, e, f = (2, 4, 2)

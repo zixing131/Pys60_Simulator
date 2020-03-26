@@ -10,7 +10,7 @@ from PIL import ImageFont
 import os
 import string 
 import tkFont
-from appuifw import app as _app
+#from appuifw import app as _app
 Draw=lambda x: x
 
 FONT_BOLD=1
@@ -125,7 +125,7 @@ class Image:
         self.image.paste(image2,(0,0,self.size[0],self.size[1]))
         if(self.canvas):
             self.canvas.blit(self)
-    def blit(self,img,source=None,target=None,mask=None):
+    def blit(self,img,source=None,target=None,mask=None,scale =False):
 
         if(source==None):
             source = (0,0,img.size[0],img.size[1])
@@ -136,15 +136,26 @@ class Image:
         if (len(target) == 2):
             target = (target[0], target[1], img.size[0], img.size[1])
 
-        pos=(target[0]-source[0],target[1]-source[1])
+        #pos=(target[0]-source[0],target[1]-source[1])
+        pos = (target[0] - source[0], target[1] - source[1])
         if(mask!=None):
             try:
-                self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+source[2]),int(pos[1]+source[3])),mask = mask.image)
+                self.image.paste(img.image.crop(((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3]))), ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])),mask=mask.image)
             except Exception,ex:
                 print(ex)
-                self.image.paste(img.image, (pos[0], pos[1], pos[0] +source[2], pos[1] + source[3]))
+                self.image.paste(img.image.crop(
+                    ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3]))),
+                     ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])))
+
+                #self.image.paste(img.image, (pos[0], pos[1], pos[0] +source[2], pos[1] + source[3]))
         else:
-           self.image.paste(img.image,(int(pos[0]),int(pos[1]),int(pos[0]+source[2]),int(pos[1]+source[3])))
+            try:
+                self.image.paste(img.image.crop(
+                    ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3]))),
+                    ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])))
+
+            except Exception,ex:
+                print("graphics 150",ex)
         if(self.canvas):
             self.canvas.blit(self)
     def line(self,pos,bgcolor=0,width=0,outline=0):
@@ -161,6 +172,10 @@ class Image:
         self.image.save(path)
         
     def text(self,pos,text,fill = 0x0,font=('dense',15)):
+        if(font==None):
+            font = ('dense', 15)
+        elif(len(font)>=2 and font[1]==None):
+            font = ('dense', 15)
         color = fill
         #print(pos,text,color,font)
         draw = ImageDraw.Draw(self.image)
@@ -176,7 +191,7 @@ class Image:
         if(self.canvas):
             self.canvas.blit(self)
          
-    def polygon(self,pos,color=0x0,width=1,fill=0x0):
+    def polygon(self,pos,color=0x0,width=1,fill=0x0,outline = 0x0):
         draw = ImageDraw.Draw(self.image)
         ismask = 0
         if( len(str(fill))>7):
@@ -185,8 +200,14 @@ class Image:
         if(ismask):
             fill = fill+'bb'
         #print(fill)
-        pos = list(pos)
-        draw.polygon( pos , fill=fill)
+        pos2=[]
+        for i in pos:
+            if(type(i) is tuple or type(i) is list):
+                pos2 += list(i)
+            else:
+                pos2.append(i)
+        pos2 = list(pos2)
+        draw.polygon( pos2 , fill=fill)
         del draw
     def point(self,pos,color,width=1,fill=0x0):
         # draw = ImageDraw.Draw(self.image)
@@ -227,7 +248,11 @@ class Image:
         if (maxwidth == -1):
             fontsize = 18
             if(type(font) is tuple or type(font) is list):
-                fontsize= font[1]
+                if(font[1]==None):
+                    fontsize=18
+                else:
+                    fontsize= font[1]
+
             w,h = getTextFontWidth(title,int(fontsize))
             if(self.canvas):
                 self.canvas.blit(self)

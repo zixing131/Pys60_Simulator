@@ -3,10 +3,10 @@
 import graphics
 __version_info__ = (u'internal', '135度浮雕'.decode('utf8'), u'1.3', u'1.1')
 cc = 0
-def Execute(.0):
+def Execute(_0):
 
 
-    ProgressCallback = brushsize = forecolor, backcolor = sourceim, MASK = .0
+    ProgressCallback = brushsize = forecolor, backcolor = sourceim, MASK = _0
     cc = 0
     image = graphics.Image.new(sourceim.size)
     a, b, c = (1, 0, 0)

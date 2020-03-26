@@ -6,6 +6,7 @@ mypath=path[:index]
 mypath2=path+"\\ImageDesigner\\"
 sys.path.append(mypath)
 sys.path.append(mypath2)
+'''
 import appuifw
 import sys
 from os import path, remove
@@ -37,8 +38,9 @@ del __selfmodlist__
 del tocomp
 del file
 del source
+'''
 import main
 
-while 1:
+#while 1:
 #  appuifw.app.Yield()
-  appuifw.app.body.root.update()
+#  appuifw.app.body.root.update()
