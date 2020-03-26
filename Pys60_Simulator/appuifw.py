@@ -10,7 +10,7 @@ except:
 import tkMessageBox
 
 screen = (240, 320)
-screen = (360, 640)
+#screen = (360, 640)
 #screen = (320, 240)
 from threading import Timer
 from PIL import ImageTk
@@ -82,6 +82,7 @@ class Canvas():
                 args["keycode"] = 0
                 args["scancode"] = 164
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
             elif (mykey == 'w'):
                 if (app.exit_key_handler): app.exit_key_handler()
@@ -90,6 +91,7 @@ class Canvas():
                 args["keycode"] = 0x30 + key
                 args["scancode"] = 1
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'up'):
@@ -97,6 +99,7 @@ class Canvas():
                 args["keycode"] = 63497  # 2
                 args["scancode"] = 16
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'down'):
@@ -104,6 +107,7 @@ class Canvas():
                 args["keycode"] = 63498  # 8
                 args["scancode"] = 17
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'left'):
@@ -111,6 +115,7 @@ class Canvas():
                 args["keycode"] = 63495  # 4
                 args["scancode"] = 14
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'right'):
@@ -118,6 +123,7 @@ class Canvas():
                 args["keycode"] = 63496  # 6
                 args["scancode"] = 15
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'space'):
@@ -125,6 +131,7 @@ class Canvas():
                 args["keycode"] = 63557  # 5
                 args["scancode"] = 167
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'backspace'):
@@ -132,6 +139,7 @@ class Canvas():
                 args["keycode"] = 8  # backspace
                 args["scancode"] = 0
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
 
@@ -171,12 +179,14 @@ class Canvas():
                 args["keycode"] = -1
                 args["scancode"] = 164
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
             if (key != -1):
                 args = {}
                 args["keycode"] = -1
                 args["scancode"] = 1
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'up'):
@@ -184,6 +194,7 @@ class Canvas():
                 args["keycode"] = -1
                 args["scancode"] = 16
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'down'):
@@ -191,12 +202,14 @@ class Canvas():
                 args["keycode"] = -1
                 args["scancode"] = 17
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'left'):
                 args = {}
                 args["keycode"] = -1
                 args["scancode"] = 14
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'right'):
@@ -204,6 +217,7 @@ class Canvas():
                 args["keycode"] = -1
                 args["scancode"] = 15
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'space'):
@@ -211,6 +225,7 @@ class Canvas():
                 args["keycode"] = -1
                 args["scancode"] = 167
                 args["type"] = keytype
+                args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
 

@@ -49,11 +49,11 @@ def GetFont(fill=None,font=None):
         pass
     else:
         if (os.path.exists("..\\fonts\\S60SC.ttf")):
-            myfnt = ImageFont.truetype("..\\fonts\\S60SC.ttf", font[1])
+            myfnt = ImageFont.truetype("..\\fonts\\S60SC.ttf", int(font[1]))
         elif(os.path.exists("fonts\\S60SC.ttf")):
-            myfnt = ImageFont.truetype("fonts\\S60SC.ttf", font[1])
+            myfnt = ImageFont.truetype("fonts\\S60SC.ttf",int(font[1]))
         elif(os.path.exists("Pys60_Simulator\\fonts\\S60SC.ttf")):
-            myfnt = ImageFont.truetype("Pys60_Simulator\\fonts\\S60SC.ttf", font[1])
+            myfnt = ImageFont.truetype("Pys60_Simulator\\fonts\\S60SC.ttf", int(font[1]))
     lastfont = font
     return myfnt
 
@@ -99,15 +99,22 @@ class Image:
         self.size = img.size
     def new(size,mode=None):
         return Image(size,mode)
-    
-    def rectangle(self,pos,color = 0x0,fill=0x0,width=1,outline=0x0):
+
+    #"coords", "start", "end", "outline", "fill",
+    #"width", "pattern"
+    def rectangle(self, coords ,outline=0x0, fill=-1, width=1,pattern = 0x0):
         draw = ImageDraw.Draw(self.image)
+        if(fill==-1):
+            outline = convertColor(outline)
+            draw.rectangle((coords[0], coords[1], coords[2], coords[3]),outline=outline, width=width)
+            del draw
+            return
         fill = convertColor(fill)
         if(outline!=0):
             outline = convertColor(outline)
-            draw.rectangle((pos[0],pos[1],pos[2],pos[3]), fill=fill,outline=outline,width=width)
+            draw.rectangle((coords[0], coords[1], coords[2], coords[3]), fill=fill, outline=outline, width=width)
         else:
-            draw.rectangle((pos[0],pos[1],pos[2],pos[3]), fill=fill,width=width)
+            draw.rectangle((coords[0], coords[1], coords[2], coords[3]), fill=fill, width=width)
         del draw
         
     def clear(self,color=0):
@@ -158,9 +165,14 @@ class Image:
         #print(pos,text,color,font)
         draw = ImageDraw.Draw(self.image)
         color = convertColor(color)
-        if(type(font) is str):
+        if(type(font) is str or type(font) is unicode):
             font=(font,15)
-        draw.text((pos[0],pos[1]-font[1]),text,fill=color,font = GetFont(color,font))
+        else:
+            try:
+                font = (font[0],int(font[1]))
+            except Exception,e:
+                print font
+        draw.text((int(pos[0]),int(pos[1]-font[1])),text,fill=color,font = GetFont(color,font))
         if(self.canvas):
             self.canvas.blit(self)
          
@@ -177,11 +189,12 @@ class Image:
         draw.polygon( pos , fill=fill)
         del draw
     def point(self,pos,color,width=1,fill=0x0):
-        draw = ImageDraw.Draw(self.image)
-        fill = convertColor(fill)
-        pos = list(pos)
-        draw.point( pos , fill=fill,width=width)
-        del draw
+        # draw = ImageDraw.Draw(self.image)
+        # fill = convertColor(fill)
+        # pos = list(pos)
+        # draw.point( pos , fill=fill)
+        # del draw
+        self.ellipse((pos[0],pos[1],pos[0]+width,pos[1]+width),color,color)
     def arc(self,pos,pi1,pi2,color,width=1):
         draw = ImageDraw.Draw(self.image)
         color = convertColor(color)
@@ -210,15 +223,37 @@ class Image:
         self.image = self.image.resize(size)
         self.size = size
         return self
-    def measure_text(self,title,font='dense'):
-        fontsize = 18
-        if(type(font) is tuple):
-            fontsize= font[1]
-        w,h = getTextFontWidth(title,fontsize)
-        if(self.canvas):
-            self.canvas.blit(self)
-        return [[0,0,w,h],w]
-   
+    def measure_text(self,title,font='dense',maxwidth = -1,maxadvance=-1):
+        if (maxwidth == -1):
+            fontsize = 18
+            if(type(font) is tuple or type(font) is list):
+                fontsize= font[1]
+            w,h = getTextFontWidth(title,int(fontsize))
+            if(self.canvas):
+                self.canvas.blit(self)
+            return ((0,0-h,w,0),w,len(title))
+        else:
+            fontsize = 18
+            if (type(font) is tuple or type(font) is list):
+                fontsize = font[1]
+            w, h = getTextFontWidth(title, int(fontsize))
+            if (self.canvas):
+                self.canvas.blit(self)
+            if (w <= maxwidth):
+                w = maxwidth
+                return ((0, 0-h, w,0), w, len(title))
+            else:
+                w,h = 0,0
+                nowchars = ''
+                for i in title:
+                    nowchars+=i
+                    w, h = getTextFontWidth(nowchars, int(fontsize))
+                    if(w>=maxwidth):
+                        nowchars= nowchars[:-1]
+                        w, h = getTextFontWidth(nowchars, int(fontsize))
+                        break
+                return ((0, 0-h, w, 0), w, len(nowchars))
+
     new=staticmethod(new)
     open=staticmethod(open)
 def Draw(canvas):

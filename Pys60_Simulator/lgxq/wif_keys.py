@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+KC = 1
+KLEFT = 14
+KRIGHT = 15
+KUP = 16
+KDOWN = 17
+KABC = 18
+KSTAR = 42
+K0 = 48
+K1 = 49
+K2 = 50
+K3 = 51
+K4 = 52
+K5 = 53
+K6 = 54
+K7 = 55
+K8 = 56
+K9 = 57
+KHASH = 127
+KMENU = 164
+KSELECT = 167
+KGREEN = 196

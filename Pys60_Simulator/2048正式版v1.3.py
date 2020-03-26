@@ -29,10 +29,13 @@ path="c:\\python\\pygame\\2048"
 def log(x,y):
     return int(math.log(y)/math.log(x))
 def read():
-    db=e32dbm.open(path+"\\data","r")
-    tdb=db.items()
-    db.close()
-    return int(cn(tdb[0][1]))
+    try:
+        db=e32dbm.open(path+"\\data","r")
+        tdb=db.items()
+        db.close()
+        return int(cn(tdb[0][1]))
+    except:
+        return 0
 def write(v):
     db=e32dbm.open(path+"\\data","c")
     db["score"]=str(v)
