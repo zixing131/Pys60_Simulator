@@ -235,7 +235,7 @@ class Canvas():
         pass
 
     def bind(self, key, event,point = 0):
-        if(key == key_codes.EButton1Down or key == key_codes.EButton1Up):
+        if(key >= 0x101 and key <= 0x10A):
             self.allTouchEvents.append((key, event,point))
         else:
             self.allEvents.append((key, event))
