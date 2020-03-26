@@ -1,3 +1,4 @@
+#-*- encoding:utf-8 -*-
 #
 # key_codes
 #
