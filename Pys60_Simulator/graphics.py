@@ -135,24 +135,27 @@ class Image:
             source = (source[0],source[1],img.size[0],img.size[1])
         if (len(target) == 2):
             target = (target[0], target[1], img.size[0], img.size[1])
-
         #pos=(target[0]-source[0],target[1]-source[1])
-        pos = (target[0] - source[0], target[1] - source[1])
+        pos = (int(target[0] - source[0]), int(target[1] - source[1]))
         if(mask!=None):
             try:
-                self.image.paste(img.image.crop(((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3]))), ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])),mask=mask.image)
+                #self.image.paste(img.image, (pos[0], pos[1], pos[0] + source[2], pos[1] + source[3]),mask=mask.image)
+                self.image.paste(img.image.crop((0, 0, (int)(source[2]), (int)(source[3]))), ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])),mask=mask.image)
             except Exception,ex:
                 print(ex)
-                self.image.paste(img.image.crop(
-                    ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3]))),
-                     ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])))
+                self.image.paste(img.image.crop((0, 0, (int)(source[2]), (int)(source[3]))),
+                                 ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])))
+
+                # self.image.paste(img.image.crop(
+                #     ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3]))),
+                #      ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])))
 
                 #self.image.paste(img.image, (pos[0], pos[1], pos[0] +source[2], pos[1] + source[3]))
         else:
             try:
-                self.image.paste(img.image.crop(
-                    ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3]))),
-                    ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])))
+                #self.image.paste(img.image, (pos[0], pos[1], pos[0] + source[2], pos[1] + source[3]))
+                self.image.paste(img.image.crop((0, 0, (int)(source[2]), (int)(source[3]))),
+                                 ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])))
 
             except Exception,ex:
                 print("graphics 150",ex)
