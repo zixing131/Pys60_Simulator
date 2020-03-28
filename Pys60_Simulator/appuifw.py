@@ -2,7 +2,7 @@
 # import _appuifw
 # from _appuifw import *
 from key_codes import *
-
+import key_codes
 try:  # import as appropriate for 2.x vs. 3.x
     import tkinter as tk
 except:

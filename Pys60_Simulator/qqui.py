@@ -17,6 +17,13 @@ sleep = e32.ao_sleep
 import mypath
 mypath = mypath.getmypath("\\python\\pysoft\\pyqq\\")
 cachePath = mypath + "cache\\"
+#圆角矩形
+def rim(a,b,c,d,e=1):
+    if (a,b)<(c,d):
+        if e==1:return (a,b+1,a+1,b+1,a+1,b,c-1,b,c-1,b+1,c,b+1,c,d-1,c-1,d-1,c-1,d,a+1,d,a+1,d-1,a,d-1)
+        elif e==2:return (a,b+2,a+1,b+1,a+2,b,c-2,b,c-1,b+1,c,b+2,c,d-2,c-1,d-1,c-2,d,a+2,d,a+1,d-1,a,d-2)
+        elif e==3:return (a,b+2,a+1,b+1,a+2,b,c-2,b,c-1,b+1,c,b+2,c,d,a,d)
+        elif e==4:return (a,b+2,a-1,b+1,a-2,b,c-2,b,c-1,b+1,c,b+2,c,d-2,c+1,d-1,c+2,d,a+2,d,a+1,d-1,a,d-2)
 
 class QQSkin:
     def __init__(self):
