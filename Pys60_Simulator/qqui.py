@@ -164,7 +164,7 @@ class QQUi(object, ):
 
         index = 0
         while (self.isRefush):
-            self.background.clear(0x0)
+            self.background.clear(0)
             self.background.blit(self.imgOld, mask=self.deepMaskImg)
             center = [int(self.width / 2), int(self.height / 2)]
             allxy = self.genAllEllipseXy(center)
@@ -184,6 +184,10 @@ class QQUi(object, ):
 
         self.loading = 0
 
+    def drawMain(self):
+        self.background.clear(self.bgcolor)
+        self.img.blit(self.background)
+
     def redraw(self):  # 重绘界面
         if (self.loading == 1):
             return
@@ -194,7 +198,7 @@ class QQUi(object, ):
         elif (self.RunningForm == self.allForm.refushLoading):
             pass
         elif (self.RunningForm == self.allForm.main):
-
+            self.drawMain();
             self.__redraw()
             self.imgOld.blit(self.img)
         elif (self.RunningForm == self.allForm.menu):

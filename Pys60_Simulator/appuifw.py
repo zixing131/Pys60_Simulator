@@ -461,7 +461,7 @@ def note(text, type='info',wait=3):
         tkMessageBox.showinfo(type.title(), text)
 
 
-def query(text, type='info'):
+def query(text, type='info',defalutvalue=''):
     return True
 
 
