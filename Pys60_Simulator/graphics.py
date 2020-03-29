@@ -190,6 +190,7 @@ class Image:
                 font = (font[0],int(font[1]))
             except Exception,e:
                 print font
+        #text=text.encode('u8')
         draw.text((int(pos[0]),int(pos[1]-font[1])),text,fill=color,font = GetFont(color,font))
         if(self.canvas):
             self.canvas.blit(self)

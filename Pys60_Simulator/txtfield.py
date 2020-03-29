@@ -40,7 +40,12 @@ class New():
         cv = _app.body and _app.body.cv or None
         if(cv!=None):
            if(data==1):
-               self.textwindow = _app.body.cv.create_window((x,y),window=self.textbox,height = height, width =width)
+               try:
+                   self.textwindow = _app.body.cv.create_window((x,y),window=self.textbox,height = height, width =width)
+               except:
+                   cv = _app.body and _app.body.cv or None
+                   self.textbox = tk.Text(cv, width=width, height=height)
+                   self.textwindow = _app.body.cv.create_window((x, y), window=self.textbox, height=height, width=width)
            elif(data==0):
                if(self.textwindow!=None):
                    _app.body.cv.delete(self.textwindow)

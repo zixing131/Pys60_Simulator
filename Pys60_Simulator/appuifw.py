@@ -2,12 +2,15 @@
 # import _appuifw
 # from _appuifw import *
 from key_codes import *
-
+import key_codes
 try:  # import as appropriate for 2.x vs. 3.x
     import tkinter as tk
 except:
     import Tkinter as tk
 import tkMessageBox
+import pys60Socket
+
+
 
 screen = (240, 320)
 #screen = (360, 640)
@@ -403,7 +406,9 @@ class Text(object):
 
 
 class Application(object):
-
+    def full_name(self):
+        # Todo
+        return "d:\\"
     def __init__(self, **keys):
         self.running = 1
         self.exit_key_handler = None
@@ -449,7 +454,7 @@ def abort():
 os.abort = abort
 
 
-def note(text, type='info'):
+def note(text, type='info',wait=3):
     if type == "error":
         tkMessageBox.showerror(type.title(), text)
     else:
