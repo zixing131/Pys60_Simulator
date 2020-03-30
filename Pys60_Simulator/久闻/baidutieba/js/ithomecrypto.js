@@ -32,6 +32,14 @@ function getLoginUrl(userhash)
 	
 }
   
+function toBase64(rawStr)  
+{
+	var wordArray = CryptoJS.enc.Utf8.parse(rawStr);
+	var base64 = CryptoJS.enc.Base64.stringify(wordArray);
+	return base64
+}
+
+
 function getCommentParam(newsid,data)
 {
 	username = widget.preferenceForKey('email');

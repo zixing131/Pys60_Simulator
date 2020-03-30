@@ -1,9 +1,9 @@
 var page_list = 1, page_comments = 1, list_top = 0, ref_page = 'list' ,last_page = 'list'; //当前页码
 var isloading = 0;
 var info = { //应用属性
-	appname: 'IT之家s60v3客户端',
-	version: '0.0.0.8',
-	summary: '“IT之家”是业内领先的IT资讯和数码产品类网站。IT之家快速精选泛科技新闻，分享即时的IT业界动态和紧跟潮流的数码产品资讯，提供给力的PC和手机技术文章、丰富的系统应用美化资源，以及享不尽的智能阅读。',
+	appname: '百度贴吧s60v3客户端',
+	version: '0.0.0.1',
+	summary: '贴吧即百度贴吧，是百度旗下独立品牌，全球最大的中文社区。贴吧的创意来自于百度首席执行官李彦宏：结合搜索引擎建立一个在线的交流平台，让那些对同一个话题感兴趣的人们聚集在一起，方便地展开交流和互相帮助。贴吧是一种基于关键词的主题交流社区，它与搜索紧密结合，准确把握用户需求，为兴趣而生。',
 	thanks: '感谢塞班s60v3吧吧群(群号:140369358)的小伙伴们一直以来的支持~',
 	website: 'www.ithome.com'
 };
@@ -106,7 +106,12 @@ lastnewsTime = '';
 function displayList(hash) { //显示文章列表 
 	showPage('loading');//显示加载动画 
 	ref_page = 'list';  
-	ajax_get('http://api.ithome.com/json/listpage/news/'+hash, function(error, data) {
+	var option = function(){};
+	option.isphone =1;
+	option.un ='123456789';
+	option.passwd= '123456789';
+	login(option,function(data){alert(data)},function(data){alert(data)});
+	/*ajax_get('http://api.ithome.com/json/listpage/news/'+hash, function(error, data) {
 		if (error) {
 			alert(error);
 		} else {
@@ -150,8 +155,10 @@ function displayList(hash) { //显示文章列表
 				document.body.scrollTop += 20;
 			}
 		}
-	});
+		
+	});*/	
 }
+
 function displayArticle(item) { //显示文章正文
 	showPage('loading');//显示加载动画
 	item = JSON.parse(unescape(item))
