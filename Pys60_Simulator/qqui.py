@@ -99,6 +99,24 @@ class AllForm:
         self.RunningForm = self.splash
         self.genForms()
 
+    def loginEvent(self):
+        print("开始登录")
+        pass
+
+    def exit2(self):
+        if ui.query(cn("要退出吗？"), "query"):
+            self.running = 0
+            os.abort()
+
+    def refushMsg(self):
+        print ('刷新消息')
+
+    def refushFriendList(self):
+        print ('刷新好友列表')
+
+    def refushGroupList(self):
+        print ('刷新群列表')
+
     def genForms(self):
         self.MainForm = Form("PYQQ",(0,0),self.screen)
         bgImage = ''
@@ -110,6 +128,19 @@ class AllForm:
         self.MainForm.addControl(self.SplashPanel)
 
         self.LoginPanel = Panel(cn("登陆界面"), (0, 0), self.screen,qqSkin.bgColor)
+        self.loginMenuL = [(cn("登录"), self.loginEvent),
+                           (cn("退出"), self.exit2)]
+
+        self.mainMenu = [(cn("刷新消息"), self.refushMsg),
+                         (cn("刷新好友列表"), self.refushFriendList),
+                         (cn("刷新群列表"), self.refushGroupList),
+                         (cn("退出"), self.exit2)]
+        menuLogin = Menu(self.loginMenuL,(1,1),qqSkin.menuBgColor,qqSkin.menuTextColor,qqSkin.menuSelectedTextColor,
+                         qqSkin.menuSelectedBgColor,qqSkin.menuBgAroundColor1,qqSkin.menuBgAroundColor2
+                         ,fontsize=15,menuItemHeight=30,menuMinWidth = 0,menuSpeed=40)
+        menuLogin.hide()
+        self.LoginPanel.addControl(menuLogin)
+
         if(self.width==240):
             labelUsername = Label(cn('账号：'),(38,70),qqSkin.textColor,16)
             self.LoginPanel.addControl(labelUsername)
@@ -147,15 +178,9 @@ class QQUi(object, ):
         screen = ui.app.layout(ui.EScreen)[0]
         self.width = screen[0]
         self.height = screen[1]
-        self.loginMenuL = [(cn("登录"), self.loginEvent),
-                           (cn("退出"), self.exit2)]
 
-        self.mainMenu = [(cn("刷新消息"), self.refushMsg),
-                         (cn("刷新好友列表"), self.refushFriendList),
-                         (cn("刷新群列表"), self.refushGroupList),
-                         (cn("退出"), self.exit2)]
 
-        self.img = ph.Image.new(screen)
+
         self.allForm = AllForm()
         self.MainForm = self.allForm.getMainForm()
         self.MainForm._redraw = self.__redraw
@@ -168,7 +193,7 @@ class QQUi(object, ):
         self.redraw()
 
     def __redraw(self, size=0):  # 重绘界面
-        self.blit(self.img)
+        self.blit(self.MainForm.img)
 
     def blit(self, img):
         self.MainForm._Form__canvas.blit(img)
@@ -176,38 +201,20 @@ class QQUi(object, ):
     def key(self, event):
         pass
 
-    def loginEvent(self):
-        print("开始登录")
-        pass
-
-    def exit2(self):
-        if ui.query(cn("要退出吗？"), "query"):
-            self.running = 0
-            os.abort()
-
-    def refushMsg(self):
-        print ('刷新消息')
-
-    def refushFriendList(self):
-        print ('刷新好友列表')
-
-    def refushGroupList(self):
-        print ('刷新群列表')
-
     def show(self):
         self.MainForm.run()
         self._redraw()
     def _redraw(self):
-        self.img.blit(self.MainForm.getPaintImg())
+        self.MainForm.img.blit(self.MainForm.getPaintImg())
         self.redraw()
 
     def redraw(self):  # 重绘界面
         if (self.allForm.RunningForm == self.allForm.splash):
             self.allForm.setSplashPanel()
-            self.img.blit(self.MainForm.getPaintImg())
+            self.MainForm.img.blit(self.MainForm.getPaintImg())
         elif (self.allForm.RunningForm == self.allForm.login):
             self.allForm.setLoginPanel()
-            self.img.blit(self.MainForm.getPaintImg())
+            self.MainForm.img.blit(self.MainForm.getPaintImg())
 
         self.__redraw()
 

@@ -9,7 +9,7 @@
 import graphics as ph
 import appuifw as ui
 import txtfield
-
+cn = lambda x: x.decode("u8")
 class Events:
     def __init__(self):
         self.KEY_UP = 0
@@ -22,8 +22,10 @@ class Events:
         self.ARROW_DOWN = 17
 
 events = Events()
+tempImg = ph.Image.new((1, 1))
+screen = ui.app.layout(ui.EScreen)[0]
 
-class Control:
+class Control(object):
     def __init__(self,pos,color,fontsize):
         self.pos = pos
         self.color= color
@@ -33,14 +35,22 @@ class Control:
         self.isShow = 1
         self.Parent = None
         self.canGetFocus = 1
+        self.width = screen[0]
+        self.height = screen[1]
         #是否有焦点
         self.focus = 0
+    def textLen(self, content=u'', font=('dense',15)):
+        length = tempImg.measure_text(content, font)[0]
+        return length[2]
 
     def addControl(self, control):
         control.Parent = self
         self.Controls.append(control)
 
     def pressOk(self):
+        pass
+
+    def pressLeft(self):
         pass
 
     def WndProc(self,message, wparam, lparam):
@@ -67,6 +77,13 @@ class Control:
 
     def getPaintImg(self):
         return self.PaintImg
+
+class Button(Control):
+    def __init__(self,text="",pos=(0,0),size=(0,0),color=0x0,fontsize=15):
+        Control.__init__(self, pos, color, fontsize)
+        self.text = text
+        self.canGetFocus = 0
+        self.size = size
 
 class Label(Control):
 
@@ -105,6 +122,10 @@ class Textbox(Control):
             self.TextEditing = 0
             self.field.focus(0)
             self.field.visible(0)
+            if(isinstance(self,PasswordBox)):
+                self.password = self.field.get()
+            else:
+                self.text = self.field.get()
         elif(self.TextEditing == 0):
             self.TextEditing = 1
             self.field.focus(1)
@@ -119,7 +140,7 @@ class Textbox(Control):
         else:
             baseImg.rectangle((self.pos[0], self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]),
                               outline=self.selectedOutLineColor, fill=self.bgcolor, width=2)
-        baseImg.text((self.pos[0] + 2, self.pos[1] + self.size[0] - 1), self.text, self.color,
+        baseImg.text((self.pos[0] + 2, self.pos[1] + self.size[1] - 1), self.text, self.color,
                          ('dense', self.fontsize))
 
 
@@ -136,16 +157,70 @@ class PasswordBox(Textbox):
 
 class Menu(Control):
 
-    def __init__(self, menuList=[], pos=(0, 0), color=0x0, fontsize=15,menuItemHeight = 30,menuMinWidth = 0,menuSpeed = 40):
+    #Menu的pos是从左下角开始的
+    def __init__(self, menuList=[], pos=(0, 0), color=0x0,textColor = 0x0,selectedTextColor = 0x0,selectedBgColor = 0x0 ,menuBgAroundColor1=0x0,menuBgAroundColor2=0x0, fontsize=15,menuItemHeight = 30,menuMinWidth = 0,menuSpeed = 40):
         Control.__init__(self,pos, color, fontsize)
         self.menuList = menuList
         self.menuItemHeight = menuItemHeight
         self.menuMinWidth=menuMinWidth
         self.menuSpeed=menuSpeed
+        self.textColor=textColor
+        self.selectedTextColor=selectedTextColor
+        self.selectedBgColor=selectedBgColor
+        self.menuBgAroundColor1=menuBgAroundColor1
+        self.menuBgAroundColor2=menuBgAroundColor2
+        self.MenuIndex = 0
 
     def Paint(self, baseImg):
         if (self.isShow == 0):
             return
+        self._drawMenu(baseImg)
+
+    def _drawMenu(self, baseImg , menuPos):
+        # self.imgOld.blit(self.img)
+
+        imgTemp = ph.Image.new((self.RealMenuWidth, self.RealMenuHeight))
+        imgTemp.clear(self.menuBgAroundColor1)
+        imgTemp.rectangle((1,1,self.RealMenuWidth-1, self.RealMenuHeight-1),self.menuBgAroundColor2,self.menuBgAroundColor2)
+        imgTemp.rectangle((2, 2, self.RealMenuWidth - 2, self.RealMenuHeight -2), self.color,
+                          self.color)
+
+        for i in range(len(self.listName)):
+            color = self.textColor
+            if (i == self.MenuIndex):
+                color = self.selectedTextColor
+                imgTemp.rectangle((3,i * self.menuItemHeight + 3,self.RealMenuWidth - 3,i * self.menuItemHeight + self.menuItemHeight+3),self.selectedBgColor,self.selectedBgColor)
+            imgTemp.text((5, i * self.menuItemHeight + self.menuItemHeight / 2 + 11), self.listName[i], color, ('dense',self.fontsize))
+
+        x = 0 - (menuPos - self.RealMenuWidth + 3)
+        y = 0 - (self.height - self.RealMenuHeight - 5)
+        # print x,y
+        baseImg.blit(imgTemp, (self.height-self.pos[0] - self.RealMenuHeight, self.width - self.pos[1] - self.RealMenuWidth))
+        del imgTemp
+
+    def genMenuList(self):
+        self.listName = []
+        self.listEvent = []
+        index = 1
+        for i in self.menuList:
+            self.listName.append(cn(str(index) + '. ') + i[0])
+            self.listEvent.append(i[1])
+            index += 1
+        self.RealMenuWidth = self.getMenuWidth()
+        self.RealMenuHeight = len(self.listName) * self.menuItemHeight
+
+    def getMenuWidth(self):
+        l = self.menuMinWidth
+        for i in self.listName:
+            t = self.textLen(i, ('dense', 17))
+            if (l < t):
+                l = t
+            if (l > self.width):
+                return self.width
+        return l
+
+
+    #def appuifw.app.exit_key_handler = self.OnReturn6
 
 class Panel(Control):
     def __init__(self,text='', pos=(0, 0),size=(240,320), color=0x0, fontsize=15,bgImage=''):
@@ -184,6 +259,8 @@ class Form(Control):
         ui.app.body = self._Form__canvas
         self._Form__index = -1 #当前选中的项目
         self.center = [] #模拟鼠标对应的控件中心点
+        self.img = ph.Image.new(size)
+        self.oldImg = ph.Image.new(size)
 
 
     def redraw(self,rd=None):
@@ -227,7 +304,7 @@ class Form(Control):
         if(len(visiableChildrens) == 0):
             return
         for child in visiableChildrens:
-            if (type(child) is Textbox and child.TextEditing == 1):
+            if ( isinstance(child,Textbox) and child.TextEditing == 1):
                 return
         self._Form__index -= 1
         if (self._Form__index < 0):
@@ -239,7 +316,7 @@ class Form(Control):
         if (len(visiableChildrens) == 0):
             return
         for child in visiableChildrens:
-            if (type(child) is Textbox and child.TextEditing == 1):
+            if (isinstance(child,Textbox) and child.TextEditing == 1):
                 return
         self._Form__index += 1
         if (self._Form__index > len(visiableChildrens) - 1):
@@ -265,6 +342,8 @@ class Form(Control):
             self.indexDown()
         if(wparam == 167):#ok键
             self.pressOk()
+        if(wparam == 164): #左键
+            self.pressLeft()
 
     def reblit(self):
         if(self._blit!=None):
@@ -316,6 +395,7 @@ class Form(Control):
         self.baseImg.clear(self.color)
         for i in self.Controls:
             i.Paint(self.baseImg)
+        self.img.blit(self.baseImg)
         return self.baseImg
 
     def InitializeComponent(self):
