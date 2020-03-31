@@ -33,6 +33,15 @@ def rim(a,b,c,d,e=1):
 
 class QQSkin:
     def __init__(self):
+
+        # 文本编辑框文本颜色
+        self.textboxTextColor = 0x002157
+        #文本编辑框背景颜色
+        self.textboxBgColor = 0xD6EFFE
+        # 文本编辑框边框颜色
+        self.textboxOutlineColor = 0xB5D3E7
+        #选中的边框颜色
+        self.selectedOutlineColor = 0x4AFFFF
         #三角箭头颜色
         self.ArrowColor = 0x2996CE
         # 文字颜色
@@ -87,40 +96,47 @@ class AllForm:
         self.screen = ui.app.layout(ui.EScreen)[0]
         self.width = self.screen[0]
         self.height = self.screen[1]
+        self.RunningForm = self.splash
         self.genForms()
 
     def genForms(self):
-
-        self.SplashForm = Form("启动界面",(0,0),self.screen)
+        self.MainForm = Form("PYQQ",(0,0),self.screen)
         bgImage = ''
         if (self.width == 240):
             bgImage = mypath + "splash_1.png"
         else:
-            bgImage =mypath + "splash_2.png"
-        bgpanel = Panel((0,0),self.screen,bgImage=bgImage)
-        self.SplashForm.addControl(bgpanel)
+            bgImage = mypath + "splash_2.png"
+        self.SplashPanel = Panel(cn('启动界面'),(0,0),self.screen,bgImage=bgImage)
+        self.MainForm.addControl(self.SplashPanel)
 
-        self.LoginForm = Form("登陆界面", (0, 0), self.screen,qqSkin.bgColor)
+        self.LoginPanel = Panel(cn("登陆界面"), (0, 0), self.screen,qqSkin.bgColor)
         if(self.width==240):
-            labelUsername = Label(cn('账号：'),(38,71),qqSkin.textColor,16)
-            self.LoginForm.addControl(labelUsername)
+            labelUsername = Label(cn('账号：'),(38,70),qqSkin.textColor,16)
+            self.LoginPanel.addControl(labelUsername)
             labelPassword = Label(cn('密码：'),(38,100),qqSkin.textColor,16)
-            self.LoginForm.addControl(labelPassword)
-
+            self.LoginPanel.addControl(labelPassword)
+            textboxUsername = Textbox(cn(''),(85,53),(100,20), qqSkin.textboxTextColor,qqSkin.textboxBgColor,qqSkin.textboxOutlineColor,qqSkin.selectedOutlineColor, 15)
+            self.LoginPanel.addControl(textboxUsername)
+            textboxPassword = PasswordBox(cn(''),'', (85, 83),(100,20), qqSkin.textboxTextColor,qqSkin.textboxBgColor,qqSkin.textboxOutlineColor,qqSkin.selectedOutlineColor, 15)
+            self.LoginPanel.addControl(textboxPassword)
         else:
             labelUsername = Label(cn('账号：'), (38, 71), qqSkin.textColor, 16)
-            self.LoginForm.addControl(labelUsername)
+            self.LoginPanel.addControl(labelUsername)
             labelPassword = Label(cn('密码：'), (38, 100), qqSkin.textColor, 16)
-            self.LoginForm.addControl(labelPassword)
+            self.LoginPanel.addControl(labelPassword)
+        self.MainForm.addControl(self.LoginPanel)
 
+    def getMainForm(self):
+        return self.MainForm
+    def setSplashPanel(self):
+        self.RunningForm = self.splash
+        self.MainForm.HideAllChildrenExcept(self.SplashPanel)
+        self.MainForm.redraw()
 
-
-
-    def getSplashForm(self):
-        return self.SplashForm
-
-    def getLoginForm(self):
-        return self.LoginForm
+    def setLoginPanel(self):
+        self.RunningForm = self.login
+        self.MainForm.HideAllChildrenExcept(self.LoginPanel)
+        self.MainForm.redraw()
 
 
 
@@ -128,7 +144,6 @@ class AllForm:
 class QQUi(object, ):
     def __init__(self):
         self.TitleName = "PYQQ"
-        ui.app.screen = "full"
         screen = ui.app.layout(ui.EScreen)[0]
         self.width = screen[0]
         self.height = screen[1]
@@ -139,27 +154,24 @@ class QQUi(object, ):
                          (cn("刷新好友列表"), self.refushFriendList),
                          (cn("刷新群列表"), self.refushGroupList),
                          (cn("退出"), self.exit2)]
-        self.__canvas = ui.Canvas(self.__redraw, self.key)
-        ui.app.body = self.__canvas
-        self.background = ph.Image.new((self.width, self.height))
-        self.bgcolor = qqSkin.bgColor
-        self.background.clear(self.bgcolor)
 
-        self.imgOld = Image.new(screen)
-        self.img = ph.Image.new((self.width, self.height))
+        self.img = ph.Image.new(screen)
         self.allForm = AllForm()
-        self.RunningForm = self.allForm.splash
-        self.img.blit(self.allForm.getSplashForm().getPaintImg())
-        self.__redraw()
+        self.MainForm = self.allForm.getMainForm()
+        self.MainForm._redraw = self.__redraw
+        self.MainForm._blit=self.blit
+        self.allForm.setSplashPanel()
+        self.MainForm.show()
+        self.redraw()
         sleep(0)
-        self.RunningForm = self.allForm.login
-
+        self.allForm.setLoginPanel()
+        self.redraw()
 
     def __redraw(self, size=0):  # 重绘界面
         self.blit(self.img)
 
     def blit(self, img):
-        self.__canvas.blit(img)
+        self.MainForm._Form__canvas.blit(img)
 
     def key(self, event):
         pass
@@ -183,17 +195,19 @@ class QQUi(object, ):
         print ('刷新群列表')
 
     def show(self):
+        self.MainForm.run()
         self._redraw()
     def _redraw(self):
-        self.img.blit(self.background, (0, 0))
+        self.img.blit(self.MainForm.getPaintImg())
         self.redraw()
 
     def redraw(self):  # 重绘界面
-        if (self.RunningForm == self.allForm.splash):
-            self.img.blit(self.allForm.getSplashForm().getPaintImg())
-
-        elif (self.RunningForm == self.allForm.login):
-            self.img.blit(self.allForm.getLoginForm().getPaintImg())
+        if (self.allForm.RunningForm == self.allForm.splash):
+            self.allForm.setSplashPanel()
+            self.img.blit(self.MainForm.getPaintImg())
+        elif (self.allForm.RunningForm == self.allForm.login):
+            self.allForm.setLoginPanel()
+            self.img.blit(self.MainForm.getPaintImg())
 
         self.__redraw()
 
@@ -201,5 +215,4 @@ class QQUi(object, ):
 qqUi = QQUi()
 qqUi.TitleName = cn("PYQQ")
 qqUi.show()
-
 e32.Ao_lock().wait()
