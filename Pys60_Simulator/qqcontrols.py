@@ -108,6 +108,51 @@ class Button(Control):
             if( self.event!=None):
                 self.event()
 
+class CheckBox(Button):
+    def __init__(self,text="",event = None,pos=(0,0),size=(0,0),color=0x0,bgcolor = 0x0,outlinecolor=0x0,selectedOutLineColor = 0x0,fontsize=15,checkedTextColor = 0x0,checkColor=0x0,checkInlineColor=0x0):
+        Button.__init__(self,text,event, pos,size, color,bgcolor,outlinecolor,selectedOutLineColor, fontsize)
+        self.value = 0
+        self.canGetFocus = 1
+        self.checkedTextColor = checkedTextColor
+        self.checkColor=checkColor
+        self.checkInlineColor=checkInlineColor
+
+    def Paint(self,baseImg):
+        if (self.isShow == 0):
+            return
+        if (self.focus == 0):
+            baseImg.rectangle((self.pos[0], self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]),
+                              outline=self.outlinecolor, fill=self.bgcolor, width=1)
+        else:
+            baseImg.rectangle((self.pos[0], self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]),
+                              outline=self.selectedOutLineColor, fill=self.bgcolor, width=2)
+
+        gap = int((self.size[1] - 10)/2)
+        x = self.pos[0] + gap
+        y = self.pos[1] + gap
+        baseImg.rectangle((x , y, x + 10, y+ 10),
+                              outline=self.checkColor, fill=0xffffff, width=1)
+        textcolor = self.color
+        if (self.value == 1):
+            textcolor = self.checkedTextColor
+            baseImg.rectangle((x+2 , y+2, x + 8, y+ 8),
+                                          outline=0xffffff, fill=self.checkColor, width=1)
+        baseImg.text((self.pos[0] + 2 + 15, self.pos[1] + self.size[1] - 1), self.text, textcolor,
+                     ('dense', self.fontsize))
+
+
+    def getValue(self):
+        return self.value
+
+    def pressOk(self):
+        if(self.isShow==1 and self.focus==1):
+            if( self.event!=None):
+                self.event()
+            if(self.value == 1):
+                self.value = 0
+            else:
+                self.value = 1
+
 
 class Label(Control):
 
@@ -261,6 +306,8 @@ class Menu(Control):
             self.Parent.leftMenuName = self.ParentLeftMenuName
             self.Parent.rightMenuName = self.ParentRightMenuName
             self.listEvent[self.MenuIndex]()
+            self.MenuIndex = 0
+            ui.app.exit_key_handler = self.lastExitHandle
         else:
             self.isShow = 1
             if(type(self.Parent) is Panel):
@@ -268,10 +315,13 @@ class Menu(Control):
                 self.ParentRightMenuName =  self.Parent.rightMenuName
                 self.Parent.leftMenuName = cn('选择')
                 self.Parent.rightMenuName = cn('返回')
+                self.lastExitHandle = ui.app.exit_key_handler
                 ui.app.exit_key_handler = self.returnMenu
     def returnMenu(self):
         if (self.isShow == 1):
             self.isShow = 0
+            self.MenuIndex = 0
+            ui.app.exit_key_handler = self.lastExitHandle
             if (type(self.Parent) is Panel):
                 self.Parent.leftMenuName = self.ParentLeftMenuName
                 self.Parent.rightMenuName = self.ParentRightMenuName
@@ -284,6 +334,8 @@ class Menu(Control):
             self.Parent.leftMenuName = self.ParentLeftMenuName
             self.Parent.rightMenuName = self.ParentRightMenuName
             self.listEvent[self.MenuIndex]()
+            self.MenuIndex = 0
+            ui.app.exit_key_handler = self.lastExitHandle
 
 
     #def appuifw.app.exit_key_handler = self.OnReturn6
@@ -301,6 +353,9 @@ class Panel(Control):
         self.MenuBarHeight = 30
         self.MenuBarBgColor=0x0
         self.MenuBarTextColor = 0x0
+
+    def setRightMenuEvent(self,event):
+        ui.app.exit_key_handler = event
 
     def Paint(self, baseImg):
         if (self.isShow == 0):

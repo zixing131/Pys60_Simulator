@@ -64,6 +64,16 @@ class QQSkin:
         self.menuSelectedBgColor = 0x2982BD
         # 菜单选中文字颜色
         self.menuSelectedTextColor = 0xFFFFFF
+        #checkbox 选中的时候的文本颜色
+        self.cbk_CheckedTextColor = 0xFFFFFF
+        #checkbox的文本颜色
+        self.cbk_TextColor = 0xA5D7F7
+        #checkbox 勾的颜色
+        self.cbk_checkColor = 0x10456B
+        # checkbox 勾的内部颜色
+        self.cbk_checkInlineColor = 0xD6EFFF
+
+
 
         # 菜单包围颜色1（外层）
         self.menuBgAroundColor1 = 0x031421
@@ -142,6 +152,7 @@ class AllForm:
         self.LoginPanel.MenuBarHeight = 30
         self.LoginPanel.MenuBarBgColor = qqSkin.barBgColor
         self.LoginPanel.MenuBarTextColor = qqSkin.barTextColor
+        self.LoginPanel.setRightMenuEvent(self.loginEvent)
 
         menuLogin = Menu(self.loginMenuL, (2, 2+self.LoginPanel.MenuBarHeight), qqSkin.menuBgColor, qqSkin.menuTextColor,
                          qqSkin.menuSelectedTextColor,
@@ -159,7 +170,12 @@ class AllForm:
             self.LoginPanel.addControl(textboxUsername)
             textboxPassword = PasswordBox(cn(''),'', (85, 83),(100,20), qqSkin.textboxTextColor,qqSkin.textboxBgColor,qqSkin.textboxOutlineColor,qqSkin.selectedOutlineColor, 15)
             self.LoginPanel.addControl(textboxPassword)
-            loginButton = Button(cn('登陆'))
+            ckb_rememberPassword = CheckBox(cn('记住密码'),None, (82,113),(82,20), qqSkin.cbk_TextColor ,qqSkin.bgColor,qqSkin.bgColor,qqSkin.selectedOutlineColor,15,
+                                            checkedTextColor = qqSkin.cbk_CheckedTextColor,checkColor=qqSkin.cbk_checkColor,checkInlineColor=qqSkin.cbk_checkInlineColor)
+
+            ckb_rememberPassword.value = 1
+            self.LoginPanel.addControl(ckb_rememberPassword)
+
         else:
             labelUsername = Label(cn('账号：'), (38, 71), qqSkin.textColor, 16)
             self.LoginPanel.addControl(labelUsername)
