@@ -43,6 +43,10 @@ class Control(object):
         length = tempImg.measure_text(content, font)[0]
         return length[2]
 
+    def maxLenOfText(self, content=u'',maxwidth = -1, font=('dense', 15)):
+        length = tempImg.measure_text(content, font,maxwidth=maxwidth)
+        return length[2]
+
     def addControl(self, control):
         control.Parent = self
         self.Controls.append(control)
@@ -79,11 +83,31 @@ class Control(object):
         return self.PaintImg
 
 class Button(Control):
-    def __init__(self,text="",pos=(0,0),size=(0,0),color=0x0,fontsize=15):
+    def __init__(self,text="",event = None,pos=(0,0),size=(0,0),color=0x0,bgcolor = 0x0,outlinecolor=0x0,selectedOutLineColor = 0x0,fontsize=15):
         Control.__init__(self, pos, color, fontsize)
         self.text = text
-        self.canGetFocus = 0
+        self.canGetFocus = 1
         self.size = size
+        self.outlinecolor=outlinecolor
+        self.bgcolor=bgcolor
+        self.event=event
+        self.selectedOutLineColor=selectedOutLineColor
+    def Paint(self,baseImg):
+        if (self.isShow == 0):
+            return
+        if (self.focus == 0):
+            baseImg.rectangle((self.pos[0], self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]),
+                              outline=self.outlinecolor, fill=self.bgcolor, width=1)
+        else:
+            baseImg.rectangle((self.pos[0], self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]),
+                              outline=self.selectedOutLineColor, fill=self.bgcolor, width=2)
+        baseImg.text((self.pos[0] + 2, self.pos[1] + self.size[1] - 1), self.text, self.color,
+                     ('dense', self.fontsize))
+    def pressOk(self):
+        if(self.isShow==1 and self.focus==1):
+            if( self.event!=None):
+                self.event()
+
 
 class Label(Control):
 
@@ -140,25 +164,29 @@ class Textbox(Control):
         else:
             baseImg.rectangle((self.pos[0], self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]),
                               outline=self.selectedOutLineColor, fill=self.bgcolor, width=2)
-        baseImg.text((self.pos[0] + 2, self.pos[1] + self.size[1] - 1), self.text, self.color,
+
+        drawLength = self.maxLenOfText(self.text,self.size[0],('dense',self.fontsize))
+        drawText =self.text [:drawLength]
+        baseImg.text((self.pos[0] + 2, self.pos[1] + self.size[1] - 1), drawText, self.color,
                          ('dense', self.fontsize))
 
 
 class PasswordBox(Textbox):
 
-    def __init__(self, text='',password='', pos=(0, 0),size = (0,0), color=0x0,bgcolor = 0x0,outlinecolor=0x0,selectedOutLineColor = 0x0, fontsize=15):
-        Textbox.__init__(self,text, pos,size, color,bgcolor,outlinecolor, selectedOutLineColor,fontsize)
+    def __init__(self, text='',password='', pos=(0, 0),size = (0,0), color=0x0,bgcolor = 0x0,outlinecolor=0x0,selectedOutLineColor = 0x0, fontsize=15,limit=16):
+        Textbox.__init__(self,text, pos,size, color,bgcolor,outlinecolor, selectedOutLineColor,fontsize,limit)
         self.password = password
     def Paint(self,baseImg):
         if(self.password!=''):
-            self.text = '*'*len(self.password)
+            self.text = cn('*'*len(self.password))
         Textbox.Paint(self,baseImg)
-
+    def pressOk(self):
+        Textbox.pressOk(self)
 
 class Menu(Control):
 
     #Menu的pos是从左下角开始的
-    def __init__(self, menuList=[], pos=(0, 0), color=0x0,textColor = 0x0,selectedTextColor = 0x0,selectedBgColor = 0x0 ,menuBgAroundColor1=0x0,menuBgAroundColor2=0x0, fontsize=15,menuItemHeight = 30,menuMinWidth = 0,menuSpeed = 40):
+    def __init__(self, menuList=[], pos=(0, 0), color=0x0,textColor = 0x0,selectedTextColor = 0x0,selectedBgColor = 0x0 ,menuBgAroundColor1=0x0,menuBgAroundColor2=0x0, fontsize=15,menuItemHeight = 30,menuMinWidth = 50,menuSpeed = 40):
         Control.__init__(self,pos, color, fontsize)
         self.menuList = menuList
         self.menuItemHeight = menuItemHeight
@@ -170,13 +198,24 @@ class Menu(Control):
         self.menuBgAroundColor1=menuBgAroundColor1
         self.menuBgAroundColor2=menuBgAroundColor2
         self.MenuIndex = 0
+        self.genMenuList()
 
     def Paint(self, baseImg):
         if (self.isShow == 0):
             return
         self._drawMenu(baseImg)
 
-    def _drawMenu(self, baseImg , menuPos):
+    def MenuDown(self):
+        self.MenuIndex += 1
+        if(self.MenuIndex > len(self.listName)-1):
+            self.MenuIndex = 0
+
+    def MenuUp(self):
+        self.MenuIndex -=1
+        if(self.MenuIndex<0):
+            self.MenuIndex = len(self.listName)-1
+
+    def _drawMenu(self, baseImg):
         # self.imgOld.blit(self.img)
 
         imgTemp = ph.Image.new((self.RealMenuWidth, self.RealMenuHeight))
@@ -191,11 +230,8 @@ class Menu(Control):
                 color = self.selectedTextColor
                 imgTemp.rectangle((3,i * self.menuItemHeight + 3,self.RealMenuWidth - 3,i * self.menuItemHeight + self.menuItemHeight+3),self.selectedBgColor,self.selectedBgColor)
             imgTemp.text((5, i * self.menuItemHeight + self.menuItemHeight / 2 + 11), self.listName[i], color, ('dense',self.fontsize))
-
-        x = 0 - (menuPos - self.RealMenuWidth + 3)
-        y = 0 - (self.height - self.RealMenuHeight - 5)
-        # print x,y
-        baseImg.blit(imgTemp, (self.height-self.pos[0] - self.RealMenuHeight, self.width - self.pos[1] - self.RealMenuWidth))
+        T=(0-self.pos[0],0-(self.height - self.pos[1] - self.RealMenuHeight))
+        baseImg.blit(imgTemp, T)
         del imgTemp
 
     def genMenuList(self):
@@ -212,12 +248,42 @@ class Menu(Control):
     def getMenuWidth(self):
         l = self.menuMinWidth
         for i in self.listName:
-            t = self.textLen(i, ('dense', 17))
+            t = self.textLen(i, ('dense',self.fontsize+2)) +10
             if (l < t):
                 l = t
             if (l > self.width):
                 return self.width
         return l
+
+    def pressLeft(self):
+        if(self.isShow == 1):
+            self.isShow = 0
+            self.Parent.leftMenuName = self.ParentLeftMenuName
+            self.Parent.rightMenuName = self.ParentRightMenuName
+            self.listEvent[self.MenuIndex]()
+        else:
+            self.isShow = 1
+            if(type(self.Parent) is Panel):
+                self.ParentLeftMenuName =  self.Parent.leftMenuName
+                self.ParentRightMenuName =  self.Parent.rightMenuName
+                self.Parent.leftMenuName = cn('选择')
+                self.Parent.rightMenuName = cn('返回')
+                ui.app.exit_key_handler = self.returnMenu
+    def returnMenu(self):
+        if (self.isShow == 1):
+            self.isShow = 0
+            if (type(self.Parent) is Panel):
+                self.Parent.leftMenuName = self.ParentLeftMenuName
+                self.Parent.rightMenuName = self.ParentRightMenuName
+                if (type(self.Parent.Parent) is Form):
+                    self.Parent.Parent.reblit()
+
+    def pressOk(self):
+        if (self.isShow == 1):
+            self.isShow = 0
+            self.Parent.leftMenuName = self.ParentLeftMenuName
+            self.Parent.rightMenuName = self.ParentRightMenuName
+            self.listEvent[self.MenuIndex]()
 
 
     #def appuifw.app.exit_key_handler = self.OnReturn6
@@ -229,6 +295,12 @@ class Panel(Control):
         self.bgImage=bgImage
         self.size = size
         self.canGetFocus = 0
+        self.showMenuBar = 0
+        self.leftMenuName = cn('')
+        self.rightMenuName = cn('')
+        self.MenuBarHeight = 30
+        self.MenuBarBgColor=0x0
+        self.MenuBarTextColor = 0x0
 
     def Paint(self, baseImg):
         if (self.isShow == 0):
@@ -236,6 +308,14 @@ class Panel(Control):
         baseImg.rectangle((self.pos[0], self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]), fill=self.color,width=0)
         if(self.bgImage!=''):
             baseImg.blit(ph.Image.open(self.bgImage))
+        if(self.showMenuBar):
+            baseImg.rectangle(( 0,self.height - self.MenuBarHeight ,self.width,self.height),self.MenuBarBgColor,self.MenuBarBgColor)
+            baseImg.text((int(self.fontsize/2), self.height - int(self.fontsize/2) ), self.leftMenuName, self.MenuBarTextColor,
+                         ('dense', self.fontsize))
+            p = self.textLen(self.rightMenuName, ('dense', self.fontsize))
+            baseImg.text((self.width - p - int(self.fontsize / 2), self.height - int(self.fontsize / 2)), self.rightMenuName,
+                         self.MenuBarTextColor,
+                         ('dense', self.fontsize))
         for i in self.Controls:
             i.Paint(baseImg)
 
@@ -243,6 +323,10 @@ class Panel(Control):
         self.isShow = 1
     def hide(self):
         self.isShow = 0
+
+    def pressLeft(self):
+        for i in self.Controls:
+            i.pressLeft()
 
 class Form(Control):
 
@@ -304,6 +388,9 @@ class Form(Control):
         if(len(visiableChildrens) == 0):
             return
         for child in visiableChildrens:
+            if ( isinstance(child,Menu) and child.isShow == 1):
+                child.MenuUp()
+                return
             if ( isinstance(child,Textbox) and child.TextEditing == 1):
                 return
         self._Form__index -= 1
@@ -316,6 +403,9 @@ class Form(Control):
         if (len(visiableChildrens) == 0):
             return
         for child in visiableChildrens:
+            if (isinstance(child, Menu) and child.isShow == 1):
+                child.MenuDown()
+                return
             if (isinstance(child,Textbox) and child.TextEditing == 1):
                 return
         self._Form__index += 1
@@ -328,8 +418,13 @@ class Form(Control):
         if (len(visiableChildrens) == 0):
             return
         for child in visiableChildrens:
-            if(child.focus):
+            if ( isinstance(child,Menu) and child.isShow == 1):
                 child.pressOk()
+                return
+        for child in visiableChildrens:
+            if (child.focus):
+                child.pressOk()
+
 
     def keyup(self,message, wparam, lparam):
         if wparam == events.ARROW_LEFT:
@@ -361,7 +456,7 @@ class Form(Control):
             self.indexDown()
 
     def keyrepeat(self,message, wparam, lparam):
-
+        return
         if wparam == events.ARROW_LEFT:
             self.indexUp()
         elif (wparam == events.ARROW_UP):
@@ -381,6 +476,11 @@ class Form(Control):
         elif (message == events.KEY_DOWN):
             self.keydown(message, wparam, lparam)
             self.reblit()
+
+    def pressLeft(self):
+        for i in self.Controls:
+            if(i.isShow):
+                i.pressLeft()
 
     def getWidth(self):
         return self.size[0]

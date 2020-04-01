@@ -128,16 +128,25 @@ class AllForm:
         self.MainForm.addControl(self.SplashPanel)
 
         self.LoginPanel = Panel(cn("登陆界面"), (0, 0), self.screen,qqSkin.bgColor)
-        self.loginMenuL = [(cn("登录"), self.loginEvent),
-                           (cn("退出"), self.exit2)]
+        self.loginMenuL = [(cn("登  录"), self.loginEvent),
+                           (cn("退  出"), self.exit2)]
 
         self.mainMenu = [(cn("刷新消息"), self.refushMsg),
                          (cn("刷新好友列表"), self.refushFriendList),
                          (cn("刷新群列表"), self.refushGroupList),
                          (cn("退出"), self.exit2)]
-        menuLogin = Menu(self.loginMenuL,(1,1),qqSkin.menuBgColor,qqSkin.menuTextColor,qqSkin.menuSelectedTextColor,
-                         qqSkin.menuSelectedBgColor,qqSkin.menuBgAroundColor1,qqSkin.menuBgAroundColor2
-                         ,fontsize=15,menuItemHeight=30,menuMinWidth = 0,menuSpeed=40)
+
+        self.LoginPanel.showMenuBar=1
+        self.LoginPanel.leftMenuName = cn('菜单')
+        self.LoginPanel.rightMenuName = cn('登录')
+        self.LoginPanel.MenuBarHeight = 30
+        self.LoginPanel.MenuBarBgColor = qqSkin.barBgColor
+        self.LoginPanel.MenuBarTextColor = qqSkin.barTextColor
+
+        menuLogin = Menu(self.loginMenuL, (2, 2+self.LoginPanel.MenuBarHeight), qqSkin.menuBgColor, qqSkin.menuTextColor,
+                         qqSkin.menuSelectedTextColor,
+                         qqSkin.menuSelectedBgColor, qqSkin.menuBgAroundColor1, qqSkin.menuBgAroundColor2
+                         , fontsize=15, menuItemHeight=30, menuMinWidth=50, menuSpeed=40)
         menuLogin.hide()
         self.LoginPanel.addControl(menuLogin)
 
@@ -150,6 +159,7 @@ class AllForm:
             self.LoginPanel.addControl(textboxUsername)
             textboxPassword = PasswordBox(cn(''),'', (85, 83),(100,20), qqSkin.textboxTextColor,qqSkin.textboxBgColor,qqSkin.textboxOutlineColor,qqSkin.selectedOutlineColor, 15)
             self.LoginPanel.addControl(textboxPassword)
+            loginButton = Button(cn('登陆'))
         else:
             labelUsername = Label(cn('账号：'), (38, 71), qqSkin.textColor, 16)
             self.LoginPanel.addControl(labelUsername)
