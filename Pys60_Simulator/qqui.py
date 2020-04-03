@@ -161,26 +161,38 @@ class AllForm:
         menuLogin.hide()
         self.LoginPanel.addControl(menuLogin)
 
+        basex = 0
         if(self.width==240):
-            labelUsername = Label(cn('账号：'),(38,70),qqSkin.textColor,16)
-            self.LoginPanel.addControl(labelUsername)
-            labelPassword = Label(cn('密码：'),(38,100),qqSkin.textColor,16)
-            self.LoginPanel.addControl(labelPassword)
-            textboxUsername = Textbox(cn(''),(85,53),(100,20), qqSkin.textboxTextColor,qqSkin.textboxBgColor,qqSkin.textboxOutlineColor,qqSkin.selectedOutlineColor, 15)
-            self.LoginPanel.addControl(textboxUsername)
-            textboxPassword = PasswordBox(cn(''),'', (85, 83),(100,20), qqSkin.textboxTextColor,qqSkin.textboxBgColor,qqSkin.textboxOutlineColor,qqSkin.selectedOutlineColor, 15)
-            self.LoginPanel.addControl(textboxPassword)
-            ckb_rememberPassword = CheckBox(cn('记住密码'),None, (82,113),(82,20), qqSkin.cbk_TextColor ,qqSkin.bgColor,qqSkin.bgColor,qqSkin.selectedOutlineColor,15,
-                                            checkedTextColor = qqSkin.cbk_CheckedTextColor,checkColor=qqSkin.cbk_checkColor,checkInlineColor=qqSkin.cbk_checkInlineColor)
-
-            ckb_rememberPassword.value = 1
-            self.LoginPanel.addControl(ckb_rememberPassword)
-
+            basex = 0
         else:
-            labelUsername = Label(cn('账号：'), (38, 71), qqSkin.textColor, 16)
-            self.LoginPanel.addControl(labelUsername)
-            labelPassword = Label(cn('密码：'), (38, 100), qqSkin.textColor, 16)
-            self.LoginPanel.addControl(labelPassword)
+            basex = 45
+        labelUsername = Label(cn('账号：'), (basex+38, 70), qqSkin.textColor, 16)
+        self.LoginPanel.addControl(labelUsername)
+        labelPassword = Label(cn('密码：'), (basex+38, 100), qqSkin.textColor, 16)
+        self.LoginPanel.addControl(labelPassword)
+        textboxUsername = Textbox(cn(''), (basex+85, 53), (100, 20), qqSkin.textboxTextColor, qqSkin.textboxBgColor,
+                                  qqSkin.textboxOutlineColor, qqSkin.selectedOutlineColor, 15)
+        self.LoginPanel.addControl(textboxUsername)
+        textboxPassword = PasswordBox(cn(''), '', (basex+85, 83), (100, 20), qqSkin.textboxTextColor,
+                                      qqSkin.textboxBgColor, qqSkin.textboxOutlineColor,
+                                      qqSkin.selectedOutlineColor, 15)
+        self.LoginPanel.addControl(textboxPassword)
+        ckb_rememberPassword = CheckBox(cn('记住密码'), None, (basex+82, 113), (82, 20), qqSkin.cbk_TextColor, qqSkin.bgColor,
+                                        qqSkin.bgColor, qqSkin.selectedOutlineColor, 15,
+                                        checkedTextColor=qqSkin.cbk_CheckedTextColor,
+                                        checkColor=qqSkin.cbk_checkColor,
+                                        checkInlineColor=qqSkin.cbk_checkInlineColor)
+        ckb_receiveGroupMsg = CheckBox(cn('接收群消息'), None, (basex+82, 143), (95, 20), qqSkin.cbk_TextColor, qqSkin.bgColor,
+                                       qqSkin.bgColor, qqSkin.selectedOutlineColor, 15,
+                                       checkedTextColor=qqSkin.cbk_CheckedTextColor,
+                                       checkColor=qqSkin.cbk_checkColor,
+                                       checkInlineColor=qqSkin.cbk_checkInlineColor)
+
+        ckb_rememberPassword.value = 1
+        ckb_receiveGroupMsg.value = 1
+        self.LoginPanel.addControl(ckb_rememberPassword)
+        self.LoginPanel.addControl(ckb_receiveGroupMsg)
+
         self.MainForm.addControl(self.LoginPanel)
 
     def getMainForm(self):
