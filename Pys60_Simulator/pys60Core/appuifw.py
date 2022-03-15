@@ -8,10 +8,14 @@ try:  # import as appropriate for 2.x vs. 3.x
 except:
     import Tkinter as tk
 import tkMessageBox
+import pys60Socket
+
+
 
 screen = (240, 320)
 #screen = (360, 640)
 #screen = (320, 240)
+from threading import Timer
 
 
 FFormEditModeOnly = 2
@@ -22,8 +26,10 @@ EEventKey=1
 
 from PIL import ImageTk
 import time
+import thread
 import os
 import graphics
+graphics.screen=screen
 EScreen = 1
 EHLeftVTop = 0
 root = tk.Tk()
@@ -53,7 +59,7 @@ class Listbox():
 
 class Canvas(graphics.Image):
     def __init__(self, redraw_callback=None, event_callback=None, resize_callback=None):
-        graphics.Image.__init__(self, screen, None, self)
+        graphics.Image.__init__(self, screen, None,self)
         self.redraw_callback = redraw_callback
         self.event_callback = event_callback
         self.root = root
@@ -91,9 +97,12 @@ class Canvas(graphics.Image):
         # 打印键盘事件
         flag = time.time() - self.lastkeytime
         self.lastkeytime = time.time()
-        keytype = 3
-        if (flag < 0.1):
-            keytype = 1
+        keytype = 1
+        #if (flag < 0.1):
+        #    return
+        if(flag<0.1):
+            keytype = 2
+        #print (keytype)
         if evt.type == "2":
             mykey = evt.keysym.lower()
             key = -1
@@ -109,7 +118,14 @@ class Canvas(graphics.Image):
                 args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
             elif (mykey == 'w'):
+                args = {}
+                args["keycode"] = 0
+                args["scancode"] = 165
+                args["type"] = keytype
+                args["modifiers"] = 0
+                if (self.event_callback): self.event_callback(args)
                 if (app.exit_key_handler): app.exit_key_handler()
+
             if (key != -1):
                 args = {}
                 args["keycode"] = 0x30 + key
@@ -190,7 +206,8 @@ class Canvas(graphics.Image):
     # 处理键盘事件，ke为控件传递过来的键盘事件对象
     def processKeyUpEvent(self, evt):
         # 打印键盘事件
-        keytype = 2
+        keytype = 3
+        #print (keytype)
         if evt.type == "3":
             mykey = evt.keysym.lower()
             key = -1
@@ -200,14 +217,22 @@ class Canvas(graphics.Image):
                 key = -1
             if (mykey == 'q'):
                 args = {}
-                args["keycode"] = -1
+                args["keycode"] = 0
                 args["scancode"] = 164
                 args["type"] = keytype
                 args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
+            elif (mykey == 'w'):
+                args = {}
+                args["keycode"] = 0
+                args["scancode"] = 165
+                args["type"] = keytype
+                args["modifiers"] = 0
+                if (self.event_callback): self.event_callback(args)
+                if (app.exit_key_handler): app.exit_key_handler()
             if (key != -1):
                 args = {}
-                args["keycode"] = -1
+                args["keycode"] = 0x30 + key
                 args["scancode"] = 1
                 args["type"] = keytype
                 args["modifiers"] = 0
@@ -215,7 +240,7 @@ class Canvas(graphics.Image):
                 self.callEvents(args)
             if (mykey == 'up'):
                 args = {}
-                args["keycode"] = -1
+                args["keycode"] = 63497
                 args["scancode"] = 16
                 args["type"] = keytype
                 args["modifiers"] = 0
@@ -223,14 +248,15 @@ class Canvas(graphics.Image):
                 self.callEvents(args)
             if (mykey == 'down'):
                 args = {}
-                args["keycode"] = -1
+                args["keycode"] = 63498
                 args["scancode"] = 17
                 args["type"] = keytype
                 args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
+                self.callEvents(args)
             if (mykey == 'left'):
                 args = {}
-                args["keycode"] = -1
+                args["keycode"] = 63495
                 args["scancode"] = 14
                 args["type"] = keytype
                 args["modifiers"] = 0
@@ -238,7 +264,7 @@ class Canvas(graphics.Image):
                 self.callEvents(args)
             if (mykey == 'right'):
                 args = {}
-                args["keycode"] = -1
+                args["keycode"] = 63496
                 args["scancode"] = 15
                 args["type"] = keytype
                 args["modifiers"] = 0
@@ -246,8 +272,16 @@ class Canvas(graphics.Image):
                 self.callEvents(args)
             if (mykey == 'space'):
                 args = {}
-                args["keycode"] = -1
+                args["keycode"] = 63557
                 args["scancode"] = 167
+                args["type"] = keytype
+                args["modifiers"] = 0
+                if (self.event_callback): self.event_callback(args)
+                self.callEvents(args)
+            if (mykey == 'backspace'):
+                args = {}
+                args["keycode"] = 8  # backspace
+                args["scancode"] = 0
                 args["type"] = keytype
                 args["modifiers"] = 0
                 if (self.event_callback): self.event_callback(args)
@@ -288,7 +322,14 @@ class Canvas(graphics.Image):
             if (self.redraw_callback == None):
                 return
             else:
-                self.redraw_callback()
+                try:
+                    self.redraw_callback()
+                except:
+                    try:
+                        self.redraw_callback(())
+                    except Exception,ex:
+                        print(ex)
+
             # self.timer = Timer(0,self.redraw,())
             # self.timer.start()
         except Exception, ex:
@@ -324,6 +365,7 @@ class Text(object):
 
     def processKeyboardEvent(self, evt):
         # 打印键盘事件
+
         if evt.type == "2":
             mykey = evt.keysym.lower()
             key = -1
@@ -406,10 +448,11 @@ class Application(object):
         return "d:\\"
     def __init__(self, **keys):
         self.running = 1
-        self.exit_key_handler = None
+        self.CC = None
         self.body = None
         self.screen = (0, 0, screen[0], screen[1])
         # thread.start_new_thread(self.refush,())
+        self.exit_key_handler=None
 
     def focus(self):
         pass
@@ -425,6 +468,9 @@ class Application(object):
     def redraw(self,t=1):
         if (self.body):
             self.body.redraw()
+
+    def getscreen(self):
+        return self.body.lastimg
 
     def Yield(self):
         # while 1:
@@ -478,3 +524,4 @@ def popup_menu(name,den):
 import e32
 
 e32 = e32
+graphics.app=app

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import pys60Core
 import appuifw as ap
 import graphics as gr
 import e32

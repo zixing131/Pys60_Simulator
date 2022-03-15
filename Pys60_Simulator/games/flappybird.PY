@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import pys60Core
 """#游戏作者：Light.紫.星
 
 #QQ:1311817771

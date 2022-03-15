@@ -8,9 +8,10 @@ from PIL import Image as Image2
 from PIL import ImageDraw
 from PIL import ImageFont
 import os
-
+screen = (240, 320)
 #from appuifw import app as _app
 Draw=lambda x: x
+app=None
 
 FONT_BOLD=1
 FONT_ITALIC=2
@@ -128,10 +129,88 @@ class Image:
            color = color+color[-2:]
         image2 = Image2.new("RGBA",self.size,color)
         self.image.paste(image2,(0,0,self.size[0],self.size[1]))
-        if(self.canvas):
-            self.canvas.blit(self)
-    def blit(self,img,source=None,target=None,mask=None,scale =False):
+        self.blitSelf()
 
+    def blit(self,img,source=None,target=None,scale=False,mask=None):
+        '''
+        if(source):
+            source = list(source)
+            print(source)
+            if(len(source)==2 ):
+                if (target == None):
+                    target = [0, 0]
+                else:
+                    target = list(target)
+                if(source[0]< 0 and source[1] < 0):
+                    source = [source[1],source[0],0,0]
+                    if(source[0]<0):
+                        source[0] = abs(source[0])
+                        source[2] = source[0]+img.size[0]
+                        target[1] = source[0]
+                    if (source[1] < 0):
+                        source[1] = abs(source[1])
+                        target[0] = source[1]
+                        source[3] = source[1] + img.size[1]
+                else:
+                    pass
+                    #target[0] = source[0]
+                    #target[1] = source[1]
+        '''
+
+        target_size = screen
+        source_size = img.size
+        fx1 = 0
+        fy1 = 0
+        fx2 = source_size[0]
+        fy2 = source_size[1]
+        tx1 = 0
+        ty1 = 0
+        tx2 = target_size[0]
+        ty2 = target_size[1]
+        n = 0
+
+        if(source):
+            if(len(source)==2):
+                fx1 = source[0]
+                fy1 = source[1]
+                fx2 = fx1+fx2
+                fy2 = fy1+fy2
+            elif(len(source)==4):
+                fx1 = source[0]
+                fy1 = source[1]
+                fx2 = source[2]
+                fy2 = source[3]
+        if(target):
+            if (len(target) == 2):
+                tx1 = target[0]
+                ty1 = target[1]
+                tx1 = tx1 + tx2
+                ty1 = ty1 + ty2
+            elif (len(target) == 4):
+                tx1 = target[0]
+                ty1 = target[1]
+                tx2 = target[2]
+                ty2 = target[3]
+
+        toRect = (tx1, ty1, tx2 - tx1, ty2 - ty1)  # xywh
+        fromRect = (fx1, fy1, fx2 - fx1, fy2 - fy1)  # xywh
+
+        if(scale):
+            if(mask):
+                print('sorry, scaling and masking is not supported at the same time.')
+                return
+            else:
+                self.image.paste(img.image.resize((toRect[2],toRect[3])),(toRect[0],toRect[1]))
+        else:
+            #print((tx1-fx1, ty1-fy1))
+            if(mask):
+                self.image.paste(img.image.crop((0,0,fromRect[2], fromRect[3])), (tx1-fx1, ty1-fy1),mask=mask.image.crop((0,0,fromRect[2], fromRect[3])))
+            else:
+                self.image.paste(img.image.crop((0,0,fromRect[2], fromRect[3])), (tx1-fx1, ty1-fy1))
+
+        self.blitSelf()
+
+    def blitold(self,img,source=None,target=None,scale=False,mask=None):
         if(source==None):
             source = (0,0,img.size[0],img.size[1])
         if(target == None):
@@ -145,7 +224,7 @@ class Image:
         if(mask!=None):
             try:
                 #self.image.paste(img.image, (pos[0], pos[1], pos[0] + source[2], pos[1] + source[3]),mask=mask.image)
-                self.image.paste(img.image.crop((0, 0, (int)(source[2]), (int)(source[3]))), ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])),mask=mask.image)
+                self.image.paste(img.image.crop((0, 0, (int)(source[2]), (int)(source[3]))), ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])),mask=mask.image.crop((0, 0, (int)(source[2]), (int)(source[3]))))
             except Exception,ex:
                 print(ex)
                 self.image.paste(img.image.crop((0, 0, (int)(source[2]), (int)(source[3]))),
@@ -164,8 +243,8 @@ class Image:
 
             except Exception,ex:
                 print("graphics 150",ex)
-        if(self.canvas):
-            self.canvas.blit(self)
+        self.blitSelf()
+
     def line(self,pos,bgcolor=0,width=0,outline=0):
         draw = ImageDraw.Draw(self.image)
         bgcolor = convertColor(bgcolor)
@@ -197,9 +276,16 @@ class Image:
                 print font
         #text=text.encode('u8')
         draw.text((int(pos[0]),int(pos[1]-font[1])),text,fill=color,font = GetFont(color,font))
-        if(self.canvas):
+        self.blitSelf()
+
+    def blitSelf(self):
+        if (self.canvas):
             self.canvas.blit(self)
-         
+        #else:
+        #    if(app):
+        #        pass
+        #        app.body.blit(self)
+
     def polygon(self,pos,color=0x0,width=1,fill=0x0,outline = 0x0):
         draw = ImageDraw.Draw(self.image)
         ismask = 0
@@ -263,16 +349,14 @@ class Image:
                     fontsize= font[1]
 
             w,h = getTextFontWidth(title,int(fontsize))
-            if(self.canvas):
-                self.canvas.blit(self)
+            self.blitSelf()
             return ((0,0-h,w,0),w,len(title))
         else:
             fontsize = 18
             if (type(font) is tuple or type(font) is list):
                 fontsize = font[1]
             w, h = getTextFontWidth(title, int(fontsize))
-            if (self.canvas):
-                self.canvas.blit(self)
+            self.blitSelf()
             if (w <= maxwidth):
                 w = maxwidth
                 return ((0, 0-h, w,0), w, len(title))
@@ -294,8 +378,14 @@ def Draw(canvas):
     img = Image(canvas.size,canvas = canvas) 
     canvas.blit(img)
     return img
+
 def screenshot():
-    img = Image((240,320))
-    return img
+    nowimg =  Image((240, 320))
+    if(app==None):
+        return nowimg
+    img = app.getscreen()#Image((240, 320))
+    nowimg.image = img
+    return nowimg
+
 if(__name__=='__main__'):
    print(convertColor((3,280,280)))

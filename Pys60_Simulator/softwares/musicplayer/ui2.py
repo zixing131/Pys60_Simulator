@@ -533,6 +533,7 @@ class Listbox(object, ) :
                 self.img.rectangle(((self.x - 3), 50, self.x, (55 + (((self.gb1 + 1)) * x_1))), fill = self.xx)
             else : 
                 self.img.text(((self.x / 5), (self.y / 2)), cn('（无项目）'), self.color[0], (self.ziti, (app.ziti + 30)))
+
             self.zjm(self.bt)
         elif self.mode == 1 : 
             try :
@@ -779,6 +780,8 @@ class Listbox(object, ) :
             for t in xrange(len(app.note[0])):
                 self.img.text((10, ((t * 25) + 23) + app.note[1][0]), app.note[0][t], self.color[0], (self.ziti, (app.ziti + 18)))
             pass
+
+
         self.blit(self.img, target = (app.rolling['界面'][0], app.rolling['界面'][1]))
 
 
@@ -977,6 +980,8 @@ class Listbox(object, ) :
     def keyft(self, key):
         tp = key['type']
         ky = key['scancode']
+        if(tp==3):
+            print (key)
         if app.gb_key == False : 
             pass
         elif app.query != [] : 

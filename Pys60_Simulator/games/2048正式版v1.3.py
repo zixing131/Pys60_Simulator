@@ -7,7 +7,6 @@
 zt2=u"Sans MT 936_s60",15,1#文字字体
 zt=u"Sans MT 936_s60",25,1#默认字体
 VER="1.4"
-import pys60Core
 import appuifw as ui
 import e32
 import graphics as ph,os,random,e32dbm,math,time
