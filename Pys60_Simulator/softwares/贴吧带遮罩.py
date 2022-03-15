@@ -7,7 +7,7 @@ print dl.psw打印用户密码
 dl.pnum变量为1时用手机号登录，为0时用户名登录（默认为0）
 dl.rempsw变量为1时记住密码，为0时不记住密码（默认为1）
 """
-import pys60Core
+
 cn=lambda x:x.decode("u8")
 #引入模块
 from  sysinfo import display_pixels

@@ -1,0 +1,9 @@
+app.switch["电量"]=True
+app.switch["时间"]=True
+app.switch["阴影"]=False
+system.vol=5
+system.moshi=0
+system.rolling=True
+system.dengguang=False
+app.e32=0
+app.keshihua=True

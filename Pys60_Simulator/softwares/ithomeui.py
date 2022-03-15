@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import pys60Core
 zt = u"Sans MT 936_s60", 15, 1
 import thread
 import graphics as ph, appuifw as ui, e32

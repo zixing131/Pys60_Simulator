@@ -47,12 +47,16 @@ def GetFont(fill=None,font=None):
     if(font==lastfont):
         pass
     else:
-        if (os.path.exists("fonts\\S60SC.ttf")):
+        p = os.path.split(os.path.realpath(__file__))[0]+'\\fonts\\S60SC.ttf'
+        if (os.path.exists(p)):
+            myfnt = ImageFont.truetype(p, int(font[1]))
+        elif (os.path.exists("fonts\\S60SC.ttf")):
             myfnt = ImageFont.truetype("..\\fonts\\S60SC.ttf", int(font[1]))
         elif(os.path.exists("fonts/S60SC.ttf")):
             myfnt = ImageFont.truetype("fonts\\S60SC.ttf",int(font[1]))
         elif (os.path.exists("../pys60Core/fonts/S60SC.ttf")):
             myfnt = ImageFont.truetype("../pys60Core/fonts/S60SC.ttf", int(font[1]))
+
         elif(os.path.exists("Pys60_Simulator\\fonts\\S60SC.ttf")):
             myfnt = ImageFont.truetype("Pys60_Simulator\\fonts\\S60SC.ttf", int(font[1]))
     lastfont = font

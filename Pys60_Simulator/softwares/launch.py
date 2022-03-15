@@ -3,7 +3,6 @@
 #######中文名好听########
 #######decompile2########
 
-import pys60Core
 import msys
 msys.send_bg()
 import graphics as gr, appuifw as ap, sysinfo

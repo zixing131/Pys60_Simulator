@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import pys60Core
 import appuifw, e32
 from Pys60_Simulator.pys60Core.graphics import*
 def cn(x):return x.decode("u8")

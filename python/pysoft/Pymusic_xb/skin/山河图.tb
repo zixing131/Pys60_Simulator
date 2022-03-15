@@ -1,0 +1,10 @@
+# -*- coding: utf-8 -*-
+s.skin_path="D:\\Users\\zixing\\Documents\\GitHub\\Pys60_Simulator_Private\\python\\pysoft\\Pymusic_xb\\skin\\山河图.png"#背景路径
+s.logo_path="D:\\Users\\zixing\\Documents\\GitHub\\Pys60_Simulator_Private\\python\\pysoft\\Pymusic_xb\\logo.png"#启动图片
+s.menu_tag=0x9ab335  #菜单透明颜色
+s.cursor_tag=0xabcdfd  #光标透明颜色
+s.title_tag=0x520987  #标题栏透明颜色
+s.color=[(50,50,80),(205,128,230),(30,20,10)] #下面详解 ↓ 必须用(r,g,b)格式
+#1普通字体颜色
+#2进度、网格颜色
+#3当前位置加亮颜色

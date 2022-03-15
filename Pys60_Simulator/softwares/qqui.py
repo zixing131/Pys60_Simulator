@@ -5,7 +5,6 @@
 # @QQun    : 140369358
 # @File    : qqui.py
 # @Software: PyCharm
-import pys60Core
 import time
 
 from qqsdk import QQSDK
