@@ -123,8 +123,10 @@ class Canvas(graphics.Image):
                 args["scancode"] = 165
                 args["type"] = keytype
                 args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
-                if (app.exit_key_handler): app.exit_key_handler()
+                #if (self.event_callback):
+                #    self.event_callback(args)
+                #elif (app.exit_key_handler):
+                #    app.exit_key_handler()
 
             if (key != -1):
                 args = {}
@@ -228,8 +230,10 @@ class Canvas(graphics.Image):
                 args["scancode"] = 165
                 args["type"] = keytype
                 args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
-                if (app.exit_key_handler): app.exit_key_handler()
+                if (self.event_callback):
+                    self.event_callback(args)
+                elif (app.exit_key_handler):
+                    app.exit_key_handler()
             if (key != -1):
                 args = {}
                 args["keycode"] = 0x30 + key

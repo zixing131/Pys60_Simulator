@@ -980,8 +980,10 @@ class Listbox(object, ) :
     def keyft(self, key):
         tp = key['type']
         ky = key['scancode']
+        print(key)
         if(tp==3):
-            print (key)
+            pass
+            #print (key)
         if app.gb_key == False : 
             pass
         elif app.query != [] : 
@@ -993,7 +995,7 @@ class Listbox(object, ) :
                 app.return_query = True
             pass
         elif ky == 16 : 
-            if self.mode1 == 1 or self.mode2 == 1 and tp == 1 : 
+            if (self.mode1 == 1 or self.mode2 == 1) and tp == 1 :
                 self.up()
             elif self.mode == 0 and self.mode1 == 0 and tp == 3 : 
                 self.key = 1
@@ -1008,7 +1010,7 @@ class Listbox(object, ) :
                 self.up()
             pass
         elif ky == 17 : 
-            if self.mode1 == 1 or self.mode2 == 1 and tp == 1 : 
+            if (self.mode1 == 1 or self.mode2 == 1) and tp == 1 :
                 self.down()
             elif self.mode == 0 and self.mode1 == 0 and tp == 3 : 
                 self.key = 1
@@ -1058,7 +1060,7 @@ class Listbox(object, ) :
                 self.mode1 = 1
             self.menu()
         elif ky == 165 : 
-            if self.mode1 == 1 or self.mode2 == 1 and tp == 3 : 
+            if self.mode1 == 1 or self.mode2 == 1 and tp == 3 :
                 self.gb2 = 0
                 self.gb3 = 0
                 self.mode1 = 0
