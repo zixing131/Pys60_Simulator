@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
+import os
 from time import sleep 
 import threading
 import shutil
@@ -42,12 +43,13 @@ def ao_yield():
     _app.Yield()
 
 def drive_list():
-    return ['c','d','e','z']
+    print(os.getcwd())
+    return ['c:','d:','e:','z:',os.getcwd()]
 
 def ao_sleep(interval, cb=None): 
     ao_yield()
     sleep(interval)
-
+pys60_version_info=(1,4,5,0,0)
 def in_emulator():
     return True
 def file_copy(old,new):

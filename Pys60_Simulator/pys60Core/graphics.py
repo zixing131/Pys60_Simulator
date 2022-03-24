@@ -13,6 +13,7 @@ screen = (240, 320)
 Draw=lambda x: x
 app=None
 
+ROTATE_270 = 270
 FONT_BOLD=1
 FONT_ITALIC=2
 FONT_SUBSCRIPT=4
@@ -184,8 +185,8 @@ class Image:
             if (len(target) == 2):
                 tx1 = target[0]
                 ty1 = target[1]
-                tx1 = tx1 + tx2
-                ty1 = ty1 + ty2
+                tx2 = tx1 + tx2
+                ty2 = ty1 + ty2
             elif (len(target) == 4):
                 tx1 = target[0]
                 ty1 = target[1]

@@ -85,6 +85,14 @@ class Canvas(graphics.Image):
         self.allEvents = []
         self.allTouchEvents = []
 
+    def begin_redraw(self):
+        print('begin_redraw')
+        pass
+
+    def end_redraw(self):
+        print('end_redraw')
+        pass
+
     # def rectangle():
     def callEvents(self, evt):
         keycode = evt["keycode"]
@@ -297,6 +305,7 @@ class Canvas(graphics.Image):
 
     #
     # print(evt.type)
+
     def blit(self, img, target=(0, 0),scale =False):
         try:
             img = ImageTk.PhotoImage(image=img.image, master=self.cv)
@@ -305,8 +314,7 @@ class Canvas(graphics.Image):
             # self.cv.create_line(10,10,240,320,width=5)
             self.root.update()
         except Exception, e:
-            pass
-            # print(e)
+            print(e)
 
     def clear(self, color):
         pass
@@ -450,6 +458,10 @@ class Application(object):
     def full_name(self):
         # Todo
         return "d:\\"
+
+    def set_exit(self):
+        pass
+
     def __init__(self, **keys):
         self.running = 1
         self.CC = None

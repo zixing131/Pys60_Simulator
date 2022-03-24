@@ -106,7 +106,7 @@ class Application(QtGui.QApplication):
 
     # requests a graceful exit from the application as soon as the 
     # current script execution returns
-    def set_exit():
+    def set_exit(self):
         pass 
 
     def _set_body(self, body):
