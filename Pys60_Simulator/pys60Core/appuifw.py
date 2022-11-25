@@ -306,7 +306,7 @@ class Canvas(graphics.Image):
     #
     # print(evt.type)
 
-    def blit(self, img, target=(0, 0),scale =False):
+    def blit(self, img, target=(0, 0),scale =False,source=None):
         try:
             img = ImageTk.PhotoImage(image=img.image, master=self.cv)
             self.lastimg = img
