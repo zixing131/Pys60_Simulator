@@ -7,12 +7,18 @@
 # @Software: PyCharm
 import os
 def getmypath(path="\\python\\pysoft\\ithome\\"):
-    if (os.name != 'nt'):
+    #print(os.name)
+    if (os.name != 'nt' and os.name!='posix'):
         mypath = 'e:'+path
         return mypath
+
+    path = path.replace("\\","/")
     p=os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
-    p=os.path.join(p,'../')
-    print(p+path)
-    return p+path
+    p = p.replace("\\", "/")
+    p=p[:p.rfind("/")+1]
+    if(path.startswith("/")):
+        path=path[1:]
+    realpath = os.path.join(p,path)
+    return realpath
 if __name__ == '__main__':
     getmypath()
