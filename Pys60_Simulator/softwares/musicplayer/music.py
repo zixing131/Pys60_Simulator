@@ -9,7 +9,7 @@ class system :
 
 
 
-system.path = 'D:\\Users\\zixing\\Documents\\GitHub\\Pys60_Simulator_Private\\python\\pysoft\\Pymusic_xb\\'
+system.path = r'E:\Users\zixing\Documents\GitHub\Pys60_Simulator\python\pysoft\Pymusic_xb\\'
 
 def openfile(path):
     txt = open(path)

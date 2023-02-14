@@ -142,7 +142,7 @@ class Canvas(graphics.Image):
                 args["scancode"] = 1
                 args["type"] = keytype
                 args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
+                #if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'up'):
                 args = {}
@@ -150,7 +150,7 @@ class Canvas(graphics.Image):
                 args["scancode"] = 16
                 args["type"] = keytype
                 args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
+                #if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'down'):
                 args = {}
@@ -158,7 +158,7 @@ class Canvas(graphics.Image):
                 args["scancode"] = 17
                 args["type"] = keytype
                 args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
+                #if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'left'):
                 args = {}
@@ -166,7 +166,7 @@ class Canvas(graphics.Image):
                 args["scancode"] = 14
                 args["type"] = keytype
                 args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
+                #if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'right'):
                 args = {}
@@ -174,7 +174,7 @@ class Canvas(graphics.Image):
                 args["scancode"] = 15
                 args["type"] = keytype
                 args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
+                #if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'space'):
                 args = {}
@@ -182,7 +182,7 @@ class Canvas(graphics.Image):
                 args["scancode"] = 167
                 args["type"] = keytype
                 args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
+                #if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
             if (mykey == 'backspace'):
                 args = {}
@@ -190,7 +190,7 @@ class Canvas(graphics.Image):
                 args["scancode"] = 0
                 args["type"] = keytype
                 args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
+                #if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
 
         if evt.type == "4":
@@ -217,6 +217,7 @@ class Canvas(graphics.Image):
     def processKeyUpEvent(self, evt):
         # 打印键盘事件
         keytype = 3
+        print(evt)
         #print (keytype)
         if evt.type == "3":
             mykey = evt.keysym.lower()
@@ -240,7 +241,7 @@ class Canvas(graphics.Image):
                 args["modifiers"] = 0
                 if (self.event_callback):
                     self.event_callback(args)
-                elif (app.exit_key_handler):
+                if (app.exit_key_handler):
                     app.exit_key_handler()
             if (key != -1):
                 args = {}
