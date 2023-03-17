@@ -151,53 +151,23 @@ class tbUi(object,):
     def enter(self):  # 按键确认
         global id, psw
         if (s_p == 0):
-            if (dl.kjzt == 0):
-                dl.kjzt = 1
-            else:
-                dl.kjzt = 0
-            if (dl.kjzt == 0):
-                id = kj1.get()
-                kj1.visible(0)
-                kj1.focus(0)
-                kj2.visible(0)
-                kj2.focus(0)
-            elif (dl.kjzt == 1):
-                id = kj1.get()
-                kj1.visible(1)
-                kj1.focus(1)
-            elif (dl.kjzt == 2):
-                psw = kj2.get()
-                kj2.visible(1)
-                kj2.focus(1)
+            dl.kjzt = 1 - dl.kjzt
+            id = kj1.get()
+            kj1.visible(dl.kjzt == 1)
+            kj1.focus(dl.kjzt == 1)
+            kj2.visible(dl.kjzt == 2)
+            kj2.focus(dl.kjzt == 2)
         elif (s_p == 1):
-            if (dl.kjzt == 0):
-                dl.kjzt = 2
-            else:
-                dl.kjzt = 0
-            if (dl.kjzt == 0):
-                id = kj1.get()
-                kj1.visible(0)
-                kj1.focus(0)
-                kj2.visible(0)
-                kj2.focus(0)
-            elif (dl.kjzt == 1):
-                id = kj1.get()
-                kj1.visible(1)
-                kj1.focus(1)
-            elif (dl.kjzt == 2):
-                psw = kj2.get()
-                kj2.visible(1)
-                kj2.focus(1)
+            dl.kjzt = 2 - dl.kjzt
+            id = kj1.get()
+            kj1.visible(dl.kjzt == 1)
+            kj1.focus(dl.kjzt == 1)
+            kj2.visible(dl.kjzt == 2)
+            kj2.focus(dl.kjzt == 2)
         elif s_p == 2:
-            if (dl.pnum == 0):
-                dl.pnum = 1
-            elif (dl.pnum == 1):
-                dl.pnum = 0
+            dl.pnum = 1 - dl.pnum
         elif s_p == 3:
-            if (dl.rempsw == 0):
-                dl.rempsw = 1
-            elif (dl.rempsw == 1):
-                dl.rempsw = 0
+            dl.rempsw = 1 - dl.rempsw
         self.redraw()
 
     def fan(self):  # 定义返回键动作

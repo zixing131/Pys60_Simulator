@@ -6,7 +6,7 @@
 # @File    : test.py
 # @Software: PyCharm
 import graphics
-from Pys60_Simulator.pys60Core.fonts import fonts
+from fonts import fonts
 
 def getFontSize(str,size):
     if(fonts.has_key(str)==False):

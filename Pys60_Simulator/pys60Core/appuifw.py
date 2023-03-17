@@ -10,37 +10,36 @@ except:
 import tkMessageBox
 import pys60Socket
 
-
-
 screen = (240, 320)
-#screen = (360, 640)
-#screen = (320, 240)
 from threading import Timer
-
 
 FFormEditModeOnly = 2
 FFormDoubleSpaced = 4
-EEventKeyDown=3
+EEventKeyDown = 3
 EEventKeyUp = 2
-EEventKey=1
+EEventKey = 1
+EEventRedraw = 5
+EHCenterVTop = 6
 
 from PIL import ImageTk
 import time
 import thread
 import os
 import graphics
-graphics.screen=screen
+
+graphics.screen = screen
 EScreen = 1
 EHLeftVTop = 0
 root = tk.Tk()
 cv = tk.Canvas(root, width=screen[0], height=screen[1], background='white')
+
 def on_closing():
     abort()
+
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
 def available_fonts():
-    return ['dense','normal']
-
+    return ['dense', 'normal']
 class Form(list):
     def __init__(self,optcont,flags):
         pass
@@ -64,23 +63,19 @@ class Canvas(graphics.Image):
         self.event_callback = event_callback
         self.root = root
         self.root.title('Pys60 Simulator')
-        self.root.geometry(str(screen[0]) + 'x' + str(screen[1]))
+        self.root.geometry(str(screen[0])+'x'+str(screen[1]))
         self.root.resizable(0, 0)
         self.cv = cv
         self.cv.pack(fill=tk.BOTH, expand=tk.YES)
         self.cv.bind_all(sequence="<KeyPress>", func=self.processKeyPressEvent)
         self.cv.bind_all(sequence="<KeyRelease>", func=self.processKeyUpEvent)
-        self.cv.bind_all(sequence="<Button-1>", func=self.mouseLeftButtonEvent) #鼠标左键按下
-        self.cv.bind_all(sequence="<ButtonRelease-1>", func=self.mouseLeftButtonReleaseEvent)  #鼠标左键释放
-
+        self.cv.bind_all(sequence="<Button-1>", func=self.mouseLeftButtonEvent)
+        self.cv.bind_all(sequence="<ButtonRelease-1>", func=self.mouseLeftButtonReleaseEvent)
 
         self.lastimg = None
         self.menu_key_handler = None
         self.size = screen
         self.font = ['font1', 'font2']
-        self.lastkeytime = time.time()
-        # self.timer = Timer(0,self.redraw,())
-        # self.timer.start()
         self.lastkeytime = time.time()
         self.allEvents = []
         self.allTouchEvents = []
@@ -93,24 +88,19 @@ class Canvas(graphics.Image):
         print('end_redraw')
         pass
 
-    # def rectangle():
     def callEvents(self, evt):
         keycode = evt["keycode"]
         for i in self.allEvents:
             if (keycode == i[0]):
                 i[1]()
 
-    # 处理键盘事件，ke为控件传递过来的键盘事件对象
     def processKeyPressEvent(self, evt):
-        # 打印键盘事件
         flag = time.time() - self.lastkeytime
         self.lastkeytime = time.time()
         keytype = 1
-        #if (flag < 0.1):
-        #    return
         if(flag<0.1):
             keytype = 2
-        #print (keytype)
+
         if evt.type == "2":
             mykey = evt.keysym.lower()
             key = -1
@@ -118,107 +108,53 @@ class Canvas(graphics.Image):
                 key = int(mykey)
             except:
                 key = -1
-            if (mykey == 'q'):
-                args = {}
-                args["keycode"] = 0
-                args["scancode"] = 164
-                args["type"] = keytype
-                args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
-            elif (mykey == 'w'):
-                args = {}
-                args["keycode"] = 0
-                args["scancode"] = 165
-                args["type"] = keytype
-                args["modifiers"] = 0
-                #if (self.event_callback):
-                #    self.event_callback(args)
-                #elif (app.exit_key_handler):
-                #    app.exit_key_handler()
+            key_mapping = {
+                'q': (0, 164),
+                'w': (0, 165),
+                'up': (63497, 16),
+                'down': (63498, 17),
+                'left': (63495, 14),
+                'right': (63496, 15),
+               'space': (63557, 167),
+                'backspace': (8, 0)
+            }
 
-            if (key != -1):
-                args = {}
-                args["keycode"] = 0x30 + key
-                args["scancode"] = 1
-                args["type"] = keytype
-                args["modifiers"] = 0
-                #if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'up'):
-                args = {}
-                args["keycode"] = 63497  # 2
-                args["scancode"] = 16
-                args["type"] = keytype
-                args["modifiers"] = 0
-                #if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'down'):
-                args = {}
-                args["keycode"] = 63498  # 8
-                args["scancode"] = 17
-                args["type"] = keytype
-                args["modifiers"] = 0
-                #if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'left'):
-                args = {}
-                args["keycode"] = 63495  # 4
-                args["scancode"] = 14
-                args["type"] = keytype
-                args["modifiers"] = 0
-                #if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'right'):
-                args = {}
-                args["keycode"] = 63496  # 6
-                args["scancode"] = 15
-                args["type"] = keytype
-                args["modifiers"] = 0
-                #if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'space'):
-                args = {}
-                args["keycode"] = 63557  # 5
-                args["scancode"] = 167
-                args["type"] = keytype
-                args["modifiers"] = 0
-                #if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'backspace'):
-                args = {}
-                args["keycode"] = 8  # backspace
-                args["scancode"] = 0
-                args["type"] = keytype
-                args["modifiers"] = 0
-                #if (self.event_callback): self.event_callback(args)
+            if mykey in key_mapping:
+                args = {
+                    "keycode": key_mapping[mykey][0],
+                    "scancode": key_mapping[mykey][1],
+                    "type": keytype,
+                    "modifiers": 0
+                }
                 self.callEvents(args)
 
-        if evt.type == "4":
-            pass
-            # print("鼠标： %s" % evt.num)
+            if key != -1:
+                args = {
+                    "keycode": 0x30 + key,
+                    "scancode": 1,
+                    "type": keytype,
+                    "modifiers": 0
+                }
+                self.callEvents(args)
 
-    def mouseLeftButtonEvent(self,event):
-        #print event,event.x,event.y
+    def check_event_and_execute(self, event, button_event):
         for evt in self.allTouchEvents:
-            if(evt[0]  == key_codes.EButton1Down):
-                if( evt[2][0][0] <= event.x and  evt[2][1][0] >= event.x and evt[2][0][1] <= event.y and  evt[2][1][1] >= event.y):
-                    evt[1]((event.x,event.y))
-
-    def mouseLeftButtonReleaseEvent(self,event):
-        #print event, event.x, event.y
-        for evt in self.allTouchEvents:
-            if (evt[0] == key_codes.EButton1Up):
-                if( evt[2][0][0] <= event.x and  evt[2][1][0] >= event.x and evt[2][0][1] <= event.y and  evt[2][1][1] >= event.y):
+            if evt[0] == button_event:
+                x1, y1 = evt[2][0]
+                x2, y2 = evt[2][1]
+                if x1 <= event.x <= x2 and y1 <= event.y <= y2:
                     evt[1]((event.x, event.y))
 
-    #
-    # print(evt.type)
+    def mouseLeftButtonEvent(self, event):
+        self.check_event_and_execute(event, key_codes.EButton1Down)
+
+    def mouseLeftButtonReleaseEvent(self, event):
+        self.check_event_and_execute(event, key_codes.EButton1Up)
+
     # 处理键盘事件，ke为控件传递过来的键盘事件对象
     def processKeyUpEvent(self, evt):
-        # 打印键盘事件
         keytype = 3
         print(evt)
-        #print (keytype)
         if evt.type == "3":
             mykey = evt.keysym.lower()
             key = -1
@@ -226,127 +162,77 @@ class Canvas(graphics.Image):
                 key = int(mykey)
             except:
                 key = -1
-            if (mykey == 'q'):
-                args = {}
-                args["keycode"] = 0
-                args["scancode"] = 164
-                args["type"] = keytype
-                args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
-            elif (mykey == 'w'):
-                args = {}
-                args["keycode"] = 0
-                args["scancode"] = 165
-                args["type"] = keytype
-                args["modifiers"] = 0
-                if (self.event_callback):
+
+            key_map = {
+                'q': (0, 164),
+                'w': (0, 165),
+                'up': (63497, 16),
+                'down': (63498, 17),
+                'left': (63495, 14),
+                'right': (63496, 15),
+                'space': (63557, 167),
+                'backspace': (8, 0)
+            }
+
+            if mykey in key_map:
+                args = {
+                    "keycode": key_map[mykey][0],
+                    "scancode": key_map[mykey][1],
+                    "type": keytype,
+                    "modifiers": 0
+                }
+                if self.event_callback:
                     self.event_callback(args)
-                if (app.exit_key_handler):
+                if mykey == 'w' and app.exit_key_handler:
                     app.exit_key_handler()
-            if (key != -1):
-                args = {}
-                args["keycode"] = 0x30 + key
-                args["scancode"] = 1
-                args["type"] = keytype
-                args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
                 self.callEvents(args)
-            if (mykey == 'up'):
-                args = {}
-                args["keycode"] = 63497
-                args["scancode"] = 16
-                args["type"] = keytype
-                args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'down'):
-                args = {}
-                args["keycode"] = 63498
-                args["scancode"] = 17
-                args["type"] = keytype
-                args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'left'):
-                args = {}
-                args["keycode"] = 63495
-                args["scancode"] = 14
-                args["type"] = keytype
-                args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'right'):
-                args = {}
-                args["keycode"] = 63496
-                args["scancode"] = 15
-                args["type"] = keytype
-                args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'space'):
-                args = {}
-                args["keycode"] = 63557
-                args["scancode"] = 167
-                args["type"] = keytype
-                args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
-                self.callEvents(args)
-            if (mykey == 'backspace'):
-                args = {}
-                args["keycode"] = 8  # backspace
-                args["scancode"] = 0
-                args["type"] = keytype
-                args["modifiers"] = 0
-                if (self.event_callback): self.event_callback(args)
+
+            if key != -1:
+                args = {
+                    "keycode": 0x30 + key,
+                    "scancode": 1,
+                    "type": keytype,
+                    "modifiers": 0
+                }
+                if self.event_callback:
+                    self.event_callback(args)
                 self.callEvents(args)
 
         if evt.type == "4":
             pass
             # print("鼠标： %s" % evt.num)
 
-    #
-    # print(evt.type)
-
-    def blit(self, img, target=(0, 0),scale =False,source=None):
+    def blit(self, img, target=(0, 0), scale=False, source=None):
         try:
             img = ImageTk.PhotoImage(image=img.image, master=self.cv)
             self.lastimg = img
             self.cv.create_image(target[0] + img.width() / 2, target[1] + img.height() / 2, image=img)
-            # self.cv.create_line(10,10,240,320,width=5)
             self.root.update()
-        except Exception, e:
+        except Exception as e:
             print(e)
 
     def clear(self, color):
         pass
 
-    def bind(self, key, event,point = 0):
-        if(key >= 0x101 and key <= 0x10A):
-            self.allTouchEvents.append((key, event,point))
+    def bind(self, key, event, point=0):
+        if 0x101 <= key <= 0x10A:
+            self.allTouchEvents.append((key, event, point))
         else:
             self.allEvents.append((key, event))
 
     def update(self):
         self.redraw()
 
-    def redraw(self,t=1):
+    def redraw(self, t=1):
+        if self.redraw_callback is None:
+            return
         try:
-            # print(self.redraw_callback)
-            if (self.redraw_callback == None):
-                return
-            else:
-                try:
-                    self.redraw_callback()
-                except:
-                    try:
-                        self.redraw_callback(())
-                    except Exception,ex:
-                        print(ex)
-
-            # self.timer = Timer(0,self.redraw,())
-            # self.timer.start()
-        except Exception, ex:
-            print("appuifw 230 ",ex)
+            self.redraw_callback()
+        except:
+            try:
+                self.redraw_callback(())
+            except Exception as ex:
+                print(ex)
 
 
 class Text(object):
@@ -364,9 +250,7 @@ class Text(object):
         self.textwindow = self.cv.create_window((120, 160), window=self.textbox, height=320, width=240)
         self.showingMenu = 0
         self.font = ['font1', 'font2']
-        # root.mainloop()
 
-    # 处理键盘事件，ke为控件传递过来的键盘事件对象
     def showMenu(self):
         self.showingMenu = 1
         self.menuBox = tk.Listbox(self.cv)
@@ -377,8 +261,6 @@ class Text(object):
             self.root.update()
 
     def processKeyboardEvent(self, evt):
-        # 打印键盘事件
-
         if evt.type == "2":
             mykey = evt.keysym.lower()
             key = -1
@@ -387,10 +269,7 @@ class Text(object):
             except:
                 key = -1
             if (mykey == 'q'):
-                args = {}
-                args["keycode"] = 0
-                args["scancode"] = 164
-                args["type"] = 3
+                args = {"keycode": 0, "scancode": 164, "type": 3}
                 if (self.event_callback): self.event_callback(args)
                 if (self.showingMenu == 1):
                     selectIndex = self.menuBox.curselection()[0]
@@ -406,54 +285,28 @@ class Text(object):
                     self.cv.delete(self.menuwindow)
                 if (app.exit_key_handler): app.exit_key_handler()
             if (key != -1):
-                args = {}
-                args["keycode"] = 0x30 + key
-                args["scancode"] = 1
-                args["type"] = 1
+                args = {"keycode": 0x30 + key, "scancode": 1, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'up'):
-                args = {}
-                args["keycode"] = 63497  # 2
-                args["scancode"] = 1
-                args["type"] = 1
+                args = {"keycode": 63497, "scancode": 1, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'down'):
-                args = {}
-                args["keycode"] = 63498  # 8
-                args["scancode"] = 1
-                args["type"] = 1
+                args = {"keycode": 63498, "scancode": 1, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'left'):
-                args = {}
-                args["keycode"] = 63495  # 4
-                args["scancode"] = 1
-                args["type"] = 1
+                args = {"keycode": 63495, "scancode": 1, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'right'):
-                args = {}
-                args["keycode"] = 63496  # 6
-                args["scancode"] = 1
-                args["type"] = 1
+                args = {"keycode": 63496, "scancode": 1, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'space'):
-                args = {}
-                args["keycode"] = 63557  # 5
-                args["scancode"] = 1
-                args["type"] = 1
+                args = {"keycode": 63557, "scancode": 1, "type": 1}
                 if (self.event_callback): self.event_callback(args)
-                # print("键盘：%s" % evt.keysym)
-        # 打印鼠标操作
-        if evt.type == "4":
-            pass
-            # print("鼠标： %s" % evt.num)
-        #
-        # print(evt.type)
 
     def set(self, text):
         self.textbox.insert("insert", text)
         while 1:
             self.root.update()
-
 
 class Application(object):
     def full_name(self):
