@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import time
+
 import appuifw
 import graphics
 import e32
@@ -35,6 +37,12 @@ class MyApp:
         self.initialize()
     def readCookies(self):
         self.Cookies = ""
+        p = self.basePath+"/cookies.txt"
+        if(os.path.exists(p)):
+            self.Cookies = open(p,'r').read()
+
+    def SaveCookies(self):
+        open(self.basePath+"/cookies.txt",'w').write(self.Cookies)
 
     def quit(self):
         self.running = 0
@@ -77,9 +85,39 @@ class MyApp:
             target1 = [0-int(center1[0] - self.QrImage.size[0] / 2), 0-int(center1[1] - self.QrImage.size[1] / 2)]
             print(target1)
             self.baseimg.blit(self.QrImage,target1)
-            self.baseimg.text( (int(center1[0] - 90),int(center1[1] + self.QrImage.size[1] / 2+30)) , cn('请使用网易云APP扫码登录'), 0xffffff,
+            self.showLoginText = cn('请使用网易云APP扫码登录')
+            wh = graphics.getTextFontWidth(self.showLoginText,16)
+            self.baseimg.text( (int(center1[0] - wh[0]/2),int(center1[1] + self.QrImage.size[1] / 2+wh[1]+3)) , self.showLoginText, 0xffffff,
                          ("dense", 16, graphics.FONT_BOLD | graphics.FONT_ANTIALIAS))
+            self.drawToCanvas()
+            while(1):
+                checkret = self.api.qrCheck(self.loginkey)
+                ccode = checkret['code']
+                if(ccode==801):
+                    e32.ao_sleep(1)
+                elif(ccode == 803 or ccode==802):
+                    if(ccode==802):
+                        self.showLoginText = cn('请点击授权')
+                    else:
+                        self.showLoginText = cn('登录成功')
+                        self.Cookies = checkret['cookie']
+                        self.SaveCookies()
+                        self.nowscreen = ScreenType.main
+                        return
+                    self.baseimg.clear(0x202020)
+                    self.baseimg.blit(self.QrImage, target1)
 
+                    wh = graphics.getTextFontWidth(self.showLoginText, 16)
+                    self.baseimg.text((int(center1[0] - wh[0] / 2), int(center1[1] + self.QrImage.size[1] / 2 + wh[1]+3)),
+                                      self.showLoginText, 0xffffff,
+                                      ("dense", 16, graphics.FONT_BOLD | graphics.FONT_ANTIALIAS))
+                    self.drawToCanvas()
+                elif(ccode == 804):
+                    #码失效了
+                    self.loginkey == ''
+                    return self.drawLoginScreen()
+                e32.ao_sleep(1)
+                e32.ao_yield()
         pass
 
     def initialize(self):
