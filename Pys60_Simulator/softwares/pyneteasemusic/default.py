@@ -2,4 +2,4 @@
 import neteasemusic
 if __name__ == "__main__":
     app = neteasemusic.MyApp()
-    app.run()
+    app.show()

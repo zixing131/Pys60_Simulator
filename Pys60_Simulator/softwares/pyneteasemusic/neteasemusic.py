@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 import time
+import xml
+import xml.sax
+from xml.dom.minidom import parse
+import xml.dom.minidom
 
 import appuifw
 import graphics
@@ -20,168 +24,225 @@ FONT = 'normal'
 def get_text_size(text, font=None):
     global img
     if img is None:
-        img = graphics.Image.new((240,100))
+        img = graphics.Image.new((0,0))
     wh=img.measure_text(text, (FONT,font))[0]
-    print(wh)
+    #print(wh)
     return [wh[2],0-wh[1]]
 
-class MyApp:
+
+#UI元素
+class UIElement(object):
     def __init__(self):
-        self.screensize = appuifw.app.layout(appuifw.EScreen)[0]
-        self.screenwidth, self.screenheight = self.screensize
-        self.basePath = 'c:\\python\\pysoft\\pyneteasemusic\\'
-        self.isE63 = self.screenwidth == 320
-        self.running = 1
-        self.canvas = appuifw.Canvas(None,self.handle_redraw)
-        appuifw.app.body = self.canvas
-        appuifw.app.screen = 'full'
-        appuifw.app.exit_key_handler = self.quit
-        self.loginkey=''
-        self.QrImage = None
+        self.Screensize = appuifw.app.layout(appuifw.EScreen)[0]
+        self.Width, self.Height = self.Screensize
+        self.Left = 0
+        self.Top = 0
+        self.Props = [] #属性
+        #以下是基础属性
+        self.Props.append('Background') #背景色
+        self.Props.append('Foreground') #前景色
 
-        self.api = api.MyApi()
-        self.load_resources()
-        self.readCookies()
-        self.checkLogin()
-        self.initialize()
-    def readCookies(self):
-        self.Cookies = ""
-        p = self.basePath+"/cookies.txt"
-        if(os.path.exists(p)):
-            self.Cookies = open(p,'r').read()
+        self.Props.append('Width') #宽度
+        self.Props.append('Height') #高度
+        self.Props.append('Left') #左边
+        self.Props.append('Top') #顶边
+        self.Props.append('Enabled')  # 是否启用
+        self.Props.append('Visibility')  # 是否可见
+        self.img=None
 
-    def SaveCookies(self):
-        open(self.basePath+"/cookies.txt",'w').write(self.Cookies)
+    def __setattr__(self, key, value):
+        super.__setattr__(self, key, value)
+        if(key == 'Width' or key == 'Height'):
+            self.reNewImage()
 
-    def quit(self):
-        self.running = 0
-
-
-    def load_resources(self):
-        if self.isE63:
-            self.bgimg = graphics.Image.open(self.basePath + "skin\\skin_320x240.png")
-            self.iconimg = graphics.Image.open(self.basePath + "skin\\icon_320x240.png")
-        else:
-            self.bgimg = graphics.Image.open(self.basePath + "skin\\skin_240x320.png")
-            self.iconimg = graphics.Image.open(self.basePath + "skin\\icon_240x320.png")
-
-        self.iconimg2 = graphics.Image.new((self.iconimg.size[0] + 10, self.iconimg.size[1] + 10))
-        self.iconimg2.blit(self.iconimg, target=(5, 5))
-        self.iconimgmask = graphics.Image.new(self.iconimg2.size, "L")
-        self.iconimgmask.clear(0x333333)
-        self.iconimgmask.rectangle((5, 5, self.iconimg.size[0] + 4, self.iconimg.size[1] + 4), fill=0, outline=0,
-                                   width=0)
-
-    def checkLogin(self):
-        if(self.Cookies==''):
-            self.nowscreen = ScreenType.login
-        else:
-            self.nowscreen = ScreenType.main
-
-    def drawLoginScreen(self):
-        if(self.loginkey==''):
-            keyret = self.api.qrKey()
-            self.loginkey = keyret['data']['unikey']
-            dataret = self.api.qrCreate(self.loginkey)
-            qrurl = dataret['data']['qrurl']
-            qr = qrcode.QRCode(box_size=4,border=4)
-            qr.add_data(qrurl)
-            img = qr.make_image()
-            self.QrImage = img
-        elif(self.QrImage!=None):
-            self.baseimg.clear(0x202020)
-            center1 = [int(self.screenwidth / 2), int((self.screenheight) / 2 - 20)]
-            target1 = [0-int(center1[0] - self.QrImage.size[0] / 2), 0-int(center1[1] - self.QrImage.size[1] / 2)]
-            print(target1)
-            self.baseimg.blit(self.QrImage,target1)
-            self.showLoginText = cn('请使用网易云APP扫码登录')
-            wh = get_text_size(self.showLoginText,16)
-            self.baseimg.text( (int(center1[0] - wh[0]/2),int(center1[1] + self.QrImage.size[1] / 2+wh[1]+8)) , self.showLoginText, 0xffffff,
-                         ("dense", 16, graphics.FONT_BOLD | graphics.FONT_ANTIALIAS))
-            self.drawToCanvas()
-            while(1):
-                checkret = self.api.qrCheck(self.loginkey)
-                ccode = checkret['code']
-                if(ccode==801):
-                    e32.ao_sleep(1)
-                elif(ccode == 803 or ccode==802):
-                    if(ccode==802):
-                        self.showLoginText = cn('请点击授权')
-                    else:
-                        self.showLoginText = cn('登录成功')
-                        self.Cookies = checkret['cookie']
-                        self.SaveCookies()
-                        self.lastImg = None
-                        self.nowscreen = ScreenType.main
-                        return
-                    self.baseimg.clear(0x202020)
-                    self.baseimg.blit(self.QrImage, target1)
-
-                    wh = get_text_size(self.showLoginText, 16)
-                    self.baseimg.text((int(center1[0] - wh[0] / 2), int(center1[1] + self.QrImage.size[1] / 2 + wh[1]+8)),
-                                      self.showLoginText, 0xffffff,
-                                      ("dense", 16, graphics.FONT_BOLD | graphics.FONT_ANTIALIAS))
-                    self.drawToCanvas()
-                elif(ccode == 804):
-                    #码失效了
-                    self.loginkey = ''
-                    return self.drawLoginScreen()
-                e32.ao_sleep(1)
-        pass
-
-    def initialize(self):
-        self.baseimg = graphics.Image.new(self.screensize)
-        splash = graphics.Image.new(self.screensize)
-        splash.clear(0xdb2c1f)
-        splash1 = graphics.Image.open(self.basePath + "skin\\splash1.png")
-        splash2 = graphics.Image.open(self.basePath + "skin\\splash2.png")
-        center1 = [int(self.screenwidth / 2), int((self.screenheight * 0.7) / 2)]
-        target1 = [int(center1[0] - splash1.size[0] / 2), int(center1[1] - splash1.size[1] / 2)]
-        center2 = [int(self.screenwidth / 2), int(self.screenheight * 0.7 + (self.screenheight * 0.3) / 2)]
-        target2 = [int(center2[0] - splash2.size[0] / 2), int(center2[1] - splash2.size[1] / 2)]
-        splash.blit(splash1, target=target1)
-        splash.blit(splash2, target=target2)
-        self.canvas.blit(splash)
-        del splash
-        e32.ao_sleep(1)
-
-    def refresh_screen(self):
-        if(self.nowscreen == ScreenType.main):
-            self.drawMainScreen()
-        elif(self.nowscreen ==ScreenType.login):
-            self.drawLoginScreen()
-        else:
+    def reNewImage(self):
+        try:
+            self.img = graphics.Image.new((self.Width, self.Height))
+        except:
             pass
 
-    def drawToCanvas(self):
-        # 把图形画到canvas(画布)上
-        self.canvas.blit(self.baseimg)
-        self.lastImg = self.baseimg
+    def onDraw(self,g):
+        if(hasattr(self,'Visibility')):
+            vis = getattr(self,"Visibility")
+            if(vis!='Visible'):
+                return
 
-    def drawMainScreen(self):
-        self.baseimg.clear(0xffffff)
-        self.baseimg.blit(self.bgimg)
-        if self.isE63:
-            self.baseimg.blit(self.iconimg2, target=(11, 28), mask=self.iconimgmask)
-        else:
-            self.baseimg.blit(self.iconimg2, target=(int(self.screenwidth / 2 - self.iconimg2.size[0] / 2), 66),
-                              mask=self.iconimgmask)
+        if(self.img==None):
+            self.reNewImage()
+        for prop in self.Props:
+            if(hasattr(self,prop)):
+                propdata = getattr(self,prop)
+                if(propdata):
+                    if(prop=='Background'):
+                        self.img.clear(propdata)
+
+        for children in self.Childrens:
+            children.onDraw(self.img)
+        if(hasattr(self,'Background')):
+            g.blit(self.img,target=(self.Left,self.Top))
+
+    def loadNodeAttrs(self,nownode,childnode):
+        # print(childnode.attributes.items())
+        for attrdata in childnode.attributes.items():
+            attrname = attrdata[0]
+            attrprop = attrdata[1]
+            if (attrname in self.Props):
+                try:
+                    # 强制转换int
+                    attrprop = int(attrprop)
+                except:
+                    pass
+                setattr(nownode, attrname, attrprop)
+            else:
+                try:
+                    # 强制转换int
+                    attrprop = cn(attrprop)
+                except:
+                    pass
+                setattr(nownode, attrname, attrprop)
+
+        self.Childrens.append(nownode)
+
+    def loadChildrens(self,childrendata):
+        self.Childrens = []
+        if(not childrendata):
+            return
+        for childnode in childrendata:
+            if (childnode.nodeName == u'#text'):
+                continue
+            try:
+                nownode = eval(childnode.nodeName + '()')
+                nownode.loadChildrens(childnode.childNodes)
+                nownode.parent = self
+                self.loadNodeAttrs(nownode,childnode)
+            except Exception,e:
+                print(e)
+                print('not supported element type:' + childnode.nodeName)
+
+#基本面板
+class Panel(UIElement):
+    def __init__(self):
+        UIElement.__init__(self)
+
+    def onDraw(self, g):
+        UIElement.onDraw(self,g)
+
+#Grid面板
+class Grid(Panel):
+    def __init__(self):
+        Panel.__init__(self)
+
+    def onDraw(self,g):
+        Panel.onDraw(self,g)
+
+#Image图像
+class Image(UIElement):
+    def __init__(self):
+        UIElement.__init__(self)
+        self.Source = ''
+
+    def __setattr__(self, key, value):
+        super.__setattr__(self, key, value)
+        if(key==u'Source'):
+            if(self.Source!='' and os.path.exists(self.Source)):
+                self.image = graphics.Image.open(self.Source)
+                self.Width ,self.Height = self.image.size
+
+    def onDraw(self,g):
+        UIElement.onDraw(self,g)
+        if(self.Source!=''):
+            g.blit(self.image,target=(self.Width,self.Height))
+
+#TextBlock
+class TextBlock(UIElement):
+    def __init__(self):
+        UIElement.__init__(self)
+        self.Width = 0
+        self.Height = 0
+        self.FontSize = 16
+        self.Props.append('Text')
+        self.Props.append('FontSize')
+
+    def __setattr__(self, key, value):
+        super.__setattr__(self, key, value)
+        #print (key,value)
+        if(key==u'Text'):
+            self.Width,self.Height = get_text_size(value,self.FontSize)
+            self.Height = self.Height+10
+
+    def onDraw(self, g):
+        UIElement.onDraw(self, g)
+        if(hasattr(self,"Text")):
+            text = self.Text
+            try:
+                text=cn(text)
+            except:
+                pass
+            foreground=0x0
+            if(hasattr(self,"Foreground")):
+                foreground = self.Foreground
+            g.text((self.Left,self.Top+self.Height),text,foreground,font=('dense',self.FontSize))
 
 
-    def handle_redraw(self, rect):
-        self.drawToCanvas()
+#窗口，理论上只允许一个窗口出现
+class Window(UIElement):
+    def __init__(self):
+        UIElement.__init__(self)
+        self.parent = None
+        self.Screensize = appuifw.app.layout(appuifw.EScreen)[0]
+        self.Width, self.Height = self.Screensize
+        self.baseimg = graphics.Image.new(self.Screensize)
+        self.Canvas = appuifw.Canvas(None, self.handle_redraw)
+        appuifw.app.body = self.Canvas
+        self.lastImg = None
+        self.running = 1
 
-    def run(self):
+    def loadLayout(self,layoutpath):
+        self.Childrens = []
+        self.layoutpath=layoutpath
+        xaml= open(self.layoutpath,'r').read()
+        self.xamldata = xml.dom.minidom.parseString(xaml)
+        collection = self.xamldata.documentElement
+        if(collection.nodeName!=u'Window'):
+            print(u'Can not load xaml without Window Element')
+            return
+        self.loadNodeAttrs(self,collection)
+        self.loadChildrens(collection.childNodes)
+
+    def onDraw(self, g):
+        UIElement.onDraw(self, g)
+
+    def setFullScreen(self,isfull='full'):
+        appuifw.app.screen = isfull
+
+    def exit(self):
+        self.running = 0
+
+    def handle_redraw(self):
+        g = self.baseimg
+        self.onDraw(g)
+        for children in self.Childrens:
+            children.onDraw(g)
+        self.Canvas.blit(self.baseimg)
+
+    def show(self):
         self.lastImg = None
         while self.running:
             try:
-                self.refresh_screen()
-                if(self.lastImg!=self.baseimg):
-                    self.drawToCanvas()
+                self.handle_redraw()
                 e32.ao_yield()
-            except:
+            except Exception , e:
+                print(e)
                 pass
+
+#主程序
+class MyApp(Window):
+    def __init__(self):
+        Window.__init__(self)
+        self.setFullScreen('full')
+        self.loadLayout('myapp.xaml')
+
 
 if __name__ == "__main__":
     app = MyApp()
-    app.run()
+    app.show()

@@ -1,0 +1,11 @@
+<Window Background="#ffff00">
+    <Grid Background="#ff0000" Left="100" Top="100" Width="40" Height="40">
+        <Grid Background="#00ff00" Left="10" Top="10" Width="40" Height="40">
+        </Grid>
+    </Grid>
+    <TextBlock Text='测试'>
+    </TextBlock>
+
+    <Image Source="1.jpg">
+    </Image>
+</Window>
