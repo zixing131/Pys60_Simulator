@@ -50,17 +50,22 @@ def GetFont(fill=None,font=None):
         pass
     else:
         p = os.path.split(os.path.realpath(__file__))[0]+'\\fonts\\S60SC.ttf'
+        intf = int(font[1])
+        if(intf%2==0):
+            #奇怪的bug，偶数大小的字体在py2.5上面乱码
+            intf = intf-1
         if (os.path.exists(p)):
-            myfnt = ImageFont.truetype(p, int(font[1]))
+            myfnt = ImageFont.truetype(p, intf,encoding='utf-8')
         elif (os.path.exists("fonts\\S60SC.ttf")):
-            myfnt = ImageFont.truetype("..\\fonts\\S60SC.ttf", int(font[1]))
+            myfnt = ImageFont.truetype("..\\fonts\\S60SC.ttf", intf,encoding='utf-8')
         elif(os.path.exists("fonts/S60SC.ttf")):
-            myfnt = ImageFont.truetype("fonts\\S60SC.ttf",int(font[1]))
+            myfnt = ImageFont.truetype("fonts\\S60SC.ttf",intf,encoding='utf-8')
+
         elif (os.path.exists("../pys60Core/fonts/S60SC.ttf")):
-            myfnt = ImageFont.truetype("../pys60Core/fonts/S60SC.ttf", int(font[1]))
+            myfnt = ImageFont.truetype("../pys60Core/fonts/S60SC.ttf", intf,encoding='utf-8')
 
         elif(os.path.exists("Pys60_Simulator\\fonts\\S60SC.ttf")):
-            myfnt = ImageFont.truetype("Pys60_Simulator\\fonts\\S60SC.ttf", int(font[1]))
+            myfnt = ImageFont.truetype("Pys60_Simulator\\fonts\\S60SC.ttf", intf,encoding='utf-8')
     lastfont = font
     return myfnt
 
@@ -113,15 +118,15 @@ class Image:
         draw = ImageDraw.Draw(self.image)
         if(fill==-1):
             outline = convertColor(outline)
-            draw.rectangle((coords[0], coords[1], coords[2], coords[3]),outline=outline, width=width)
+            draw.rectangle((coords[0], coords[1], coords[2], coords[3]),outline=outline)
             del draw
             return
         fill = convertColor(fill)
         if(outline!=0):
             outline = convertColor(outline)
-            draw.rectangle((coords[0], coords[1], coords[2], coords[3]), fill=fill, outline=outline, width=width)
+            draw.rectangle((coords[0], coords[1], coords[2], coords[3]), fill=fill, outline=outline)#, width=width
         else:
-            draw.rectangle((coords[0], coords[1], coords[2], coords[3]), fill=fill, width=width)
+            draw.rectangle((coords[0], coords[1], coords[2], coords[3]), fill=fill)#, width=width
         del draw
         
     def clear(self,color=0):
@@ -276,6 +281,9 @@ class Image:
             except Exception,e:
                 print font
         #text=text.encode('u8')
+        #if(type(text)!=type(u'')):
+            #print(text.encode('u8'))
+            #text = text.encode('u8')
         draw.text((int(pos[0]),int(pos[1]-font[1])),text,fill=color,font = GetFont(color,font))
         self.blitSelf()
 

@@ -210,7 +210,7 @@ class Canvas(graphics.Image):
             self.lastimg = img
             self.cv.create_image(target[0] + img.width() / 2, target[1] + img.height() / 2, image=img)
             self.root.update()
-        except Exception as e:
+        except Exception , e:
             print(e)
 
     def clear(self, color):
@@ -233,7 +233,7 @@ class Canvas(graphics.Image):
         except:
             try:
                 self.redraw_callback(())
-            except Exception as ex:
+            except Exception , ex:
                 print(ex)
 
 
@@ -322,7 +322,7 @@ class Application(object):
         self.running = 1
         self.CC = None
         self.body = None
-        self.screen = (0, 0, screen[0], screen[1])
+        self.screen = (screen[0], screen[1])
         # thread.start_new_thread(self.refush,())
         self.exit_key_handler=None
 
@@ -349,14 +349,14 @@ class Application(object):
         try:
             if (self.body):
                 self.body.update()
+            if(root):
+                root.update()
         # self.body.redraw()
         except Exception, ex:
             print(ex)
         # time.sleep(0.1)
 
-
 app = Application()
-
 
 def abort():
     app.running = 0
@@ -393,6 +393,10 @@ def InfoPopup():
 def popup_menu(name,den):
     return 0
 
+class text:
+    @staticmethod
+    def measure_text(text, font):
+        return graphics.getTextFontWidth(text,font)
 import e32
 
 e32 = e32

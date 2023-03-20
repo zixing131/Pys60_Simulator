@@ -469,7 +469,8 @@ MODE_SIZE_LARGE = {
     MODE_KANJI: 12,
 }
 
-ALPHA_NUM = b'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:'
+ALPHA_NUM = u'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:'
+
 RE_ALPHA_NUM = re.compile(b('^[') + re.escape(ALPHA_NUM) + b(r']*\Z'))
 
 # The number of bits for numeric delimited data lengths.
@@ -662,6 +663,11 @@ def _lost_point_level1(modules, modules_count):
 
     return lost_point
 
+def next(itera,value):
+    try:
+        itera.next()
+    except:
+        pass
 
 def _lost_point_level2(modules, modules_count):
     lost_point = 0
@@ -1122,7 +1128,7 @@ class PilImage(BaseImage):
 
     def drawrect(self, row, col):
         box = self.pixel_box(row, col)
-        self._idr.rectangle(box, fill=self.fill_color)
+        self._idr.rectangle(box, fill=self.fill_color,outline=self.fill_color,width=2)
 
     def save(self, path):
         self._img.save(path)

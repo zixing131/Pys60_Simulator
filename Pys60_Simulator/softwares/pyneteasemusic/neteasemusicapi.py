@@ -49,7 +49,7 @@ def testconnect():
             return True
         else:
             return False
-    except Exception as ex:
+    except Exception , ex:
         print(ex)
         return False
 
@@ -80,6 +80,8 @@ class MyApi:
         ret = GET(url)
         jsonret = json.loads(ret)
         return jsonret
+    def p(self):
+        pass
 
 def testQrLogin():
     myapi = MyApi()

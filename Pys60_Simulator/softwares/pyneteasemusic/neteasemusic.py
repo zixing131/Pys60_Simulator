@@ -15,18 +15,27 @@ class ScreenType:
 def cn(x):
     return x.decode('utf8')
 
+img=None
+FONT = 'normal'
+def get_text_size(text, font=None):
+    global img
+    if img is None:
+        img = graphics.Image.new((240,100))
+    wh=img.measure_text(text, (FONT,font))[0]
+    print(wh)
+    return [wh[2],0-wh[1]]
 
 class MyApp:
     def __init__(self):
-        self.screenwidth, self.screenheight = appuifw.screen
+        self.screensize = appuifw.app.layout(appuifw.EScreen)[0]
+        self.screenwidth, self.screenheight = self.screensize
         self.basePath = 'c:\\python\\pysoft\\pyneteasemusic\\'
         self.isE63 = self.screenwidth == 320
         self.running = 1
-        self.canvas = appuifw.Canvas()
+        self.canvas = appuifw.Canvas(None,self.handle_redraw)
         appuifw.app.body = self.canvas
         appuifw.app.screen = 'full'
         appuifw.app.exit_key_handler = self.quit
-        self.canvas.bind(appuifw.EEventRedraw, self.handle_redraw)
         self.loginkey=''
         self.QrImage = None
 
@@ -86,8 +95,8 @@ class MyApp:
             print(target1)
             self.baseimg.blit(self.QrImage,target1)
             self.showLoginText = cn('请使用网易云APP扫码登录')
-            wh = graphics.getTextFontWidth(self.showLoginText,16)
-            self.baseimg.text( (int(center1[0] - wh[0]/2),int(center1[1] + self.QrImage.size[1] / 2+wh[1]+3)) , self.showLoginText, 0xffffff,
+            wh = get_text_size(self.showLoginText,16)
+            self.baseimg.text( (int(center1[0] - wh[0]/2),int(center1[1] + self.QrImage.size[1] / 2+wh[1]+8)) , self.showLoginText, 0xffffff,
                          ("dense", 16, graphics.FONT_BOLD | graphics.FONT_ANTIALIAS))
             self.drawToCanvas()
             while(1):
@@ -102,27 +111,27 @@ class MyApp:
                         self.showLoginText = cn('登录成功')
                         self.Cookies = checkret['cookie']
                         self.SaveCookies()
+                        self.lastImg = None
                         self.nowscreen = ScreenType.main
                         return
                     self.baseimg.clear(0x202020)
                     self.baseimg.blit(self.QrImage, target1)
 
-                    wh = graphics.getTextFontWidth(self.showLoginText, 16)
-                    self.baseimg.text((int(center1[0] - wh[0] / 2), int(center1[1] + self.QrImage.size[1] / 2 + wh[1]+3)),
+                    wh = get_text_size(self.showLoginText, 16)
+                    self.baseimg.text((int(center1[0] - wh[0] / 2), int(center1[1] + self.QrImage.size[1] / 2 + wh[1]+8)),
                                       self.showLoginText, 0xffffff,
                                       ("dense", 16, graphics.FONT_BOLD | graphics.FONT_ANTIALIAS))
                     self.drawToCanvas()
                 elif(ccode == 804):
                     #码失效了
-                    self.loginkey == ''
+                    self.loginkey = ''
                     return self.drawLoginScreen()
                 e32.ao_sleep(1)
-                e32.ao_yield()
         pass
 
     def initialize(self):
-        self.baseimg = graphics.Image.new(appuifw.screen)
-        splash = graphics.Image.new(appuifw.screen)
+        self.baseimg = graphics.Image.new(self.screensize)
+        splash = graphics.Image.new(self.screensize)
         splash.clear(0xdb2c1f)
         splash1 = graphics.Image.open(self.basePath + "skin\\splash1.png")
         splash2 = graphics.Image.open(self.basePath + "skin\\splash2.png")
@@ -137,7 +146,6 @@ class MyApp:
         e32.ao_sleep(1)
 
     def refresh_screen(self):
-
         if(self.nowscreen == ScreenType.main):
             self.drawMainScreen()
         elif(self.nowscreen ==ScreenType.login):
@@ -145,13 +153,10 @@ class MyApp:
         else:
             pass
 
-        self.drawToCanvas()
-        # 线程(不是必须)，但最好有延时
-        e32.ao_yield()
-
     def drawToCanvas(self):
         # 把图形画到canvas(画布)上
         self.canvas.blit(self.baseimg)
+        self.lastImg = self.baseimg
 
     def drawMainScreen(self):
         self.baseimg.clear(0xffffff)
@@ -163,15 +168,19 @@ class MyApp:
                               mask=self.iconimgmask)
 
 
-
     def handle_redraw(self, rect):
-        self.refresh_screen()
+        self.drawToCanvas()
 
     def run(self):
+        self.lastImg = None
         while self.running:
-            self.refresh_screen()
-            e32.ao_sleep(0.1)
-
+            try:
+                self.refresh_screen()
+                if(self.lastImg!=self.baseimg):
+                    self.drawToCanvas()
+                e32.ao_yield()
+            except:
+                pass
 
 if __name__ == "__main__":
     app = MyApp()

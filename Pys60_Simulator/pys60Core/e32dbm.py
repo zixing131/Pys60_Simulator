@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import json,os
+import simplejson as json
+import os
 import e32db
 
 class db(object):
