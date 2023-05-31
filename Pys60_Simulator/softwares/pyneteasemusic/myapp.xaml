@@ -1,11 +1,10 @@
-<Window Background="#ffff00">
-    <Grid Background="#ff0000" Left="100" Top="100" Width="40" Height="40">
-        <Grid Background="#00ff00" Left="10" Top="10" Width="40" Height="40">
-        </Grid>
-    </Grid>
-    <TextBlock Text='测试'>
-    </TextBlock>
+<Window Background="#db2c1f">
 
-    <Image Source="1.jpg">
-    </Image>
+    <Grid HorizontalAlignment="Center" Top="20" Background="#ffffff" VerticalAlignment="Center" Width="200" Height="220" Margin="0 0 0 0">
+        <Image Source="1.jpg" HorizontalAlignment="Center" Top="0" Width="200" Height="200" >
+        </Image>
+        <TextBlock Text='请用网易云音乐App扫码登录' Margin="-5 10 0 0" VerticalAlignment="Bottom" Height="20" Width="200" HorizontalAlignment="Center">
+        </TextBlock>
+    </Grid>
+
 </Window>

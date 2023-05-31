@@ -48,7 +48,63 @@ class UIElement(object):
         self.Props.append('Top') #顶边
         self.Props.append('Enabled')  # 是否启用
         self.Props.append('Visibility')  # 是否可见
+
+        self.Props.append('HorizontalAlignment')  # 是否可见
+
+        self.Props.append('VerticalAlignment')  # 是否可见
+
         self.img=None
+
+    def loadPrepData(self):
+        for nownode in self.Childrens:
+            HorizontalAlignment = getattr(nownode, "HorizontalAlignment", "Stretch")
+            if (HorizontalAlignment != "Stretch"):
+                parent = nownode.parent
+                parentWidth = parent.Width
+                if (HorizontalAlignment == "Left"):
+                    setattr(nownode, "Left", 0)
+                elif (HorizontalAlignment == "Right"):
+                    left = parentWidth - nownode.Width
+                    setattr(nownode, "Left", left)
+                elif (HorizontalAlignment == "Center"):
+                    left = (int)((parentWidth - nownode.Width) / 2)
+                    setattr(nownode, "Left", left)
+            VerticalAlignment = getattr(nownode, "VerticalAlignment", "Stretch")
+            if (VerticalAlignment != "Stretch"):
+                parent = nownode.parent
+
+                parentHeight = parent.Height
+                if (VerticalAlignment == "Bottom"):
+                    setattr(nownode, "Top", parentHeight - nownode.Height)
+                elif (VerticalAlignment == "Top"):
+                    setattr(nownode, "Top", 0)
+                elif (VerticalAlignment == "Center"):
+                    top = (int)((parentHeight - nownode.Height) / 2)
+                    setattr(nownode, "Top", top)
+
+            Margin = getattr(nownode, "Margin", "0 0 0 0")
+            if (Margin != "0 0 0 0"):
+                Margin=Margin.split(' ')
+                left = int(Margin[0])
+                top = int(Margin[1])
+                right =int( Margin[2])
+                bottom = int(Margin[3])
+                nownode.Left = getattr(nownode, "Left", 0)
+
+                nownode.Top = getattr(nownode, "Top", 0)
+
+                nownode.Width = getattr(nownode, "Width", 0)
+
+                nownode.Height = getattr(nownode, "Height", 0)
+
+                if(left!=0):
+                    nownode.Left -= left
+                if(top!=0):
+                    nownode.Top -= top
+                if(right!=0):
+                    nownode.Width += right
+                if(bottom!=0):
+                    nownode.Height += bottom
 
     def __setattr__(self, key, value):
         super.__setattr__(self, key, value)
@@ -101,8 +157,10 @@ class UIElement(object):
                     pass
                 setattr(nownode, attrname, attrprop)
 
+
         self.Childrens.append(nownode)
 
+    # noinspection BaseException
     def loadChildrens(self,childrendata):
         self.Childrens = []
         if(not childrendata):
@@ -110,14 +168,17 @@ class UIElement(object):
         for childnode in childrendata:
             if (childnode.nodeName == u'#text'):
                 continue
+
             try:
                 nownode = eval(childnode.nodeName + '()')
-                nownode.loadChildrens(childnode.childNodes)
                 nownode.parent = self
                 self.loadNodeAttrs(nownode,childnode)
-            except Exception,e:
-                print(e)
+                nownode.loadChildrens(childnode.childNodes)
+            except:#Exception,e
+                #print(e)
                 print('not supported element type:' + childnode.nodeName)
+
+        self.loadPrepData()
 
 #基本面板
 class Panel(UIElement):
@@ -140,18 +201,25 @@ class Image(UIElement):
     def __init__(self):
         UIElement.__init__(self)
         self.Source = ''
+        self.image = None
 
     def __setattr__(self, key, value):
         super.__setattr__(self, key, value)
         if(key==u'Source'):
             if(self.Source!='' and os.path.exists(self.Source)):
                 self.image = graphics.Image.open(self.Source)
-                self.Width ,self.Height = self.image.size
+                #self.Width ,self.Height = self.image.size
 
     def onDraw(self,g):
         UIElement.onDraw(self,g)
-        if(self.Source!=''):
-            g.blit(self.image,target=(self.Width,self.Height))
+
+        if(self.image!=None):
+            size = self.image.size
+            if(size[0]!=self.Width and size[1]!=self.Height ):
+                    self.image = self.image.resize((self.Width, self.Height))
+
+        if(self.image!=None):
+            g.blit(self.image,target=(self.Left,self.Top))
 
 #TextBlock
 class TextBlock(UIElement):
@@ -192,10 +260,13 @@ class Window(UIElement):
         self.Screensize = appuifw.app.layout(appuifw.EScreen)[0]
         self.Width, self.Height = self.Screensize
         self.baseimg = graphics.Image.new(self.Screensize)
-        self.Canvas = appuifw.Canvas(None, self.handle_redraw)
+        self.Canvas = appuifw.Canvas(event_callback=self.event_callback,redraw_callback=self.handle_redraw)
         appuifw.app.body = self.Canvas
         self.lastImg = None
         self.running = 1
+
+    def event_callback(self,keydata):
+        print(keydata)
 
     def loadLayout(self,layoutpath):
         self.Childrens = []
@@ -209,6 +280,7 @@ class Window(UIElement):
         self.loadNodeAttrs(self,collection)
         self.loadChildrens(collection.childNodes)
 
+
     def onDraw(self, g):
         UIElement.onDraw(self, g)
 
@@ -218,7 +290,7 @@ class Window(UIElement):
     def exit(self):
         self.running = 0
 
-    def handle_redraw(self):
+    def handle_redraw(self,data=None):
         g = self.baseimg
         self.onDraw(g)
         for children in self.Childrens:
@@ -231,8 +303,9 @@ class Window(UIElement):
             try:
                 self.handle_redraw()
                 e32.ao_yield()
-            except Exception , e:
-                print(e)
+            except:#Exception , e:#
+                #print(e)
+                print("error happened!")
                 pass
 
 #主程序

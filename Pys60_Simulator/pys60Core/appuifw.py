@@ -210,7 +210,7 @@ class Canvas(graphics.Image):
             self.lastimg = img
             self.cv.create_image(target[0] + img.width() / 2, target[1] + img.height() / 2, image=img)
             self.root.update()
-        except Exception , e:
+        except Exception as e:
             print(e)
 
     def clear(self, color):
@@ -233,7 +233,7 @@ class Canvas(graphics.Image):
         except:
             try:
                 self.redraw_callback(())
-            except Exception , ex:
+            except Exception as ex:
                 print(ex)
 
 
@@ -352,7 +352,7 @@ class Application(object):
             if(root):
                 root.update()
         # self.body.redraw()
-        except Exception, ex:
+        except Exception as ex:
             print(ex)
         # time.sleep(0.1)
 

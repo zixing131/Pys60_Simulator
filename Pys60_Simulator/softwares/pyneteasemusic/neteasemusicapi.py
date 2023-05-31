@@ -49,8 +49,8 @@ def testconnect():
             return True
         else:
             return False
-    except Exception , ex:
-        print(ex)
+    except Exception:
+        #print(ex)
         return False
 
 class MyApi:
