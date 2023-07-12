@@ -1,9 +1,9 @@
-<Window Background="#db2c1f">
+<Window name="win" Background="#db2c1f">
 
-    <Grid HorizontalAlignment="Center" Top="20" Background="#ffffff" VerticalAlignment="Center" Width="200" Height="220" Margin="0 0 0 0">
-        <Image Source="1.jpg" HorizontalAlignment="Center" Top="0" Width="200" Height="200" >
+    <Grid name="gridbase" HorizontalAlignment="Center" Top="20" Background="#ffffff" VerticalAlignment="Center" Width="200" Height="220" Margin="0 0 0 0">
+        <Image name="imageqrcode" Source="1.jpg" HorizontalAlignment="Center" Top="0" Width="200" Height="200" >
         </Image>
-        <TextBlock Text='请用网易云音乐App扫码登录' Margin="-5 10 0 0" VerticalAlignment="Bottom" Height="20" Width="200" HorizontalAlignment="Center">
+        <TextBlock name="texttips" Text='请用网易云音乐App扫码登录' Margin="-5 10 0 0" VerticalAlignment="Bottom" Height="20" Width="200" HorizontalAlignment="Center">
         </TextBlock>
     </Grid>
 
