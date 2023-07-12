@@ -85,6 +85,7 @@ def convertColor(bgcolor):
             
 class Image:
     def __init__(self,size,mode=None,canvas = None):
+        size=[int(size[0]),int(size[1])]
         if(mode!='L'):
             self.image = Image2.new("RGBA",size,(255,255,255))
         else:
@@ -179,8 +180,14 @@ class Image:
             if(len(source)==2):
                 fx1 = source[0]
                 fy1 = source[1]
-                fx2 = fx1+fx2
-                fy2 = fy1+fy2
+                if(type(fx1) is tuple):
+                    fx2=fx1[1]
+                    fx1=fx1[0]
+                    fy2=fy1[1]
+                    fy1=fy1[0]
+                else:
+                    fx2 = fx1+fx2
+                    fy2 = fy1+fy2
             elif(len(source)==4):
                 fx1 = source[0]
                 fy1 = source[1]
@@ -198,8 +205,8 @@ class Image:
                 tx2 = target[2]
                 ty2 = target[3]
 
-        toRect = (tx1, ty1, tx2 - tx1, ty2 - ty1)  # xywh
-        fromRect = (fx1, fy1, fx2 - fx1, fy2 - fy1)  # xywh
+        toRect = (int(tx1), int(ty1), int(tx2 - tx1), int(ty2 - ty1))  # xywh
+        fromRect = (int(fx1), int(fy1), int(fx2 - fx1), int(fy2 - fy1))  # xywh
 
         if(scale):
             if(mask):
@@ -210,9 +217,9 @@ class Image:
         else:
             #print((tx1-fx1, ty1-fy1))
             if(mask):
-                self.image.paste(img.image.crop((0,0,fromRect[2], fromRect[3])), (tx1-fx1, ty1-fy1),mask=mask.image.crop((0,0,fromRect[2], fromRect[3])))
+                self.image.paste(img.image.crop((0,0,fromRect[2], fromRect[3])), (int(tx1-fx1), int(ty1-fy1)),mask=mask.image.crop((0,0,fromRect[2], fromRect[3])))
             else:
-                self.image.paste(img.image.crop((0,0,fromRect[2], fromRect[3])), (tx1-fx1, ty1-fy1))
+                self.image.paste(img.image.crop((0,0,fromRect[2], fromRect[3])), (int(tx1-fx1), int(ty1-fy1)))
 
         self.blitSelf()
 
@@ -289,7 +296,7 @@ class Image:
 
     def blitSelf(self):
         if (self.canvas):
-            self.canvas.blit(self)
+            self.canvas.blitSelf()
         #else:
         #    if(app):
         #        pass
@@ -344,7 +351,7 @@ class Image:
             color = hex2rgb(color)
             print color
         return [color]
-    def resize(self,size):
+    def resize(self,size,a=None,b=None):
         self.image = self.image.resize(size)
         self.size = size
         return self

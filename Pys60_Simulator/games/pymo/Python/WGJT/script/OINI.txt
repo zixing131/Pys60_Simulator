@@ -1,0 +1,25 @@
+﻿#bgm 01
+#label START
+#bg 00,BG_NOFADE,BG_VERYFAST
+#select_text 4,开始,继续,CG,结束,40,60,60,90,#ffffff,1
+#if FSEL=0,goto NEW_GAME
+#if FSEL=1,goto CONTINUE_GAME
+#if FSEL=2,goto YOUR_MEMORIES
+#goto END_GAME
+#label NEW_GAME
+#wait 2000
+#change start
+#goto START
+#label CONTINUE_GAME
+#load
+#goto START
+#label YOUR_MEMORIES
+
+#goto ALBUM
+
+#goto START
+#label ALBUM
+#album
+#goto START
+#goto YOUR_MEMORIES
+#label END_GAME

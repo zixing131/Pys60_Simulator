@@ -11,7 +11,7 @@ import tkMessageBox
 import pys60Socket
 
 screen = (240, 320)
-#screen = (320, 240)
+screen = (320, 240)
 #screen = (360, 640)
 from threading import Timer
 
@@ -33,6 +33,10 @@ graphics.screen = screen
 EScreen = 1
 EHLeftVTop = 0
 root = tk.Tk()
+root.title('Pys60 Simulator')
+root.geometry(str(screen[0])+'x'+str(screen[1]))
+root.resizable(0, 0)
+
 cv = tk.Canvas(root, width=screen[0], height=screen[1], background='white')
 
 def on_closing():
@@ -64,7 +68,6 @@ class Canvas(graphics.Image):
         self.redraw_callback = redraw_callback
         self.event_callback = event_callback
         self.root = root
-        self.root.title('Pys60 Simulator')
         self.root.geometry(str(screen[0])+'x'+str(screen[1]))
         self.root.resizable(0, 0)
         self.cv = cv
@@ -204,18 +207,19 @@ class Canvas(graphics.Image):
             pass
             # print("鼠标： %s" % evt.num)
 
-    def blit(self, img, target=(0, 0), scale=False, source=None):
+    def blit(self, img, source=None, target=None, scale=False, mask=None):
+        graphics.Image.blit(self, img, source, target, scale, mask)
+
+    def clear(self, color):
+        graphics.Image.clear(self, color)
+    def blitSelf(self):
         try:
-            img = ImageTk.PhotoImage(image=img.image, master=self.cv)
+            img = ImageTk.PhotoImage(image=self.image, master=self.cv)
             self.lastimg = img
-            self.cv.create_image(target[0] + img.width() / 2, target[1] + img.height() / 2, image=img)
+            self.cv.create_image(0 + img.width() / 2, 0 + img.height() / 2, image=img)
             self.root.update()
         except Exception as e:
             print(e)
-
-    def clear(self, color):
-        pass
-
     def bind(self, key, event, point=0):
         if 0x101 <= key <= 0x10A:
             self.allTouchEvents.append((key, event, point))
@@ -287,22 +291,22 @@ class Text(object):
                     self.cv.delete(self.menuwindow)
                 if (app.exit_key_handler): app.exit_key_handler()
             if (key != -1):
-                args = {"keycode": 0x30 + key, "scancode": 1, "type": 1}
+                args = {"keycode": 0x30 + key, "scancode": 0x30 + key, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'up'):
-                args = {"keycode": 63497, "scancode": 1, "type": 1}
+                args = {"keycode": 63497, "scancode": key_codes.EScancodeUpArrow, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'down'):
-                args = {"keycode": 63498, "scancode": 1, "type": 1}
+                args = {"keycode": 63498, "scancode": key_codes.EScancodeDownArrow, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'left'):
-                args = {"keycode": 63495, "scancode": 1, "type": 1}
+                args = {"keycode": 63495, "scancode":  key_codes.EScancodeLeftArrow, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'right'):
-                args = {"keycode": 63496, "scancode": 1, "type": 1}
+                args = {"keycode": 63496, "scancode": key_codes.EScancodeRightArrow, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'space'):
-                args = {"keycode": 63557, "scancode": 1, "type": 1}
+                args = {"keycode": 63557, "scancode": key_codes.EScancodeSelect, "type": 1}
                 if (self.event_callback): self.event_callback(args)
 
     def set(self, text):
@@ -310,12 +314,25 @@ class Text(object):
         while 1:
             self.root.update()
 
+
+class Text_display():
+    def __init__(self, text, skinned):
+        self.text = text
+        self.skinned = skinned
+Listbox2 = Listbox
+
 class Application(object):
     def full_name(self):
         # Todo
         return "d:\\"
 
     def set_exit(self):
+        pass
+
+    def set_tabs(self,N,c):
+        pass
+
+    def activate_tab(self,N):
         pass
 
     def __init__(self, **keys):

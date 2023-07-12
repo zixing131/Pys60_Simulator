@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import appuifw, e32
-from Pys60_Simulator.pys60Core.graphics import*
+from  graphics import*
 def cn(x):return x.decode("u8")
 canvas= appuifw.Canvas()
 appuifw.app.body=canvas

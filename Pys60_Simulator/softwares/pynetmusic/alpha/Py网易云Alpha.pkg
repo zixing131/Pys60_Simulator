@@ -1,0 +1,72 @@
+; Languages
+&ZH, AM, EN
+
+; Package header
+#{"PyÍøÒ×ÔÆAlpha", "pyNeteaseMusic", "pyNeteaseMusic"}, (0xFD8F9A7E), 0, 0, 9, TYPE=SA
+
+; Dependencies
+[0x101F7961], 0, 0, 0, {"Series60ProductID", "Series60ProductID", "Series60ProductID"}
+[0x20022E6D], 0, 0, 0, {"Symbian^3 devices", "Symbian^3 devices", "Symbian^3 devices"}
+[0x1028315F], 0, 0, 0, {"S60 5th Edition devices", "S60 5th Edition devices", "S60 5th Edition devices"}
+(0x2000B1A0), 1, 4, 0, {"Python for S60", "Python for S60", "Python for S60"}
+
+; Vendor names
+%{"Ë³", "Ë³", "Ë³"}
+:"Ë³-zixing"
+
+"resource\apps\NetEaseCloudMusicPython_0xfd8f9a7e.rsc"-"!:\resource\apps\NetEaseCloudMusicPython_0xfd8f9a7e.rsc"
+"private\10003a3f\import\apps\NetEaseCloudMusicPython_0xfd8f9a7e_reg.rsc"-"!:\private\10003a3f\import\apps\NetEaseCloudMusicPython_0xfd8f9a7e_reg.rsc"
+"resource\apps\NetEaseCloudMusicPython_0xfd8f9a7e_loc.r31"-"!:\resource\apps\NetEaseCloudMusicPython_0xfd8f9a7e_loc.r31"
+"resource\apps\NetEaseCloudMusicPython_0xfd8f9a7e_aif.mif"-"!:\resource\apps\NetEaseCloudMusicPython_0xfd8f9a7e_aif.mif"
+"private\fd8f9a7e\default.py"-"!:\private\fd8f9a7e\default.py"
+"private\FD8F9A7E\api.py"-"!:\private\FD8F9A7E\api.py"
+"private\FD8F9A7E\pic.bmp"-"!:\private\FD8F9A7E\pic.bmp"
+"private\FD8F9A7E\playlist.py"-"!:\private\FD8F9A7E\playlist.py"
+"private\FD8F9A7E\util.py"-"!:\private\FD8F9A7E\util.py"
+"private\FD8F9A7E\pic\actionbar_discover_normal.png"-"!:\private\FD8F9A7E\pic\actionbar_discover_normal.png"
+"private\FD8F9A7E\pic\fm_default_cover_largeex.scale-100.png"-"!:\private\FD8F9A7E\pic\fm_default_cover_largeex.scale-100.png"
+"private\FD8F9A7E\pic\list_detail_icn_faved.bmp"-"!:\private\FD8F9A7E\pic\list_detail_icn_faved.bmp"
+"private\FD8F9A7E\pic\list_detail_icn_faved.png"-"!:\private\FD8F9A7E\pic\list_detail_icn_faved.png"
+"private\FD8F9A7E\pic\list_detail_icn_faved_.bmp"-"!:\private\FD8F9A7E\pic\list_detail_icn_faved_.bmp"
+"private\FD8F9A7E\pic\list_detail_icn_fav.bmp"-"!:\private\FD8F9A7E\pic\list_detail_icn_fav.bmp"
+"private\FD8F9A7E\pic\list_detail_icn_fav.png"-"!:\private\FD8F9A7E\pic\list_detail_icn_fav.png"
+"private\FD8F9A7E\pic\list_detail_icn_fav_.bmp"-"!:\private\FD8F9A7E\pic\list_detail_icn_fav_.bmp"
+"private\FD8F9A7E\pic\pic.bmp"-"!:\private\FD8F9A7E\pic\pic.bmp"
+"private\FD8F9A7E\pic\pic.png"-"!:\private\FD8F9A7E\pic\pic.png"
+"private\FD8F9A7E\pic\play_disc.png"-"!:\private\FD8F9A7E\pic\play_disc.png"
+"private\FD8F9A7E\pic\play_fm_btn_loved.png"-"!:\private\FD8F9A7E\pic\play_fm_btn_loved.png"
+"private\FD8F9A7E\pic\play_fm_btn_loved_.bmp"-"!:\private\FD8F9A7E\pic\play_fm_btn_loved_.bmp"
+"private\FD8F9A7E\pic\play_fm_btn_love_prs.png"-"!:\private\FD8F9A7E\pic\play_fm_btn_love_prs.png"
+"private\FD8F9A7E\pic\play_icn_cmt.bmp"-"!:\private\FD8F9A7E\pic\play_icn_cmt.bmp"
+"private\FD8F9A7E\pic\play_icn_cmt.png"-"!:\private\FD8F9A7E\pic\play_icn_cmt.png"
+"private\FD8F9A7E\pic\play_icn_cmt_.bmp"-"!:\private\FD8F9A7E\pic\play_icn_cmt_.bmp"
+"private\FD8F9A7E\pic\play_icn_loop.bmp"-"!:\private\FD8F9A7E\pic\play_icn_loop.bmp"
+"private\FD8F9A7E\pic\play_icn_loop.png"-"!:\private\FD8F9A7E\pic\play_icn_loop.png"
+"private\FD8F9A7E\pic\play_icn_loop_.bmp"-"!:\private\FD8F9A7E\pic\play_icn_loop_.bmp"
+"private\FD8F9A7E\pic\play_icn_loved.bmp"-"!:\private\FD8F9A7E\pic\play_icn_loved.bmp"
+"private\FD8F9A7E\pic\play_icn_loved.png"-"!:\private\FD8F9A7E\pic\play_icn_loved.png"
+"private\FD8F9A7E\pic\play_icn_loved_.bmp"-"!:\private\FD8F9A7E\pic\play_icn_loved_.bmp"
+"private\FD8F9A7E\pic\play_icn_love.bmp"-"!:\private\FD8F9A7E\pic\play_icn_love.bmp"
+"private\FD8F9A7E\pic\play_icn_love.png"-"!:\private\FD8F9A7E\pic\play_icn_love.png"
+"private\FD8F9A7E\pic\play_icn_love_.bmp"-"!:\private\FD8F9A7E\pic\play_icn_love_.bmp"
+"private\FD8F9A7E\pic\play_icn_one.bmp"-"!:\private\FD8F9A7E\pic\play_icn_one.bmp"
+"private\FD8F9A7E\pic\play_icn_one.png"-"!:\private\FD8F9A7E\pic\play_icn_one.png"
+"private\FD8F9A7E\pic\play_icn_one_.bmp"-"!:\private\FD8F9A7E\pic\play_icn_one_.bmp"
+"private\FD8F9A7E\pic\play_icn_shuffle.bmp"-"!:\private\FD8F9A7E\pic\play_icn_shuffle.bmp"
+"private\FD8F9A7E\pic\play_icn_shuffle.png"-"!:\private\FD8F9A7E\pic\play_icn_shuffle.png"
+"private\FD8F9A7E\pic\play_icn_shuffle_.bmp"-"!:\private\FD8F9A7E\pic\play_icn_shuffle_.bmp"
+"private\FD8F9A7E\pic\play_needle.png"-"!:\private\FD8F9A7E\pic\play_needle.png"
+"private\FD8F9A7E\pic\play_needle_.png"-"!:\private\FD8F9A7E\pic\play_needle_.png"
+"private\FD8F9A7E\pic\SplashScreen.scale-100.bmp"-"!:\private\FD8F9A7E\pic\SplashScreen.scale-100.bmp"
+"private\FD8F9A7E\pic\SplashScreen.scale-100.png"-"!:\private\FD8F9A7E\pic\SplashScreen.scale-100.png"
+"private\FD8F9A7E\simplejson\decoder.py"-"!:\private\FD8F9A7E\simplejson\decoder.py"
+"private\FD8F9A7E\simplejson\decoder.pyc"-"!:\private\FD8F9A7E\simplejson\decoder.pyc"
+"private\FD8F9A7E\simplejson\encoder.py"-"!:\private\FD8F9A7E\simplejson\encoder.py"
+"private\FD8F9A7E\simplejson\encoder.pyc"-"!:\private\FD8F9A7E\simplejson\encoder.pyc"
+"private\FD8F9A7E\simplejson\scanner.py"-"!:\private\FD8F9A7E\simplejson\scanner.py"
+"private\FD8F9A7E\simplejson\scanner.pyc"-"!:\private\FD8F9A7E\simplejson\scanner.pyc"
+"private\FD8F9A7E\simplejson\__init__.py"-"!:\private\FD8F9A7E\simplejson\__init__.py"
+"private\FD8F9A7E\simplejson\__init__.pyc"-"!:\private\FD8F9A7E\simplejson\__init__.pyc"
+"sys\bin\NetEaseCloudMusicPython_0xfd8f9a7e.exe"-"!:\sys\bin\NetEaseCloudMusicPython_0xfd8f9a7e.exe"
+
+

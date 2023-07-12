@@ -6,12 +6,13 @@
 #VER="0.99"
 import httplib,urllib,socket,base64,md5,time
 import graphics, appuifw as ui, TopWindow
-from Pys60_Simulator.pys60Core.sysinfo import imei
-from Pys60_Simulator.pys60Core.sysinfo import display_pixels
+from sysinfo import imei
+from sysinfo import display_pixels
 unquote=urllib.unquote
 cn=lambda x:x.decode('u8')
 en=lambda x:x.encode('u8')
-sleep= Pys60_Simulator.pys60Core.e32.ao_sleep
+import  e32
+sleep=  e32.ao_sleep
 def showyzm(path):
     global top
     img= graphics.Image.open(path)

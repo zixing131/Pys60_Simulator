@@ -531,7 +531,8 @@ def load_image(imgfilename, width=None, height=None, is_mask=False):
             image=image.resize((height*image.size[0]/image.size[1],height),None,0)
         elif width!=None and width!=image.size[0] and height==None:
             image=image.resize((width,width*image.size[1]/image.size[0]),None,0)
-    except:
+    except Exception as ex:
+        print(ex)
         print 'Error while loading',imgfilename
         image=Image.new(screensize,"L")
         image.clear(0)

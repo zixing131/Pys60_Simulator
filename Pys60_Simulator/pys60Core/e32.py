@@ -38,7 +38,9 @@ class Ao_timer:
         self.timer = Timer(delay,func,())
         self.timer.start()
         ao_yield()
-    
+
+def reset_inactivity():
+    pass
 def ao_yield():
     _app.Yield()
 

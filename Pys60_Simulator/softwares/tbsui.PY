@@ -7,8 +7,9 @@ VER="2.0"
 import base64,os
 import dialog, appuifw as ui
 import tbsnet
+import e32
 tbsnet= tbsnet.tiebanet
-sleep= Pys60_Simulator.pys60Core.e32.ao_sleep
+sleep=  e32.ao_sleep
 path="c:\\python\\pysoft\\tbs\\"
 cn=lambda x:unicode(x,"utf-8","ignore")
 en=lambda x:x.encode("utf-8")
