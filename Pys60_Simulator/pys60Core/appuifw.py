@@ -11,7 +11,7 @@ import tkMessageBox
 import pys60Socket
 
 screen = (240, 320)
-screen = (320, 240)
+#screen = (320, 240)
 #screen = (360, 640)
 from threading import Timer
 

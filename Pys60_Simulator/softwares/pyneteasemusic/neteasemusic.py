@@ -345,10 +345,8 @@ class MyApp(Window):
         self.setFullScreen('full')
         self.loadLayout('myapp.xaml')
         texttips = self.getElementByName("texttips")
-        print(texttips)
-        texttips.Text = "测试"
         imageqrcode= self.getElementByName("imageqrcode")
-        print(imageqrcode)
+
 
 
 if __name__ == "__main__":

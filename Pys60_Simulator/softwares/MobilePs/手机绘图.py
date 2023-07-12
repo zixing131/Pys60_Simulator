@@ -6,7 +6,7 @@ mypath=path[:index]
 mypath2=path+"\\ImageDesigner\\"
 sys.path.append(mypath)
 sys.path.append(mypath2)
-'''
+
 import appuifw
 import sys
 from os import path, remove
@@ -14,10 +14,10 @@ __selfmodlist__ = ('main','improc','classes','wt_requester','wt_colormx','wt_ui'
 tocomp = []
 for f in __selfmodlist__:
   if path.exists('C:\\System\\Apps\\ImageDesigner\\palette.dat'):
-    drive = 'c:\\'
+    drive =mypath2
   else:
-    drive = 'e:\\'
-  sys.path.append(drive+'System\\Apps\\ImageDesigner')
+    drive =mypath2
+  sys.path.append(mypath2+'System\\Apps\\ImageDesigner')
   file = drive+'System\\Apps\\ImageDesigner\\' + f + '.py'.lower()
   source = drive+'System\\Apps\\ImageDesigner\\source\\' + f + '.py'.lower()
   if path.exists(file) and not path.exists(drive+'System\\Apps\\ImageDesigner\\dontcompile'): tocomp.append((file,source))
@@ -38,7 +38,6 @@ del __selfmodlist__
 del tocomp
 del file
 del source
-'''
 import main
 
 #while 1:

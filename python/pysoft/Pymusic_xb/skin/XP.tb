@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-s.skin_path="D:\\Users\\zixing\\Documents\\GitHub\\Pys60_Simulator_Private\\python\\pysoft\\Pymusic_xb\\skin\\XP.png"#背景路径
-s.logo_path="D:\\Users\\zixing\\Documents\\GitHub\\Pys60_Simulator_Private\\python\\pysoft\\Pymusic_xb\\logo.png"#启动图片
+s.skin_path="D:\\Users\\zixing\\Documents\\GitHub\\Pys60_Simulator\\python\\pysoft\\Pymusic_xb\\skin\\XP.png"#背景路径
+s.logo_path="D:\\Users\\zixing\\Documents\\GitHub\\Pys60_Simulator\\python\\pysoft\\Pymusic_xb\\logo.png"#启动图片
 s.menu_tag=0x010101  #菜单透明颜色
 s.cursor_tag=0x92213a  #光标透明颜色
 s.title_tag=0x891533  #标题栏透明颜色

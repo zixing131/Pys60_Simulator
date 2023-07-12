@@ -12,9 +12,12 @@ from os import path, abort
 from langimp import lang_load
 import wt_ui
 import wt_requester
+import traceback
 import conf
 import batch
 import kconfig
+from sysinfo import *
+from os import *
 
 __version__ = 1.4
 _beta = 2
@@ -39,18 +42,33 @@ program_path = mypath2
 __selfmodlist__ = (
 'improc', 'classes', 'wt_requester', 'wt_colormx', 'wt_ui', 'iniparser', 'langimp', 'SV_TRANS', 'conf', 'batch', 'mbm',
 'kconfig')
+import improc
+import classes
+import wt_requester
+import wt_colormx
+import wt_ui
+import iniparser
+import langimp
+import SV_TRANS
+import conf
+import batch
+
+import mbm
+import kconfig
+
 for t in __selfmodlist__:
 
     try:
         if sys.modules[t].__version__ != __version__:
-            appuifw.note(u'Incorect version of module: ' + unicode(t) + u'. Reinstall application.', 'error')
-            abort()
+            pass
+            #appuifw.note(u'Incorect version of module: ' + unicode(t) + u'. Reinstall application.', 'error')
+            #abort()
     except:
         None
         None
         None
-        appuifw.note(u'Incorect version of module: ' + unicode(t) + u'. Reinstall application.', 'error')
-        abort()
+        #appuifw.note(u'Incorect version of module: ' + unicode(t) + u'. Reinstall application.', 'error')
+        #abort()
 
 
 def logout(par1, par2='', par3='', par4=''):
