@@ -102,10 +102,10 @@ class Canvas(graphics.Image):
     def processKeyPressEvent(self, evt):
         flag = time.time() - self.lastkeytime
         self.lastkeytime = time.time()
-        keytype = 1
+        keytype = 2
         if(flag<0.1):
-            keytype = 2
-
+            keytype = 1
+        print(keytype)
         if evt.type == "2":
             mykey = evt.keysym.lower()
             key = -1
@@ -131,6 +131,8 @@ class Canvas(graphics.Image):
                     "type": keytype,
                     "modifiers": 0
                 }
+                if self.event_callback:
+                    self.event_callback(args)
                 self.callEvents(args)
 
             if key != -1:
@@ -140,6 +142,8 @@ class Canvas(graphics.Image):
                     "type": keytype,
                     "modifiers": 0
                 }
+                if self.event_callback:
+                    self.event_callback(args)
                 self.callEvents(args)
 
     def check_event_and_execute(self, event, button_event):
@@ -159,7 +163,7 @@ class Canvas(graphics.Image):
     # 处理键盘事件，ke为控件传递过来的键盘事件对象
     def processKeyUpEvent(self, evt):
         keytype = 3
-        print(evt)
+        print(keytype)
         if evt.type == "3":
             mykey = evt.keysym.lower()
             key = -1
