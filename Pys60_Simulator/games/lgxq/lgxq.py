@@ -40,8 +40,10 @@ class jbcs(object):
         return random.choice(na)
 
 
-import _md5
-
+try:
+    import  _md5
+except:
+    import md5 as _md5
 
 class gj(jbcs):
     def __init__(self):
