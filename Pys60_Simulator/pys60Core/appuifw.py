@@ -76,7 +76,7 @@ class Canvas(graphics.Image):
         self.cv.bind_all(sequence="<KeyRelease>", func=self.processKeyUpEvent)
         self.cv.bind_all(sequence="<Button-1>", func=self.mouseLeftButtonEvent)
         self.cv.bind_all(sequence="<ButtonRelease-1>", func=self.mouseLeftButtonReleaseEvent)
-
+        self.showingMenu = 0
         self.lastimg = None
         self.menu_key_handler = None
         self.size = screen
@@ -160,6 +160,16 @@ class Canvas(graphics.Image):
     def mouseLeftButtonReleaseEvent(self, event):
         self.check_event_and_execute(event, key_codes.EButton1Up)
 
+
+    def showMenu(self):
+        self.showingMenu = 1
+        self.menuBox = tk.Listbox(self.cv)
+        for item in app.menu:
+            self.menuBox.insert(tk.END, item[0])
+        self.menuwindow = self.cv.create_window((120, 160), window=self.menuBox, height=320, width=240)
+        while 1:
+            self.root.update()
+
     # 处理键盘事件，ke为控件传递过来的键盘事件对象
     def processKeyUpEvent(self, evt):
         keytype = 3
@@ -171,6 +181,23 @@ class Canvas(graphics.Image):
                 key = int(mykey)
             except:
                 key = -1
+
+            if (mykey == 'q'):
+                args = {"keycode": 0, "scancode": 164, "type": 3}
+                if (self.event_callback): self.event_callback(args)
+                if (self.showingMenu == 1):
+                    selectIndex = self.menuBox.curselection()[0]
+                    if (selectIndex != -1):
+                        app.menu[selectIndex][1]()
+                        self.showingMenu = 0
+                        self.cv.delete(self.menuwindow)
+                else:
+                    self.showMenu()
+            if (mykey == 'w'):
+                if (self.showingMenu == 1):
+                    self.showingMenu = 0
+                    self.cv.delete(self.menuwindow)
+                if (app.exit_key_handler): app.exit_key_handler()
 
             key_map = {
                 'q': (0, 164),
@@ -326,6 +353,7 @@ class Text_display():
 Listbox2 = Listbox
 
 class Application(object):
+
     def full_name(self):
         # Todo
         return "d:\\"
@@ -345,6 +373,7 @@ class Application(object):
         self.body = None
         self.screen = (screen[0], screen[1])
         # thread.start_new_thread(self.refush,())
+        self.menu=None
         self.exit_key_handler=None
 
     def focus(self):
