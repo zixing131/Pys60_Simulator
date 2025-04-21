@@ -4,15 +4,15 @@
 #######decompile2########
 
 
-from Pys60_Simulator.pys60Core.getdate import *
-from Pys60_Simulator.games.init_game import *
-from Pys60_Simulator.pys60Core.images import *
+from getdate import *
+from init_game import *
+from images import *
 import os
 import random
 import envy, appuifw as ap, e32, key_codes as kc
-
-mypath=u"..\\..\\python\\pygame\\2048_maps\\"
-
+import mypath as mp
+#mypath=u"..\\..\\python\\pygame\\2048_maps\\"
+mypath=mp.getmypath("\\python\\pygame\\2048_maps\\")
 def drawTime(string, locx, locy, img = readyimg):
     img.blit(DgtList[int(string[0])], target = (locx, locy), mask = Dgt_maskList[int(string[0])])
     img.blit(DgtList[int(string[1])], target = ((locx + 8), locy), mask = Dgt_maskList[int(string[1])])
@@ -182,6 +182,7 @@ def saveGame(slot):
 
 
 def loadGame(slot):
+    global won, dat_bak, sumscore_bak, read_values, sumscore, undo_chances, undo_option_flag, max_undo_chances, four, numlist, end
     won = 0
     dat_bak = []
     sumscore_bak = []
@@ -215,12 +216,12 @@ def loadGame(slot):
     else : 
         info.show(cn('找不到存档。'), (W, H), 2000, 0, ap.EHRightVTop)
         makedir(DATA_PATH)
-    global won, dat_bak, sumscore_bak, read_values, sumscore, undo_chances, undo_option_flag, max_undo_chances, four, numlist, end
 
 
 
 
 def readHighscoresFromDisk():
+    global hs
     if os.path.exists(DATA_PATH + '\\hsl.dat') : 
         f = open(DATA_PATH + '\\hsl.dat', 'r')
         for i in xrange(10):
@@ -233,7 +234,7 @@ def readHighscoresFromDisk():
     else : 
         hs = [[0, '0000000000'] for i in range(10)]
         saveHighscoresToDisk()
-    global hs
+
 
 
 
@@ -275,6 +276,7 @@ def deleteSav(slot):
 
 
 def rematch():
+    global hs, is_move, won, end, sumscore, dat, sumscore_flag, dat_bak, sumscore_bak, Xcode, max_undo_chances, undo_chances
     updateHighscoreList()
     saveHighscoresToDisk()
     hs = []
@@ -305,12 +307,12 @@ def rematch():
     paint_all()
     backupRecentData()
     e32.ao_sleep(0.05)
-    global hs, is_move, won, end, sumscore, dat, sumscore_flag, dat_bak, sumscore_bak, Xcode, max_undo_chances, undo_chances
 
 
 
 
 def startGame():
+    global UI_flag
     changeBackground()
     changeTileType()
     selectMenuBg(bg)
@@ -327,12 +329,12 @@ def startGame():
     paint_all()
     backupRecentData()
     UI_flag = 0
-    global UI_flag
 
 
 
 
 def execute(event):
+    global end, UI_flag, won
     if  not (UI_flag) : 
         if event['keycode'] == kc.EKeyLeftArrow or event['keycode'] == kc.EKey4 : 
             slide(-1, 0)
@@ -404,12 +406,13 @@ def execute(event):
             UI_flag = 0
             won = 0
         pass
-    global end, UI_flag, won
 
 
 
 
 def slide(dx, dy):
+    global won, is_move
+    global sumscore
     if dx == -1 : 
         for i in xrange(3):
             for x in xrange(1, (4 - i)):
@@ -481,12 +484,12 @@ def slide(dx, dy):
         paint_all()
         is_move = 0
         backupRecentData()
-    global won, is_move
 
 
 
 
 def move(a, b):
+    global is_move
     dx, dy = a
     x, y = b
     if dat[x][y] : 
@@ -576,7 +579,6 @@ def move(a, b):
                 is_move = 1
             pass
         pass
-    global is_move
 
 
 
@@ -649,6 +651,7 @@ def canmove():
 
 
 def undo():
+    global sumscore
     if len(dat_bak) > 1 and undo_chances : 
         dat_bak.pop(-1)
         sumscore_bak.pop(-1)
@@ -674,7 +677,6 @@ def undo():
         undo_chances -= 1
         drawNum(sumscore)
         paint_all()
-    global sumscore
 
 
 
@@ -705,6 +707,7 @@ def closeLoading():
 
 
 def changeTileType():
+    global MapPointer
     drawBg2()
     drawNum(sumscore)
     if os.path.exists(MAP_PATH) : 
@@ -716,7 +719,8 @@ def changeTileType():
             ap.note(cn('找不到图片！'), 'error')
         else : 
             MapPointer = (MapPointer < (len(maps) - 1) and MapPointer + 1) or 0
-            selectedmap = gr.Image.open(cn(MAP_PATH + '\\' + maps[MapPointer]))
+            #selectedmap = gr.Image.open(cn(MAP_PATH + '\\' + maps[MapPointer]))
+            selectedmap = gr.Image.open(cn(MAP_PATH + '\\' +'2048.png'))
             for j in xrange(4):
                 for i in xrange(4):
                     (tiles[(2 ** ((j * 4) + i + 1))]).blit(selectedmap, source = (((TILE * i), (TILE * j)), ((TILE * i) + TILE, (TILE * j) + TILE)))
@@ -731,12 +735,13 @@ def changeTileType():
             t.draw()
     backupLoading()
     paint_all()
-    global MapPointer
 
 
 
 
 def changeBackground():
+    global BgPointer
+
     if os.path.exists(BG_PATH) : 
         bgs = os.listdir(BG_PATH)
         for b in bgs:
@@ -773,22 +778,24 @@ def changeBackground():
             if t.visible : 
                 t.draw()
         paint_all()
-    global BgPointer
 
 
 
 
 def scroll(drt):
+
+    global screen_loc
     longimgBackup()
     screen_loc = screen_loc + (H * drt)
     longimgRead()
     paint_all()
-    global screen_loc
 
 
 
 
 def doMenuEvent(event):
+
+    global SelectedItem, UI_flag
     if event['keycode'] == kc.EKeyLeftArrow : 
         selectOption(-1)
     elif event['keycode'] == kc.EKeyUpArrow : 
@@ -870,12 +877,12 @@ def doMenuEvent(event):
         xcodeCheck(4)
     elif event['keycode'] == kc.EKey8 : 
         xcodeCheck(8)
-    global SelectedItem, UI_flag
 
 
 
 
 def selectOption(direction):
+    global snlg_flag, undo_option_flag, four, numlist
     readyimg.blit(mnbg)
     if SelectedItem == 0 : 
         if direction == -1 : 
@@ -907,7 +914,7 @@ def selectOption(direction):
     drawBars()
     drawBarNotes()
     paint_all()
-    global snlg_flag, undo_option_flag, four, numlist
+
 
 
 
@@ -939,12 +946,12 @@ def updateHighscoreList():
 
 
 def clearHighscoreList():
+    global sumscore_flag, hs
     sumscore_flag = 0
     hs = [[0, '0000000000'] for i in range(10)]
     hs.insert(0, [sumscore, today()])
     saveHighscoresToDisk()
     updateHighscoreList()
-    global sumscore_flag, hs
 
 
 
@@ -961,6 +968,8 @@ def showWin():
 
 
 def showDevelopOption():
+
+    global UI_flag, SlideRange
     UI_flag = 8
     devslt = ap.selection_list(DevelopOptionList)
     if devslt == 0 : 
@@ -1000,19 +1009,18 @@ def showDevelopOption():
             pass
         pass
     UI_flag = 2
-    global UI_flag, SlideRange
 
 
 
 
 def xcodeCheck(xinput):
+    global Xcode
     Xcode += str(xinput)
     if Xcode.endswith('2048') : 
         showDevelopOption()
         Xcode = '0000'
     else : 
         Xcode = Xcode[-4 : ]
-    global Xcode
 
 
 
@@ -1065,6 +1073,7 @@ class Tile :
 
 
 def backNexit():
+    global UI_flag, won
     if  not (UI_flag) : 
         if ap.query(cn('是否退出游戏？'), 'query') : 
             updateHighscoreList()
@@ -1085,7 +1094,6 @@ def backNexit():
         paint_all()
         UI_flag = 0
         won = 0
-    global UI_flag, won
 
 
 canvas = ap.Canvas(redraw_callback = redraw, event_callback = execute)

@@ -18,10 +18,14 @@ def cn2(string):
     return string.decode('utf-8')
 
 
-RES_PATH = os.getcwd()[0] + ':\\RESOURCE\\APPS\\SlideTiles_2.0'
-MAP_PATH = os.getcwd()[0] + ':\\data\\2048_maps'
-BG_PATH = os.getcwd()[0] + ':\\data\\2048_bg'
-mypath=u"..\\python\\pygame\\2048_maps\\"
+import mypath as mp
+#mypath=u"..\\..\\python\\pygame\\2048_maps\\"
+mypath=mp.getmypath("\\python\\pygame\\2048_maps\\")
+
+# RES_PATH = os.getcwd()[0] + ':\\RESOURCE\\APPS\\SlideTiles_2.0'
+# MAP_PATH = os.getcwd()[0] + ':\\data\\2048_maps'
+# BG_PATH = os.getcwd()[0] + ':\\data\\2048_bg'
+#mypath=u"..\\python\\pygame\\2048_maps\\"
 RES_PATH = mypath
 MAP_PATH =mypath
 BG_PATH =mypath
