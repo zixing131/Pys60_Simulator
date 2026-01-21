@@ -23,11 +23,11 @@ class SearchView(object):
         self.search_type = 'song'  # song, playlist
         
         # 组件
-        self.title = TextView(0, 5, width, 25, u'搜索', COLORS['TEXT'], 16)
+        self.title = TextView(0, 5, width, 25, cn('搜索'), COLORS['TEXT'], 16)
         self.title.align = 'center'
         
         # 搜索类型切换
-        self.type_tabs = [u'歌曲', u'歌单']
+        self.type_tabs = [cn('歌曲'), cn('歌单')]
         self.current_type_tab = 0
         
         # 列表视图
@@ -43,7 +43,7 @@ class SearchView(object):
     def show_search_input(self):
         """显示搜索输入框"""
         try:
-            keyword = appuifw.query(u'请输入搜索关键词:', 'text', self.keyword)
+            keyword = appuifw.query(cn('请输入搜索关键词:'), 'text', self.keyword)
             if keyword:
                 self.keyword = keyword
                 self.do_search()
@@ -108,7 +108,7 @@ class SearchView(object):
                 # 副标题：创建者
                 creator = playlist.get('creator', {})
                 if creator:
-                    item.subtitle = u'by ' + creator.get('nickname', '')
+                    item.subtitle = cn('by ') + cn(creator.get('nickname', ''))
                 
                 items.append(item)
         
@@ -182,7 +182,7 @@ class SearchView(object):
         # 绘制加载提示
         if self.loading:
             loading_text = TextView(0, self.height - 40, self.width, 20, 
-                                  u'搜索中...', COLORS['TEXT_GRAY'], FONT_SIZES['SMALL'])
+                                  cn('搜索中...'), COLORS['TEXT_GRAY'], FONT_SIZES['SMALL'])
             loading_text.align = 'center'
             loading_text.draw(img)
     

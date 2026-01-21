@@ -8,12 +8,17 @@ import os
 
 def cn(text):
     """转换UTF-8字符串为Unicode"""
+    if not text:
+        return u''
     try:
         if isinstance(text, unicode):
             return text
-        return text.decode('utf-8')
+        return unicode(text, 'utf-8')
     except:
-        return text
+        try:
+            return text.decode('utf-8')
+        except:
+            return text
 
 def to_str(text):
     """转换Unicode为UTF-8字符串"""

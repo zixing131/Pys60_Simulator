@@ -330,7 +330,7 @@ class NCMApi(object):
             'uid': str(uid),
             'limit': str(limit),
             'offset': str(offset),
-            'includeVideo': 'true' if include_video else 'false',
+            'includeVideo': 'false',
         }
         result = self._post('/api/user/playlist', data)
         return self._parse_json(result)

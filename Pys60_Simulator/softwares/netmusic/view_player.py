@@ -26,7 +26,7 @@ class PlayerView(object):
         
         # 组件
         # 标题
-        self.title = TextView(0, 10, width, 25, u'播放器', COLORS['TEXT'], 16)
+        self.title = TextView(0, 10, width, 25, cn('播放器'), COLORS['TEXT'], 16)
         self.title.align = 'center'
         
         # 歌曲封面（居中）
@@ -57,15 +57,15 @@ class PlayerView(object):
         
         # 上一曲
         self.btn_prev = Button((width - btn_width * 3 - 40) / 2, btn_y, btn_width, btn_height, 
-                               u'上一曲', self._on_prev)
+                               cn('上一曲'), self._on_prev)
         
         # 播放/暂停
         self.btn_play = Button((width - btn_width) / 2, btn_y, btn_width, btn_height,
-                              u'播放', self._on_toggle)
+                              cn('播放'), self._on_toggle)
         
         # 下一曲
         self.btn_next = Button((width + btn_width + 20) / 2, btn_y, btn_width, btn_height,
-                              u'下一曲', self._on_next)
+                              cn('下一曲'), self._on_next)
         
         # 设置播放器回调
         player.on_song_changed = self._on_song_changed
@@ -84,27 +84,27 @@ class PlayerView(object):
     def _on_play_state_changed(self, playing):
         """播放状态改变回调"""
         if playing:
-            self.btn_play.text = u'暂停'
+            self.btn_play.text = cn('暂停')
         else:
-            self.btn_play.text = u'播放'
+            self.btn_play.text = cn('播放')
     
     def _update_song_info(self):
         """更新歌曲信息"""
         if not self.song:
-            self.song_name.text = u'暂无歌曲'
+            self.song_name.text = cn('暂无歌曲')
             self.artist_name.text = ''
             return
         
         # 歌曲名
-        self.song_name.text = self.song.get('name', u'未知歌曲')
+        self.song_name.text = cn(self.song.get('name', '未知歌曲'))
         
         # 艺术家
         artists = self.song.get('ar', []) or self.song.get('artists', [])
         if artists:
-            artist_names = [a.get('name', '') for a in artists]
+            artist_names = [cn(a.get('name', '')) for a in artists]
             self.artist_name.text = ' / '.join(artist_names)
         else:
-            self.artist_name.text = u'未知艺术家'
+            self.artist_name.text = cn('未知艺术家')
         
         # TODO: 加载封面图片
     

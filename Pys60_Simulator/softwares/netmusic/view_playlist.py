@@ -25,7 +25,7 @@ class PlaylistView(object):
         
         # 组件
         # 标题栏
-        self.title = TextView(0, 5, width, 25, u'歌单详情', COLORS['TEXT'], 16)
+        self.title = TextView(0, 5, width, 25, cn('歌单详情'), COLORS['TEXT'], 16)
         self.title.align = 'center'
         
         # 歌单信息区域
@@ -63,11 +63,11 @@ class PlaylistView(object):
                 
                 creator = playlist.get('creator', {})
                 if creator:
-                    self.playlist_creator.text = u'创建者: ' + creator.get('nickname', '')
+                    self.playlist_creator.text = cn('创建者: ') + cn(creator.get('nickname', ''))
                 
                 track_count = playlist.get('trackCount', 0)
                 play_count = playlist.get('playCount', 0)
-                self.playlist_count.text = u'歌曲数: %d  播放: %s' % (track_count, format_count(play_count))
+                self.playlist_count.text = cn('歌曲数: %d  播放: %s' % (track_count, format_count(play_count)))
                 
                 # 获取歌曲列表
                 track_ids = playlist.get('trackIds', [])
@@ -172,7 +172,7 @@ class PlaylistView(object):
         # 绘制加载提示
         if self.loading:
             loading_text = TextView(0, self.height - 40, self.width, 20, 
-                                  u'加载中...', COLORS['TEXT_GRAY'], FONT_SIZES['SMALL'])
+                                  cn('加载中...'), COLORS['TEXT_GRAY'], FONT_SIZES['SMALL'])
             loading_text.align = 'center'
             loading_text.draw(img)
     

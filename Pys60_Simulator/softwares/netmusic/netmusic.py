@@ -66,11 +66,12 @@ class NetMusicApp(object):
     
     def setup_menu(self):
         """设置菜单"""
+        from utils import cn as decode_text
         self.menu_items = [
-            (u'主页', self._show_home),
-            (u'搜索', self._show_search),
-            (u'播放器', self._show_player),
-            (u'退出', self.exit),
+            (decode_text('主页'), self._show_home),
+            (decode_text('搜索'), self._show_search),
+            (decode_text('播放器'), self._show_player),
+            (decode_text('退出'), self.exit),
         ]
         appuifw.app.menu = self.menu_items
     
@@ -304,7 +305,8 @@ class NetMusicApp(object):
     
     def exit(self):
         """退出应用"""
-        if ui.query(cn("要退出吗？"), "query"):
+        from utils import cn as decode_cn
+        if ui.query(decode_cn("要退出吗？"), "query"):
             self.running = 0
             # 清理
             try:

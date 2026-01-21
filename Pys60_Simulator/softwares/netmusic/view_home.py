@@ -19,11 +19,11 @@ class HomeView(object):
         self.on_search_click = on_search_click
         
         # 标签页
-        self.tabs = [u'推荐歌单', u'最新歌曲', u'热门歌单']
+        self.tabs = [cn('推荐歌单'), cn('最新歌曲'), cn('热门歌单')]
         self.current_tab = 0
         
         # 组件
-        self.title_bar = TextView(0, 0, width, 30, u'网易云音乐', COLORS['TEXT'], 16)
+        self.title_bar = TextView(0, 0, width, 30, cn('网易云音乐'), COLORS['TEXT'], 16)
         self.title_bar.align = 'center'
         
         # 列表视图
@@ -90,7 +90,7 @@ class HomeView(object):
                         count_str = '%.1f万' % (play_count / 10000.0)
                     else:
                         count_str = str(play_count)
-                    item.subtitle = u'播放量: ' + count_str
+                    item.subtitle = cn('播放量: ') + count_str
                 
                 items.append(item)
         
@@ -183,14 +183,14 @@ class HomeView(object):
             if not self.loading and len(self.list_view.items) == 0:
                 hint_y = self.height / 2
                 hint_text = TextView(0, hint_y, self.width, 25, 
-                                   u'按确认键加载数据', COLORS['TEXT_GRAY'], FONT_SIZES['NORMAL'])
+                                   cn('按确认键加载数据'), COLORS['TEXT_GRAY'], FONT_SIZES['NORMAL'])
                 hint_text.align = 'center'
                 hint_text.draw(img)
             
             # 绘制加载提示
             if self.loading:
                 loading_y = self.height - 40
-                loading_text = TextView(0, loading_y, self.width, 20, u'加载中...', 
+                loading_text = TextView(0, loading_y, self.width, 20, cn('加载中...'), 
                                        COLORS['TEXT_GRAY'], FONT_SIZES['SMALL'])
                 loading_text.align = 'center'
                 loading_text.draw(img)

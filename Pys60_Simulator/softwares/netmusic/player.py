@@ -195,13 +195,14 @@ class MusicPlayer(object):
     
     def get_playback_mode_name(self):
         """获取播放模式名称"""
+        from utils import cn
         if self.playback_mode == PLAYBACK_MODE['ORDER']:
-            return u'顺序播放'
+            return cn('顺序播放')
         elif self.playback_mode == PLAYBACK_MODE['SHUFFLE']:
-            return u'随机播放'
+            return cn('随机播放')
         elif self.playback_mode == PLAYBACK_MODE['LOOP']:
-            return u'单曲循环'
-        return u'未知'
+            return cn('单曲循环')
+        return cn('未知')
     
     def get_progress(self):
         """获取播放进度 0.0 ~ 1.0"""
