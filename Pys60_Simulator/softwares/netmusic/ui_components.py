@@ -52,21 +52,25 @@ class TextView(UIComponent):
         if not self.visible or not self.text:
             return
         
-        text = cn(self.text)
-        font = ('dense', self.font_size)
-        
-        # 计算文本位置
-        if self.align == 'center':
-            text_width = img.measure_text(text, font)[0][2]
-            x = self.x + (self.width - text_width) / 2
-        elif self.align == 'right':
-            text_width = img.measure_text(text, font)[0][2]
-            x = self.x + self.width - text_width
-        else:
-            x = self.x
-        
-        y = self.y + self.height - 5
-        img.text((x, y), text, self.color, font=font)
+        try:
+            text = cn(self.text)
+            font = ('dense', self.font_size)
+            
+            # 计算文本位置
+            if self.align == 'center':
+                text_width = img.measure_text(text, font)[0][2]
+                x = self.x + (self.width - text_width) / 2
+            elif self.align == 'right':
+                text_width = img.measure_text(text, font)[0][2]
+                x = self.x + self.width - text_width
+            else:
+                x = self.x
+            
+            y = self.y + self.height - 5
+            img.text((x, y), text, self.color, font=font)
+        except Exception, e:
+            print('TextView draw error:', str(e))
+            print('Text:', self.text)
 
 class ImageView(UIComponent):
     """图片显示组件"""
@@ -215,34 +219,41 @@ class ListView(UIComponent):
         self.scroll_offset = 0
     
     def draw(self, img):
+        """绘制视图"""
         if not self.visible:
             return
         
-        # 绘制背景
-        if self.background:
-            img.rectangle((self.x, self.y, self.x + self.width, self.y + self.height),
-                         fill=self.background, outline=self.background)
-        
-        # 计算可见项
-        visible_count = self.height / self.item_height
-        start_index = self.scroll_offset
-        end_index = min(start_index + visible_count + 1, len(self.items))
-        
-        # 绘制列表项
-        y_offset = self.y - (self.scroll_offset % self.item_height)
-        for i in range(start_index, end_index):
-            if i >= len(self.items):
-                break
+        try:
+            # 绘制背景
+            if self.background:
+                img.rectangle((self.x, self.y, self.x + self.width, self.y + self.height),
+                             fill=self.background, outline=self.background)
             
-            item = self.items[i]
-            item.x = self.x
-            item.y = y_offset
-            item.width = self.width
-            item.height = self.item_height
-            item.selected = (i == self.selected_index)
-            item.draw(img)
+            # 计算可见项
+            if len(self.items) == 0:
+                return
             
-            y_offset += self.item_height
+            visible_count = self.height / self.item_height
+            start_index = self.scroll_offset
+            end_index = min(start_index + visible_count + 1, len(self.items))
+            
+            # 绘制列表项
+            y_offset = self.y - (self.scroll_offset % self.item_height)
+            for i in range(start_index, end_index):
+                if i >= len(self.items):
+                    break
+                
+                item = self.items[i]
+                item.x = self.x
+                item.y = y_offset
+                item.width = self.width
+                item.height = self.item_height
+                item.selected = (i == self.selected_index)
+                item.draw(img)
+                
+                y_offset += self.item_height
+        except Exception, e:
+            print('ListView draw error:', str(e))
     
     def scroll_up(self):
         """向上滚动"""

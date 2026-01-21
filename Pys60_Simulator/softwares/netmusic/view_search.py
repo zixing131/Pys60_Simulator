@@ -62,21 +62,23 @@ class SearchView(object):
         
         try:
             if self.search_type == 'song':
-                # 搜索歌曲
-                result = api.search_song(self.keyword, limit=30)
+                # 搜索歌曲 type=1
+                result = api.cloudsearch(self.keyword, search_type=1, limit=30)
                 if result and result.get('code') == 200:
                     songs_data = result.get('result', {})
                     self.results = songs_data.get('songs', [])
                     self._update_list()
             else:
-                # 搜索歌单
-                result = api.search_playlist(self.keyword, limit=30)
+                # 搜索歌单 type=1000
+                result = api.cloudsearch(self.keyword, search_type=1000, limit=30)
                 if result and result.get('code') == 200:
                     playlist_data = result.get('result', {})
                     self.results = playlist_data.get('playlists', [])
                     self._update_list()
         except Exception, e:
             print('Search error:', str(e))
+            import traceback
+            traceback.print_exc()
         
         self.loading = False
     

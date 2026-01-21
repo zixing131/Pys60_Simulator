@@ -74,7 +74,7 @@ class MusicPlayer(object):
                 return False
             
             # 获取播放 URL
-            url_result = api.get_song_url(song_id)
+            url_result = api.song_url(song_id)
             if url_result and url_result.get('code') == 200:
                 data = url_result.get('data', [])
                 if data and len(data) > 0:

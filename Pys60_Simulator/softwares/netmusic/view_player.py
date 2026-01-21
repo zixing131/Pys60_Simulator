@@ -115,13 +115,15 @@ class PlayerView(object):
         
         try:
             song_id = self.song.get('id')
-            result = api.get_lyric(song_id)
+            result = api.song_lyric(song_id)
             if result and result.get('code') == 200:
                 lrc = result.get('lrc', {})
                 lyric_text = lrc.get('lyric', '')
                 self.lyric_lines = self._parse_lyric(lyric_text)
-        except:
-            pass
+        except Exception, e:
+            print('Load lyric error:', str(e))
+            import traceback
+            traceback.print_exc()
     
     def _parse_lyric(self, lyric_text):
         """解析歌词"""

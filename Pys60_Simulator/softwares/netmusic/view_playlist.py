@@ -53,7 +53,7 @@ class PlaylistView(object):
         self.playlist_id = playlist_id
         
         try:
-            result = api.get_playlist_detail(playlist_id)
+            result = api.playlist_detail(playlist_id)
             if result and result.get('code') == 200:
                 playlist = result.get('playlist', {})
                 self.playlist_info = playlist
@@ -78,6 +78,8 @@ class PlaylistView(object):
                         self._load_songs(ids)
         except Exception, e:
             print('Load playlist error:', str(e))
+            import traceback
+            traceback.print_exc()
         
         self.loading = False
     
@@ -90,9 +92,8 @@ class PlaylistView(object):
             
             for i in range(0, len(song_ids), batch_size):
                 batch_ids = song_ids[i:i+batch_size]
-                ids_str = ','.join(batch_ids)
                 
-                result = api.get_song_detail(ids_str)
+                result = api.song_detail(batch_ids)
                 if result and result.get('code') == 200:
                     songs = result.get('songs', [])
                     all_songs.extend(songs)
@@ -101,6 +102,8 @@ class PlaylistView(object):
             self._update_list()
         except Exception, e:
             print('Load songs error:', str(e))
+            import traceback
+            traceback.print_exc()
     
     def _update_list(self):
         """更新列表"""

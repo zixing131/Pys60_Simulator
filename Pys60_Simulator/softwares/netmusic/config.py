@@ -5,7 +5,7 @@
 """
 
 # API 基础地址
-API_BASE_URL = 'http://music.zixing.fun:3000'
+API_BASE_URL = "http://music.163.com"
 
 # 屏幕分辨率配置
 SCREEN_SIZES = {

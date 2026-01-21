@@ -82,7 +82,8 @@ class NetMusicApp(object):
             on_playlist_click=self._on_playlist_click,
             on_search_click=self._show_search
         )
-        home_view.load_data()
+        # 不在初始化时加载数据，让用户手动触发
+        # home_view.load_data()
         self.current_view = home_view
         self.redraw()
     

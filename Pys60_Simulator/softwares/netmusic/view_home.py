@@ -47,25 +47,27 @@ class HomeView(object):
         try:
             if self.current_tab == 0:
                 # 推荐歌单
-                result = api.get_personalized_playlist(limit=20)
+                result = api.personalized_playlist(limit=20)
                 if result and result.get('code') == 200:
                     self.playlists = result.get('result', [])
                     self._update_list()
             elif self.current_tab == 1:
                 # 最新歌曲
-                result = api.get_personalized_newsong(limit=20)
+                result = api.personalized_newsong(limit=20)
                 if result and result.get('code') == 200:
                     songs_data = result.get('result', [])
                     self.songs = [item.get('song', {}) for item in songs_data if item.get('song')]
                     self._update_list()
             elif self.current_tab == 2:
                 # 热门歌单
-                result = api.get_top_playlist(limit=20)
+                result = api.top_playlist(limit=20)
                 if result and result.get('code') == 200:
                     self.playlists = result.get('playlists', [])
                     self._update_list()
         except Exception, e:
             print('Load data error:', str(e))
+            import traceback
+            traceback.print_exc()
         
         self.loading = False
     
@@ -144,47 +146,66 @@ class HomeView(object):
     
     def draw(self, img):
         """绘制视图"""
-        # 清空背景
-        img.clear(COLORS['BACKGROUND'])
-        
-        # 绘制标题栏
-        self.title_bar.draw(img)
-        
-        # 绘制标签栏
-        tab_y = 30
-        tab_height = 30
-        tab_width = self.width / len(self.tabs)
-        
-        for i, tab_name in enumerate(self.tabs):
-            x = i * tab_width
-            if i == self.current_tab:
-                color = COLORS['PRIMARY']
-            else:
-                color = COLORS['TEXT_GRAY']
+        try:
+            # 清空背景
+            img.clear(COLORS['BACKGROUND'])
             
-            # 标签文本
-            tab_text = TextView(x, tab_y, tab_width, tab_height, tab_name, color, FONT_SIZES['NORMAL'])
-            tab_text.align = 'center'
-            tab_text.draw(img)
+            # 绘制标题栏
+            self.title_bar.draw(img)
             
-            # 选中指示器
-            if i == self.current_tab:
-                indicator_y = tab_y + tab_height - 3
-                img.rectangle((x + tab_width/4, indicator_y, x + tab_width*3/4, indicator_y + 3),
-                             fill=COLORS['PRIMARY'], outline=COLORS['PRIMARY'])
-        
-        # 绘制列表
-        self.list_view.draw(img)
-        
-        # 绘制加载提示
-        if self.loading:
-            loading_text = TextView(0, self.height - 40, self.width, 20, u'加载中...', 
-                                   COLORS['TEXT_GRAY'], FONT_SIZES['SMALL'])
-            loading_text.align = 'center'
-            loading_text.draw(img)
+            # 绘制标签栏
+            tab_y = 30
+            tab_height = 30
+            tab_width = self.width / len(self.tabs)
+            
+            for i, tab_name in enumerate(self.tabs):
+                x = i * tab_width
+                if i == self.current_tab:
+                    color = COLORS['PRIMARY']
+                else:
+                    color = COLORS['TEXT_GRAY']
+                
+                # 标签文本
+                tab_text = TextView(x, tab_y, tab_width, tab_height, tab_name, color, FONT_SIZES['NORMAL'])
+                tab_text.align = 'center'
+                tab_text.draw(img)
+                
+                # 选中指示器
+                if i == self.current_tab:
+                    indicator_y = tab_y + tab_height - 3
+                    img.rectangle((x + tab_width/4, indicator_y, x + tab_width*3/4, indicator_y + 3),
+                                 fill=COLORS['PRIMARY'], outline=COLORS['PRIMARY'])
+            
+            # 绘制列表
+            self.list_view.draw(img)
+            
+            # 如果没有数据且不在加载中，显示提示
+            if not self.loading and len(self.list_view.items) == 0:
+                hint_y = self.height / 2
+                hint_text = TextView(0, hint_y, self.width, 25, 
+                                   u'按确认键加载数据', COLORS['TEXT_GRAY'], FONT_SIZES['NORMAL'])
+                hint_text.align = 'center'
+                hint_text.draw(img)
+            
+            # 绘制加载提示
+            if self.loading:
+                loading_y = self.height - 40
+                loading_text = TextView(0, loading_y, self.width, 20, u'加载中...', 
+                                       COLORS['TEXT_GRAY'], FONT_SIZES['SMALL'])
+                loading_text.align = 'center'
+                loading_text.draw(img)
+        except Exception, e:
+            print('HomeView draw error:', str(e))
+            import traceback
+            traceback.print_exc()
     
     def handle_key(self, key):
         """处理按键事件"""
+        # 如果没有数据，按确认键加载
+        if key == 'select' and len(self.list_view.items) == 0:
+            self.load_data()
+            return
+        
         if key == 'up':
             self.list_view.scroll_up()
         elif key == 'down':
