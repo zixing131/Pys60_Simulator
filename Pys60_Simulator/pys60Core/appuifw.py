@@ -372,6 +372,7 @@ class Application(object):
         pass
 
     def __init__(self, **keys):
+        self.title= 'title'
         self.running = 1
         self.CC = None
         self.body = None

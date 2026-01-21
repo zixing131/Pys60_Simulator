@@ -39,7 +39,7 @@ class Sound(object):
     def open(filename):
         player=Sound()
         # Load the music file
-        pygame.mixer.music.load("your_music_file.mp3")
+        #pygame.mixer.music.load("your_music_file.mp3")
         return player
     open=staticmethod(open)
     def _say(text):
