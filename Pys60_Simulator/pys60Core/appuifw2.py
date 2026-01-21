@@ -3,16 +3,18 @@
 # from _appuifw import *
 from key_codes import *
 import key_codes
+
 try:  # import as appropriate for 2.x vs. 3.x
     import tkinter as tk
+    from tkinter import messagebox as tkMessageBox
 except:
     import Tkinter as tk
-import tkMessageBox
+    import tkMessageBox
 import pys60Socket
 
 screen = (240, 320)
-screen = (320, 240)
-#screen = (360, 640)
+# screen = (320, 240)
+# screen = (360, 640)
 from threading import Timer
 
 FFormEditModeOnly = 2
@@ -34,41 +36,52 @@ EScreen = 1
 EHLeftVTop = 0
 root = tk.Tk()
 root.title('Pys60 Simulator')
-root.geometry(str(screen[0])+'x'+str(screen[1]))
+root.geometry(str(screen[0]) + 'x' + str(screen[1]))
 root.resizable(0, 0)
 
 cv = tk.Canvas(root, width=screen[0], height=screen[1], background='white')
 
+
 def on_closing():
     abort()
 
+
 root.protocol("WM_DELETE_WINDOW", on_closing)
+
 
 def available_fonts():
     return ['dense', 'normal']
+
+
 class Form(list):
-    def __init__(self,optcont,flags):
+    def __init__(self, optcont, flags):
         pass
-    def bind(self,keycode,nextitem):
+
+    def bind(self, keycode, nextitem):
         pass
+
     def __getitem__(self, item):
         return [[1 for i in range(10)] for i in range(10)]
 
+
 class Listbox():
-    def __init__(self,lst,itemevent):
+    def __init__(self, lst, itemevent):
         pass
-    def bind(self,keycode,nextitem):
+
+    def bind(self, keycode, nextitem):
         pass
-    def set_list(self,lst,it):
+
+    def set_list(self, lst, it):
         pass
+
 
 class Canvas(graphics.Image):
     def __init__(self, redraw_callback=None, event_callback=None, resize_callback=None):
-        graphics.Image.__init__(self, screen, None,self)
+        graphics.Image.__init__(self, screen, None, self)
         self.redraw_callback = redraw_callback
         self.event_callback = event_callback
         self.root = root
-        self.root.geometry(str(screen[0])+'x'+str(screen[1]))
+        self.root.geometry(str(screen[0]) + 'x' + str(screen[1]))
         self.root.resizable(0, 0)
         self.cv = cv
         self.cv.pack(fill=tk.BOTH, expand=tk.YES)
@@ -76,7 +89,7 @@ class Canvas(graphics.Image):
         self.cv.bind_all(sequence="<KeyRelease>", func=self.processKeyUpEvent)
         self.cv.bind_all(sequence="<Button-1>", func=self.mouseLeftButtonEvent)
         self.cv.bind_all(sequence="<ButtonRelease-1>", func=self.mouseLeftButtonReleaseEvent)
-
+        self.showingMenu = 0
         self.lastimg = None
         self.menu_key_handler = None
         self.size = screen
@@ -84,6 +97,7 @@ class Canvas(graphics.Image):
         self.lastkeytime = time.time()
         self.allEvents = []
         self.allTouchEvents = []
+        self.pressed_keys = set()  # 追踪当前按下的键
 
     def begin_redraw(self):
         print('begin_redraw')
@@ -100,47 +114,20 @@ class Canvas(graphics.Image):
                 i[1]()
 
     def processKeyPressEvent(self, evt):
-        flag = time.time() - self.lastkeytime
-        self.lastkeytime = time.time()
-        keytype = 1
-        if(flag<0.1):
-            keytype = 2
-
         if evt.type == "2":
             mykey = evt.keysym.lower()
-            key = -1
-            try:
-                key = int(mykey)
-            except:
-                key = -1
-            key_mapping = {
-                'q': (0, 164),
-                'w': (0, 165),
-                'up': (63497, 16),
-                'down': (63498, 17),
-                'left': (63495, 14),
-                'right': (63496, 15),
-               'space': (63557, 167),
-                'backspace': (8, 0)
-            }
 
-            if mykey in key_mapping:
-                args = {
-                    "keycode": key_mapping[mykey][0],
-                    "scancode": key_mapping[mykey][1],
-                    "type": keytype,
-                    "modifiers": 0
-                }
-                self.callEvents(args)
+            # 防止按键重复触发 - 如果键已经被按下，则忽略
+            if mykey in self.pressed_keys:
+                return
 
-            if key != -1:
-                args = {
-                    "keycode": 0x30 + key,
-                    "scancode": 1,
-                    "type": keytype,
-                    "modifiers": 0
-                }
-                self.callEvents(args)
+            # 标记键为已按下状态
+            self.pressed_keys.add(mykey)
+
+            # 注意：按键按下时只记录状态，不触发游戏事件
+            # 游戏事件会在 processKeyUpEvent (按键释放) 时触发
+            # 这样可以避免菜单等操作被触发两次
+            print("KeyPress: %s (recorded, no callback)" % mykey)
 
     def check_event_and_execute(self, event, button_event):
         for evt in self.allTouchEvents:
@@ -156,17 +143,54 @@ class Canvas(graphics.Image):
     def mouseLeftButtonReleaseEvent(self, event):
         self.check_event_and_execute(event, key_codes.EButton1Up)
 
+    def showMenu(self):
+        # 检查菜单是否已定义
+        if app.menu is None or len(app.menu) == 0:
+            return
+
+        self.showingMenu = 1
+        self.menuBox = tk.Listbox(self.cv)
+        for item in app.menu:
+            self.menuBox.insert(tk.END, item[0])
+        self.menuwindow = self.cv.create_window((120, 160), window=self.menuBox, height=320, width=240)
+        while 1:
+            self.root.update()
+
     # 处理键盘事件，ke为控件传递过来的键盘事件对象
     def processKeyUpEvent(self, evt):
         keytype = 3
-        print(evt)
         if evt.type == "3":
             mykey = evt.keysym.lower()
+
+            # 清除按下状态
+            if mykey in self.pressed_keys:
+                self.pressed_keys.remove(mykey)
+
+            print("KeyRelease: %s, type: %d" % (mykey, keytype))
+
             key = -1
             try:
                 key = int(mykey)
             except:
                 key = -1
+
+            if (mykey == 'q'):
+                args = {"keycode": 0, "scancode": 164, "type": 3}
+                if (self.event_callback): self.event_callback(args)
+                if (self.showingMenu == 1):
+                    selectIndex = self.menuBox.curselection()[0]
+                    if (selectIndex != -1):
+                        app.menu[selectIndex][1]()
+                        self.showingMenu = 0
+                        self.cv.delete(self.menuwindow)
+                else:
+                    self.showMenu()
+            if (mykey == 'w'):
+                if (self.showingMenu == 1):
+                    self.showingMenu = 0
+                    if hasattr(self, 'menuwindow'):
+                        self.cv.delete(self.menuwindow)
+                if (app.exit_key_handler): app.exit_key_handler()
 
             key_map = {
                 'q': (0, 164),
@@ -188,8 +212,8 @@ class Canvas(graphics.Image):
                 }
                 if self.event_callback:
                     self.event_callback(args)
-                if mykey == 'w' and app.exit_key_handler:
-                    app.exit_key_handler()
+                # 注意：W 键的 exit_key_handler 已经在前面（第177-182行）处理过了
+                # 这里不再重复调用，避免触发两次
                 self.callEvents(args)
 
             if key != -1:
@@ -207,16 +231,11 @@ class Canvas(graphics.Image):
             pass
             # print("鼠标： %s" % evt.num)
 
-    def blit(self,img,source=None,target=None,scale=False,mask=None):
-        graphics.Image.blit(self,img,source,target,scale,mask)
+    def blit(self, img, source=None, target=None, scale=False, mask=None):
+        graphics.Image.blit(self, img, source, target, scale, mask)
+
     def clear(self, color):
         graphics.Image.clear(self, color)
-
-    def bind(self, key, event, point=0):
-        if 0x101 <= key <= 0x10A:
-            self.allTouchEvents.append((key, event, point))
-        else:
-            self.allEvents.append((key, event))
 
     def blitSelf(self):
         try:
@@ -226,6 +245,13 @@ class Canvas(graphics.Image):
             self.root.update()
         except Exception as e:
             print(e)
+
+    def bind(self, key, event, point=0):
+        if 0x101 <= key <= 0x10A:
+            self.allTouchEvents.append((key, event, point))
+        else:
+            self.allEvents.append((key, event))
+
     def update(self):
         self.redraw()
 
@@ -258,6 +284,10 @@ class Text(object):
         self.font = ['font1', 'font2']
 
     def showMenu(self):
+        # 检查菜单是否已定义
+        if app.menu is None or len(app.menu) == 0:
+            return
+
         self.showingMenu = 1
         self.menuBox = tk.Listbox(self.cv)
         for item in app.menu:
@@ -282,13 +312,15 @@ class Text(object):
                     if (selectIndex != -1):
                         app.menu[selectIndex][1]()
                         self.showingMenu = 0
-                        self.cv.delete(self.menuwindow)
+                        if hasattr(self, 'menuwindow'):
+                            self.cv.delete(self.menuwindow)
                 else:
                     self.showMenu()
             if (mykey == 'w'):
                 if (self.showingMenu == 1):
                     self.showingMenu = 0
-                    self.cv.delete(self.menuwindow)
+                    if hasattr(self, 'menuwindow'):
+                        self.cv.delete(self.menuwindow)
                 if (app.exit_key_handler): app.exit_key_handler()
             if (key != -1):
                 args = {"keycode": 0x30 + key, "scancode": 0x30 + key, "type": 1}
@@ -300,7 +332,7 @@ class Text(object):
                 args = {"keycode": 63498, "scancode": key_codes.EScancodeDownArrow, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'left'):
-                args = {"keycode": 63495, "scancode":  key_codes.EScancodeLeftArrow, "type": 1}
+                args = {"keycode": 63495, "scancode": key_codes.EScancodeLeftArrow, "type": 1}
                 if (self.event_callback): self.event_callback(args)
             if (mykey == 'right'):
                 args = {"keycode": 63496, "scancode": key_codes.EScancodeRightArrow, "type": 1}
@@ -319,9 +351,13 @@ class Text_display():
     def __init__(self, text, skinned):
         self.text = text
         self.skinned = skinned
+
+
 Listbox2 = Listbox
 
+
 class Application(object):
+
     def full_name(self):
         # Todo
         return "d:\\"
@@ -329,10 +365,10 @@ class Application(object):
     def set_exit(self):
         pass
 
-    def set_tabs(self,N,c):
+    def set_tabs(self, N, c):
         pass
 
-    def activate_tab(self,N):
+    def activate_tab(self, N):
         pass
 
     def __init__(self, **keys):
@@ -341,10 +377,12 @@ class Application(object):
         self.body = None
         self.screen = (screen[0], screen[1])
         # thread.start_new_thread(self.refush,())
-        self.exit_key_handler=None
+        self.menu = None
+        self.exit_key_handler = None
 
     def focus(self):
         pass
+
     def refush(self):
         while self.running:
             if (self.body != None):
@@ -354,7 +392,7 @@ class Application(object):
     def layout(self, d):
         return [screen]
 
-    def redraw(self,t=1):
+    def redraw(self, t=1):
         if (self.body):
             self.body.redraw()
 
@@ -366,14 +404,16 @@ class Application(object):
         try:
             if (self.body):
                 self.body.update()
-            if(root):
+            if (root):
                 root.update()
         # self.body.redraw()
         except Exception as ex:
             print(ex)
         # time.sleep(0.1)
 
+
 app = Application()
+
 
 def abort():
     app.running = 0
@@ -384,16 +424,15 @@ def abort():
 os.abort = abort
 
 
-def note(text, type='info',wait=3):
+def note(text, type='info', wait=3):
     if type == "error":
         tkMessageBox.showerror(type.title(), text)
     else:
         tkMessageBox.showinfo(type.title(), text)
 
 
-def query(text, type='info',defalutvalue=''):
+def query(text, type='info', defalutvalue=''):
     return True
-
 
 
 class popup:
@@ -407,14 +446,18 @@ class popup:
 def InfoPopup():
     return popup()
 
-def popup_menu(name,den):
+
+def popup_menu(name, den):
     return 0
+
 
 class text:
     @staticmethod
     def measure_text(text, font):
-        return graphics.getTextFontWidth(text,font)
+        return graphics.getTextFontWidth(text, font)
+
+
 import e32
 
 e32 = e32
-graphics.app=app
+graphics.app = app
