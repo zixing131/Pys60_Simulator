@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-path = os.getcwd()
-index = path.rfind('\\')
-path=path[:index]
-sys.path.append(path)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import appuifw as ui
 from zui import *
 

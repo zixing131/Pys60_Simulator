@@ -1,5 +1,7 @@
 """SQLite backend for Nokia's original contacts Python wrapper."""
+from _compat import text_type as str
 
+from _compat import casefold
 import copy
 import json
 import time
@@ -86,7 +88,7 @@ class Database:
             if any(
                 f["storagetype"] == storage_type_text
                 and set(fields).intersection(self.templates[f["template"]][0])
-                and term.casefold() in f["value"].casefold()
+                and casefold(term) in casefold(f["value"])
                 for f in self.store.get(key)["fields"]
             )
         ]

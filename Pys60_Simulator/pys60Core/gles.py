@@ -5,8 +5,9 @@ NotImplementedError; CheckExtension reports them as unavailable.
 """
 
 import re
+from _compat import string_types
 import numpy as _np
-from OpenGL import GL as _GL
+from _opengl import GL as _GL
 from OpenGL.error import GLError
 from _gles_manifest import CONSTANTS, METHODS, FORMATS
 from _gl_backend import current as _current
@@ -36,7 +37,7 @@ def _flat(value):
     if isinstance(value, _np.ndarray):
         return value.reshape(-1).tolist()
     if isinstance(value, (bytes, bytearray)):
-        return list(value)
+        return list(bytearray(value))
     result = []
     for item in value:
         if isinstance(item, (list, tuple, array, _np.ndarray)):
@@ -380,7 +381,7 @@ def CheckExtension(function):
     _current()
     if isinstance(function, bytes):
         function = function.decode("ascii")
-    if not isinstance(function, str):
+    if not isinstance(function, string_types):
         raise TypeError("function name expected")
     candidate = globals().get(function)
     return bool(candidate is not None and not getattr(candidate, "_unsupported", False))
@@ -507,15 +508,15 @@ for _name in METHODS:
     if "OES" in _name:
         globals()[_name] = _unsupported(_name)
         continue
-    _match = re.fullmatch(
-        r"(gl(?:Vertex|Color|Normal|TexCoord)Pointer)(ub|us|b|s|f|x)?", _name
+    _match = re.match(
+        r"(gl(?:Vertex|Color|Normal|TexCoord)Pointer)(ub|us|b|s|f|x)?\Z", _name
     )
     if _match:
-        globals()[_name] = _pointer_wrapper(_match[1], _match[2])
+        globals()[_name] = _pointer_wrapper(_match.group(1), _match.group(2))
         continue
-    _match = re.fullmatch(r"(glBuffer(?:Sub)?Data)(ub|us|b|s|f|x)?", _name)
+    _match = re.match(r"(glBuffer(?:Sub)?Data)(ub|us|b|s|f|x)?\Z", _name)
     if _match:
-        globals()[_name] = _buffer_wrapper(_match[1], _match[2])
+        globals()[_name] = _buffer_wrapper(_match.group(1), _match.group(2))
         continue
     globals()[_name] = _generic(_name)
 __all__ = list(CONSTANTS) + METHODS + ["GLError"]

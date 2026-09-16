@@ -17,7 +17,7 @@ class sensor:
     def __init__(self, sensor_id, category_id):
         if {"id": sensor_id, "category": category_id} not in list(sensors().values()):
             raise e32.SymbianError(-1, "sensor not found")
-        self.id, self.callback, self.owner = sensor_id, None, threading.get_ident()
+        self.id, self.callback, self.owner = sensor_id, None, threading.current_thread().ident
 
     def connect(self, callback):
         if not callable(callback):

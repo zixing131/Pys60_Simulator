@@ -1,3 +1,4 @@
+from _compat import text_type as str
 #
 # calendar.py
 #
@@ -428,11 +429,18 @@ def open(dbfile=None, mode=None):
 
 
 # Preserve the host standard library calendar API for third-party packages.
-import os as _os, sysconfig as _sysconfig
+import os as _os, sysconfig as _sysconfig, types as _types, sys as _sys
 
 _stdlib_path = _os.path.join(_sysconfig.get_path("stdlib"), "calendar.py")
-_stdlib_namespace = {"__name__": "_stdlib_calendar"}
-with __import__("builtins").open(_stdlib_path, "rb") as _source:
+_stdlib_module = _types.ModuleType("_pys60_stdlib_calendar")
+_stdlib_module.__file__ = _stdlib_path
+_sys.modules[_stdlib_module.__name__] = _stdlib_module
+_stdlib_namespace = _stdlib_module.__dict__
+try:
+    import builtins as _builtins
+except ImportError:
+    import __builtin__ as _builtins
+with _builtins.open(_stdlib_path, "rb") as _source:
     exec(compile(_source.read(), _stdlib_path, "exec"), _stdlib_namespace)
 for _name, _value in _stdlib_namespace.items():
     if not _name.startswith("_") and _name not in globals():

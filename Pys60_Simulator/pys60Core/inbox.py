@@ -1,4 +1,5 @@
 """Persistent simulated Symbian message folders."""
+from _compat import text_type as str
 
 import time
 import weakref
@@ -16,7 +17,7 @@ class Inbox:
             raise e32.SymbianError(-1, "folder not found")
         self._folder = folder_type
         self._callback = None
-        self._owner = threading.get_ident()
+        self._owner = threading.current_thread().ident
         _listeners.add(self)
 
     def _get(self, message_id):

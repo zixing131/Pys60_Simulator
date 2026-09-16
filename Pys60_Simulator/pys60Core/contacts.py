@@ -1,3 +1,4 @@
+from _compat import text_type as str
 #
 # contacts.py
 #
@@ -438,6 +439,8 @@ class ContactsDb(object):
 
         def __next__(self):
             return self.db[next(self._iter)]
+
+        next = __next__
 
         def __iter__(self):
             return self

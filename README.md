@@ -6,7 +6,7 @@
 
 ## 运行
 
-使用带 Tk 的 **Python 3.10+**：
+项目以带 Tk 的 **Python 2.7** 为主运行环境，兼容 Python 3.10+。`requirements.txt` 会按解释器选择依赖版本；Python 2.7 使用 Pillow 6.2.2、pygame 2.0.3、NumPy 1.16.6、PyOpenGL 3.1.5 和 OpenCV 4.1.2.30：
 
 ```sh
 python -m pip install -r requirements.txt
@@ -26,7 +26,13 @@ python examples/extensions_demo.py --camera path/to/video.mp4
 
 Q / F1 打开菜单，W / F2 退出；文本编辑器中使用 F1 / F2，避免占用字母输入。运行自己的脚本建议使用 `run_pys60.py`，它安装 S60 socket 扩展，并确保标准库同名 `calendar` 不会遮住 S60 日历 API。
 
-旧游戏与第三方应用仍可能含 Python 2 语法，需要先迁移后再使用当前运行时；本次没有批量转换它们，也不再宣称当前新增后端支持 Python 2。
+仓库内的老程序可继续使用 Python 2.7，无需先迁移 Python 3。例如从任意工作目录执行：
+
+```sh
+python /path/to/Pys60_Simulator/run_pys60.py /path/to/Pys60_Simulator/Pys60_Simulator/games/flappybird.PY
+```
+
+已回归 Flappy Bird、`2048正式版v1.3.py`、推箱子、`softwares/qqui.py`、`softwares/wsg/demo6.py` 和 `softwares/qq_for_symbian/main.py`。这些程序的资源按文件位置定位，存档写入 `~/.pys60-simulator/examples`（或 `PYS60_DATA_DIR`），不依赖 IDE 的工作目录。推箱子首次运行会将仓库中旧文本格式的关卡/记录导入用户目录的 SQLite，原资源不变。其他第三方程序仍需逐个回归。
 
 ## 配置模拟设备
 
@@ -37,7 +43,7 @@ import simulator
 simulator.set_camera_source('frame.jpg')  # 图片、图片序列、视频路径、PIL 图像、函数或摄像头编号
 simulator.set_position(31.2304, 121.4737, altitude=12.5)
 simulator.set_gsm_location(460, 0, 12, 34)
-simulator.receive_sms('5550100', '测试消息')
+simulator.receive_sms('5550100', u'测试消息')
 simulator.receive_call('5550100')
 simulator.emit_sensor(1, 0, 300, 0)
 ```
@@ -51,6 +57,8 @@ OpenGL 使用桌面兼容上下文和真实离屏 framebuffer：macOS 默认 CGL
 ```sh
 python -m unittest discover -s tests -v
 python tests/gui_smoke.py
+python tests/app_regression.py
+python tests/app_regression.py --gui
 python examples/extensions_demo.py --smoke
 ```
 
@@ -58,4 +66,4 @@ python examples/extensions_demo.py --smoke
 
 `PYS60_HEADLESS=1` 可禁用 Tk 窗口。此时对话框默认取消，不会自动确认或选择第一项。异步回调在创建线程进入 `e32.ao_yield()`、`ao_sleep()`、`Ao_lock.wait()` 或 Tk 事件循环时执行。
 
-已在 macOS arm64 / Python 3.10 上验证 CGL、SDL 和 Tk。Windows/Linux 的实际驱动、字体及摄像头尚未实机验证。第三方来源见 [版权说明](docs/THIRD_PARTY_NOTICES.md)。
+已在本机 macOS 的 Python 2.7.14 / Pillow 6.2.2 下验证核心与扩展接口、CGL、Tk 及六个实际程序；Python 3.10 作为兼容回归。Windows/Linux 的实际驱动、字体及摄像头尚未实机验证。第三方来源见 [版权说明](docs/THIRD_PARTY_NOTICES.md)。

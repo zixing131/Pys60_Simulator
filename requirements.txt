@@ -1,8 +1,15 @@
-Pillow
-pygame
+# Python 2.7 is the primary runtime. Keep compatible releases for old hosts.
+Pillow==6.2.2; python_version < '3'
+pygame==2.0.3; python_version < '3'
+numpy==1.16.6; python_version < '3'
+PyOpenGL==3.1.5; python_version < '3'
+opencv-python-headless==4.1.2.30; python_version < '3'
+psutil==5.9.8; python_version < '3'
+Pillow; python_version >= '3'
+pygame; python_version >= '3'
+numpy; python_version >= '3'
+PyOpenGL>=3.1; python_version >= '3'
+opencv-python-headless>=4.8; python_version >= '3'
+psutil; python_version >= '3'
+python-dateutil>=2.8,<3
 pyaes
-psutil
-numpy
-PyOpenGL>=3.1
-python-dateutil>=2.8
-opencv-python-headless>=4.8

@@ -4,6 +4,7 @@ import graphics as ph
 import txtfield
 import e32
 import glib
+from pys60_examples import to_text
 
 ui.app.screen = "full"
 FONT = 'dense'
@@ -22,7 +23,7 @@ ARROW_RIGHT = 15
 ARROW_UP = 16
 ARROW_DOWN = 17
 
-cn = lambda x,: unicode(x, 'utf-8', 'ignore')
+cn = to_text
 
 
 def Calc(text, font):
@@ -144,7 +145,7 @@ class Window(object):
         type = key['type']
         code = key['scancode']
         # print(key)
-        if type == 3:
+        if type == 2:
             self.WndProc(WM_KEYDOWN, code, 0)
         elif type == 1:
             self.WndProc(WM_KEYREPEAT, code, 0)
@@ -371,83 +372,6 @@ class Window(object):
             for child in self.childs:
                 if child._show:
                     child.WndProc(WM_KEYUP, wparam, 0)
-            for child in self.childs:
-                if (type(child) is Textbox and child._Textbox__editing == True):
-                    return
-            pass
-            if wparam == ARROW_LEFT:
-                if self._Window__keyboard and self.center:
-                    self._Window__index -= 1
-                    if self._Window__index < 0:
-                        self._Window__index = (len(self.center) - 1)
-                    self.rect[0][0] = self.cx
-                    self.rect[0][1] = self.cy
-                    self.rect[0][2] = self.cw
-                    self.rect[0][3] = self.ch
-                    self.cx, self.cy = self.center[self._Window__index]
-                    self.rect[1][0] = self.cx
-                    self.rect[1][1] = self.cy
-                    self.rect[1][2] = self.cw
-                    self.rect[1][3] = self.ch
-                    self._Window__move(wparam)
-                else:
-                    self._Window__left()
-                pass
-            elif wparam == ARROW_RIGHT:
-                if self._Window__keyboard and self.center:
-                    self._Window__index += 1
-                    if self._Window__index > (len(self.center) - 1):
-                        self._Window__index = 0
-                    self.rect[0][0] = self.cx
-                    self.rect[0][1] = self.cy
-                    self.rect[0][2] = self.cw
-                    self.rect[0][3] = self.ch
-                    self.cx, self.cy = self.center[self._Window__index]
-                    self.rect[1][0] = self.cx
-                    self.rect[1][1] = self.cy
-                    self.rect[1][2] = self.cw
-                    self.rect[1][3] = self.ch
-                    self._Window__move(wparam)
-                else:
-                    self._Window__right()
-                pass
-            elif wparam == ARROW_UP:
-                if self._Window__keyboard and self.center:
-                    self._Window__index -= 1
-                    if self._Window__index < 0:
-                        self._Window__index = (len(self.center) - 1)
-                    self.rect[0][0] = self.cx
-                    self.rect[0][1] = self.cy
-                    self.rect[0][2] = self.cw
-                    self.rect[0][3] = self.ch
-                    self.cx, self.cy = self.center[self._Window__index]
-                    self.rect[1][0] = self.cx
-                    self.rect[1][1] = self.cy
-                    self.rect[1][2] = self.cw
-                    self.rect[1][3] = self.ch
-                    self._Window__move(wparam)
-                else:
-                    self._Window__up()
-                pass
-            elif wparam == ARROW_DOWN:
-                if self._Window__keyboard and self.center:
-                    self._Window__index += 1
-                    if self._Window__index > (len(self.center) - 1):
-                        self._Window__index = 0
-                    self.rect[0][0] = self.cx
-                    self.rect[0][1] = self.cy
-                    self.rect[0][2] = self.cw
-                    self.rect[0][3] = self.ch
-                    self.cx, self.cy = self.center[self._Window__index]
-                    self.rect[1][0] = self.cx
-                    self.rect[1][1] = self.cy
-                    self.rect[1][2] = self.cw
-                    self.rect[1][3] = self.ch
-                    self._Window__move(wparam)
-                else:
-                    self._Window__down()
-                pass
-            pass
         elif message == WM_REDRAW:
             self.rect[0][0] = lparam[0]
             self.rect[0][1] = lparam[1]

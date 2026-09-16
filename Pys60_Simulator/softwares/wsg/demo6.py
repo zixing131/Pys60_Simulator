@@ -1,5 +1,6 @@
 import sys
-sys.path.append(r"c:\python")
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from wsg import *
 
 bool = True
@@ -65,3 +66,5 @@ i = StaticEdit(a,cn("问曰：种种因缘，在生死中不厌，何以故但�
 j = Trackbar(a,20,280,200,20+2+16,5.0,0.0,100.0,10.0,True,u"%.2f",Trackbar.FOLLOW,0x808080,16)
 a.keyboard(1)
 a.run()
+if __name__ == '__main__':
+    e32.Ao_lock().wait()

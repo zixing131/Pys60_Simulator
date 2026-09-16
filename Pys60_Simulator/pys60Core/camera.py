@@ -2,6 +2,7 @@
 
 import io
 import os
+from _compat import string_types
 import e32
 import graphics
 import _device
@@ -66,7 +67,7 @@ def _frame(size):
         isinstance(source, (list, tuple))
         or isinstance(source, PILImage.Image)
         or (
-            isinstance(source, str)
+            isinstance(source, string_types)
             and source.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".gif"))
         )
     ):
@@ -94,7 +95,7 @@ def _frame(size):
         if not _capture.isOpened():
             raise e32.SymbianError(-1, "cannot open camera source")
         ok, frame = _capture.read()
-        if not ok and isinstance(source, str):
+        if not ok and isinstance(source, string_types):
             _capture.set(cv2.CAP_PROP_POS_FRAMES, 0)
             ok, frame = _capture.read()
         if not ok:

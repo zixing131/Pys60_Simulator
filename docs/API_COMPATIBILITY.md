@@ -55,13 +55,13 @@
 - screenshot 包含 Canvas/GLCanvas、软件绘制的 Text/Listbox、标题/标签/软键区和模拟浮窗；不包含宿主窗口边框或外部应用。Text 保留每字符插入样式，但复杂文本选择、IME 标记、双向排版仍依赖桌面近似。TopWindow 原生阴影、圆角、fading 尚未复刻。
 - `Image.from_icon`、`from_cfbsbitmap`、`Content_handler.open`（嵌入文档）、录音和修改宿主系统时钟明确报 `SymbianError(-5, ...)`。`open_standalone` 使用宿主默认应用，不提供文档关闭通知。TTS 目前仅使用 macOS `say`。
 - pygame 支持的编码格式受本地 SDL_mixer 构建限制。播放完成回调依赖活动调度器。未进行实际扬声器听测或麦克风录音测试。
-- 数据库采用 SQLite，不能读取真机 Symbian DBMS 文件或旧模拟器 JSON 文件。未自动转换已有文件。SQL 方言、COUNTER 自动递增、范围约束、复杂 SELECT 的声明类型、公元 1 年以前日期等仍有差异。数据库新建/n 模式按原版约定替换目标文件。
+- 数据库采用 SQLite，不能读取真机 Symbian DBMS 文件。核心 API 不自动转换旧文件；所选示例的 `pys60_examples` 仅在用户目录副本中导入仓库自带的文本 DBM 关卡/记录。SQL 方言、COUNTER 自动递增、范围约束、复杂 SELECT 的声明类型、公元 1 年以前日期等仍有差异。数据库新建/n 模式按原版约定替换目标文件。
 - 文件名使用宿主路径，没有全局虚拟 C:/E:/Z: 文件系统；非 Windows 平台 drive_list 的 C: 表示宿主根文件系统。接入点借用现有宿主网络，不能切换蜂窝网络或控制物理适配器。keycapture 只捕获模拟器窗口，不捕获其他宿主应用。
 - 电话/短信是本地模拟，未接真实运营商；暂未提供失败状态注入。相机后端仅宣告 none flash / auto exposure / auto white balance，其他设置明确报错；宿主硬件授权和编码器可用性由系统决定。GPS/传感器使用注入数据，未接宿主定位服务/实体传感器。calendar alarm 只保存闹钟信息，不触发桌面系统通知。
 - PIM 的 vCard/vCalendar 支持常用文本/时间字段和模拟器完整往返（X-PYS60 扩展字段）；尚未完整实现外部文件的折行/字符集/quoted-printable、全部标准 RRULE/时区与厂商私有字段。不能读取 Symbian 原生二进制数据库。所有模式字段、复杂多日事件/例外实例仍需真机对照。
 - GLES 可选 OES palette matrix、draw texture、point-size array、weight/index pointer 入口存在但明确抛 NotImplementedError，CheckExtension 返回 False。桌面内部缓冲精度可能高于请求最小值；不是逐指令 GLES 驱动仿真。`gles_utils` 的数值/向量/定点 camera 辅助函数已修复源码明显错误，原版不完整 lens-flare helper 明确报不支持。
 - 蓝牙不连接物理设备，set_security 仅保存模拟安全策略，不能提供实际配对或空口加密；OBEX 是本地文件传递协议，不是完整无线 OBEX 协议栈。Socket 的所有 Symbian 异步/SSL 方言尚未完全移植。
-- 原有第三方模块与游戏的 Python 2 到 3 迁移不属于本次核心校准；未修改参考源码，也未把其中的 Symbian 构建系统用于宿主环境。
+- Python 2.7 为主运行环境，所选六个程序同时保留 Python 3 兼容。未对整个 games/softwares 目录作完整迁移或全量回归；未修改参考源码，也未把其中的 Symbian 构建系统用于宿主环境。
 
 ## 后续对齐的验收方式
 
@@ -72,3 +72,14 @@
 macOS arm64、Python 3.10、Pillow 11、pygame 2.6.1、PyOpenGL 3.1.10、OpenCV 4.10：67 项 unittest 全部通过。另通过 CGL/SDL 两种后端的 OpenGL 三角形、纹理/VBO 和上下文隔离验证；通过实际 Tk PhotoImage 与截图像素对比及 `extensions_demo.py --smoke`。无 Symbian SDK 二进制/真机对照，因此不能声称整套原生 UI 字形和全部 API 边界已完全相同。
 
 新增依据：`ext/{contacts/eka2,calendar/eka2,camera,gps,sensor,telephone,messaging,inbox,logs,gles,glcanvas,socket}` 的包装层、方法表与实现；颜色公式为 SDK `graphicsdeviceinterface/gdi/inc/GDI.INL` 中的 `TRgb::_Color4K/_Color64K/_Gray256/_Gray2`。移植包装层的版权与修改说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+
+## Python 2.7 与真实应用回归
+
+- 文字采用显式 ascent→baseline 换算，兼容 Pillow 6 忽略 `anchor` 的行为；单色字形直接请求字体引擎栅格化，避免对抗锯齿图进行二值化导致断笔。QQ 控件显式选择抗锯齿。GLib 锚点根据实际字形 bbox 计算。
+- 多边形使用填充加闭合折线实现宽边框，避免 Pillow 6 不支持 `polygon(width=...)`。弧线补齐旧 Pillow 缺失的端点。`akntextutils` 换行使用绘图相同的字体测量；`txtfield` 延迟创建编辑器，保留 Unicode、长度限制并移除 Tk 哨兵换行。
+- 修复 Python 2 的模块加载、目录创建、Unicode 通讯录/消息、日历日期与迭代器、Bluetooth socket 包装、线程标识、OpenGL 框架加载和 Pillow 枚举差异。依赖按解释器版本固定。
+- `tests/app_regression.py` 从临时工作目录经真实启动器运行六个程序，用独立存档目录操作 QQ 输入/复选框、Flappy 开始/碰撞/重开/F2 退出取消、2048 合并与持久化、推箱子移动/撤销、WSG 控件/滚动、ZUI 焦点/编辑。`--gui` 另对比 Tk PhotoImage 与应用截图像素，产物默认位于系统临时目录 `pys60-app-regression`。
+- `txtfield` 是第三方扩展适配，编辑中的宿主 Text 控件（含 IME/选择）不纳入软件截图；退出编辑后的文字进入统一画布。没有声称所有第三方 API 或真机像素已经完全一致。
+
+最终回归环境：本机 macOS / Python 2.7.14 / Pillow 6.2.2，69 项接口测试；六个实际程序通过独立存档回归和 Tk 帧像素核验，包含嵌套 Tk 回调中等待与唤醒（F2 处理路径）。Python 3.10.9 也通过 69 项接口测试和同六个程序。旧版 Pillow 粗体改用字形掩码横向加粗，WSG 的滚动状态及数值标签重复绘制问题已纳入回归。

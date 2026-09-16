@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from pys60_examples import to_text, resource_path, data_path
 #######wap.wapele.cn#######
 #######中文名好听########
 #######decompile2########
@@ -11,7 +12,7 @@ __version__ = '1.0.2'
 import graphics, appuifw, e32
 import glib
 
-path = u"../../python/pysoft/wsg\\"
+path = resource_path("pysoft", "wsg") + "/"
 #FONT = appuifw.Canvas().font[0]
 FONT = 'dense'
 SCRX, SCRY = appuifw.app.layout(appuifw.EScreen)[0]
@@ -28,7 +29,7 @@ ARROW_LEFT = 14
 ARROW_RIGHT = 15
 ARROW_UP = 16
 ARROW_DOWN = 17
-cn = lambda x, : unicode(x, 'utf-8', 'ignore') 
+cn = lambda x, : to_text(x, 'utf-8', 'ignore')
 def Calc(text, font):
     temp = graphics.Image.new((1, 1))
     tup = temp.measure_text(text, font)[0]
@@ -183,7 +184,7 @@ class Window(object, ) :
         type = key['type']
         code = key['scancode']
         #print(key)
-        if type == 3 : 
+        if type == 2 :
             self.WndProc(WM_KEYDOWN, code, 0)
         elif type == 1 : 
             self.WndProc(WM_KEYREPEAT, code, 0)
@@ -332,7 +333,7 @@ class Window(object, ) :
                     child.WndProc(WM_PAINT, 0, 0)
             self.bg.blit(self.image, target = (self.left, self.top))
             if  not ( not (self._Window__keyboard) and self._lockcursor) :
-                self.bg.blit(self._Window__curimg, target = (0-(self.left + self.cx),0- (self.top + self.cy)), mask = self._Window__curmsk)
+                self.bg.blit(self._Window__curimg, target = (self.left + self.cx, self.top + self.cy), mask = self._Window__curmsk)
             self._Window__canvas.blit(self.bg)
         elif message == WM_KEYDOWN : 
             self._Window__keydown = 1
@@ -1314,7 +1315,7 @@ class StaticEdit(Window, ) :
         self._StaticEdit__end = 0
         self._StaticEdit__scroll = False
         self._StaticEdit__lineh = (self._StaticEdit__hei + 2)
-        self._StaticEdit__linen = ((self.height - 6) / self._StaticEdit__lineh)
+        self._StaticEdit__linen = ((self.height - 6) // self._StaticEdit__lineh)
         assert self._StaticEdit__linen > 0
         self._StaticEdit__num = []
         self._StaticEdit__index = -1
@@ -1377,7 +1378,7 @@ class StaticEdit(Window, ) :
         self._StaticEdit__end = 0
         self._StaticEdit__scroll = False
         self._StaticEdit__lineh = (self._StaticEdit__hei + 2)
-        self._StaticEdit__linen = ((self.height - 6) / self._StaticEdit__lineh)
+        self._StaticEdit__linen = ((self.height - 6) // self._StaticEdit__lineh)
         assert self._StaticEdit__linen > 0
         self._StaticEdit__num = []
         self._StaticEdit__index = -1
@@ -1430,7 +1431,7 @@ class StaticEdit(Window, ) :
         self._StaticEdit__beg = 0
         self._StaticEdit__end = 0
         self._StaticEdit__scroll = False
-        self._StaticEdit__linen = ((self.height - 6) / self._StaticEdit__lineh)
+        self._StaticEdit__linen = ((self.height - 6) // self._StaticEdit__lineh)
         assert self._StaticEdit__linen > 0
         self._StaticEdit__num = []
         self._StaticEdit__index = -1
@@ -1454,10 +1455,8 @@ class StaticEdit(Window, ) :
                 self._change = False
             if self._StaticEdit__enter : 
                 self.image.drawRect(self.left, self.top, self.width, self.height, 16568953)
-                self.drawText()
             else : 
                 self.image.drawRect(self.left, self.top, self.width, self.height, 8101565)
-                self.drawText()
             pass
         elif message == WM_MOUSEMOVE : 
             self.cx = lparam[0]
@@ -1496,7 +1495,7 @@ class StaticEdit(Window, ) :
         for char in self._StaticEdit__text:
             w = self._StaticEdit__wid + self._StaticEdit__pad
             if ord(char) < 19968 : 
-                if self._StaticEdit__cmapw.has_key(char) : 
+                if char in self._StaticEdit__cmapw :
                     w = self._StaticEdit__cmapw[char]
                 else : 
                     w = (Calc(char, (FONT, self._StaticEdit__size))[0] + 1)
@@ -1571,7 +1570,7 @@ class StaticEdit(Window, ) :
     def drawPrev(self):
         if self._StaticEdit__beg == 0 : 
             return None
-        self._StaticEdit__temp.blit(self.image, source = (((self.left + 5), (self.top + 5)), self._StaticEdit__w, self._StaticEdit__h))
+        self._StaticEdit__temp.blit(self.image, source = ((self.left + 5, self.top + 5), (self.left + 5 + self._StaticEdit__w, self.top + 5 + self._StaticEdit__h)))
         self.image.blit(self._StaticEdit__temp, target = ((self.left + 5), (self.top + 5) + self._StaticEdit__lineh))
         self.image.FillRect((self.left + 5), (self.top + 4), self._StaticEdit__w, (self._StaticEdit__lineh + 1), self._StaticEdit__bcolor)
         old = self._StaticEdit__beg
@@ -1589,7 +1588,7 @@ class StaticEdit(Window, ) :
     def drawNext(self):
         if self._StaticEdit__end == self._StaticEdit__len : 
             return None
-        self._StaticEdit__temp.blit(self.image, source = (((self.left + 5), (self.top + 5) + self._StaticEdit__lineh), self._StaticEdit__w, self._StaticEdit__h))
+        self._StaticEdit__temp.blit(self.image, source = ((self.left + 5, self.top + 5 + self._StaticEdit__lineh), (self.left + 5 + self._StaticEdit__w, self.top + 5 + self._StaticEdit__lineh + self._StaticEdit__h)))
         self.image.blit(self._StaticEdit__temp, target = ((self.left + 5), (self.top + 5)))
         self.image.FillRect((self.left + 5), self.top + self._StaticEdit__maxh, self._StaticEdit__w, self._StaticEdit__lineh, self._StaticEdit__bcolor)
         old = self._StaticEdit__end
@@ -1608,7 +1607,7 @@ class StaticEdit(Window, ) :
             char = self._StaticEdit__text[self._StaticEdit__end]
             w = self._StaticEdit__wid + self._StaticEdit__pad
             if ord(char) < 19968 : 
-                if self._StaticEdit__cmapw.has_key(char) : 
+                if char in self._StaticEdit__cmapw :
                     w = self._StaticEdit__cmapw[char]
                 else : 
                     w = (Calc(char, (FONT, self._StaticEdit__size))[0] + 1)
@@ -1701,7 +1700,7 @@ class Trackbar(Window, ) :
         if self._Trackbar__int == 0 : 
             self._Trackbar__int = 1
         self._Trackbar__n = int(((self._Trackbar__cur - minvalue) / self._Trackbar__gap))
-        self._Trackbar__num = ((self.width - 9) / self._Trackbar__int)
+        self._Trackbar__num = ((self.width - 9) // self._Trackbar__int)
         self._Trackbar__max = ((self._Trackbar__maxvalue - self._Trackbar__minvalue) / self._Trackbar__gap)
         self._Trackbar__enter = False
         self._Trackbar__bg = graphics.Image.new((self.width, self.height))
@@ -1745,7 +1744,7 @@ class Trackbar(Window, ) :
         self._Trackbar__int = int(self._Trackbar__float)
         if self._Trackbar__int == 0 : 
             self._Trackbar__int = 1
-        self._Trackbar__num = ((self.width - 9) / self._Trackbar__int)
+        self._Trackbar__num = ((self.width - 9) // self._Trackbar__int)
         self._change = True
         self._Trackbar__bg = graphics.Image.new((self.width, self.height))
         self._Trackbar__txt = graphics.Image.new((self.width, (self.height - 20)))
@@ -1780,22 +1779,25 @@ class Trackbar(Window, ) :
             if self._Trackbar__bool : 
                 if self._Trackbar__style == Trackbar.FOLLOW : 
                     self._Trackbar__txt.clear(self._Trackbar__bcolor) 
-                    self._Trackbar__txt.drawString((FONT, self._Trackbar__size), self.color, x, 2, (self._Trackbar__format % self._Trackbar__minvalue + str(self._Trackbar__n * self._Trackbar__gap)), (
-                                glib.HCENTER | glib.TOP))
+                    label = self._Trackbar__format % self.GetValue()
+                    half = Calc(label, (FONT, self._Trackbar__size))[0] / 2.0
+                    label_x = max(half, min(x, self.width - half))
+                    self._Trackbar__txt.drawString((FONT, self._Trackbar__size), self.color, label_x, 2, label,
+                                                   glib.HCENTER | glib.TOP)
                     self.image.blit(self._Trackbar__txt, target = (self.left, (self.top + 20)))
                 elif self._Trackbar__style == Trackbar.LEFT : 
                     self._Trackbar__txt.clear(self._Trackbar__bcolor)
-                    self._Trackbar__txt.drawString((FONT, self._Trackbar__size), self.color, 0, 2, (self._Trackbar__format % self._Trackbar__minvalue + (self._Trackbar__n * self._Trackbar__gap)), (
+                    self._Trackbar__txt.drawString((FONT, self._Trackbar__size), self.color, 0, 2, (self._Trackbar__format % (self._Trackbar__minvalue + self._Trackbar__n * self._Trackbar__gap)), (
                                 glib.LEFT | glib.TOP))
                     self.image.blit(self._Trackbar__txt, target = (self.left, (self.top + 20)))
                 elif self._Trackbar__style == Trackbar.center : 
                     self._Trackbar__txt.clear(self._Trackbar__bcolor)
-                    self._Trackbar__txt.drawString((FONT, self._Trackbar__size), self.color, (self.width / 2), 2, (self._Trackbar__format % self._Trackbar__minvalue + (self._Trackbar__n * self._Trackbar__gap)), (
+                    self._Trackbar__txt.drawString((FONT, self._Trackbar__size), self.color, (self.width / 2), 2, (self._Trackbar__format % (self._Trackbar__minvalue + self._Trackbar__n * self._Trackbar__gap)), (
                                 glib.HCENTER | glib.TOP))
                     self.image.blit(self._Trackbar__txt, target = (self.left, (self.top + 20)))
                 elif self._Trackbar__style == Trackbar.RIGHT : 
                     self._Trackbar__txt.clear(self._Trackbar__bcolor)
-                    self._Trackbar__txt.drawString((FONT, self._Trackbar__size), self.color, (self.width - 1), 2, (self._Trackbar__format % self._Trackbar__minvalue + (self._Trackbar__n * self._Trackbar__gap)), (
+                    self._Trackbar__txt.drawString((FONT, self._Trackbar__size), self.color, (self.width - 1), 2, (self._Trackbar__format % (self._Trackbar__minvalue + self._Trackbar__n * self._Trackbar__gap)), (
                                 glib.RIGHT | glib.TOP))
                     self.image.blit(self._Trackbar__txt, target = (self.left, (self.top + 20)))
                 pass

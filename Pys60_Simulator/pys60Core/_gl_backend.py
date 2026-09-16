@@ -94,13 +94,13 @@ class _SDLContext:
 
 class Context:
     def __init__(self, size, attributes):
-        self.owner = threading.get_ident()
+        self.owner = threading.current_thread().ident
         self.pointers = {}
         self.closed = False
         self.context = None
         self.sdl = None
         self.fbo = self.texture = self.depth = 0
-        from OpenGL import GL
+        from _opengl import GL
         from OpenGL.GL.EXT import framebuffer_object as F
 
         self.GL, self.F = GL, F
@@ -150,7 +150,7 @@ class Context:
     def make_current(self):
         if self.closed:
             raise RuntimeError("GL context is closed")
-        if threading.get_ident() != self.owner:
+        if threading.current_thread().ident != self.owner:
             raise RuntimeError("GLCanvas belongs to another thread")
         if self.context is not None:
             self.lib.CGLSetCurrentContext(self.context)
@@ -223,7 +223,7 @@ class Context:
         finally:
             GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, align)
         return Image.frombytes("RGB", self.size, bytes(pixels)).transpose(
-            Image.Transpose.FLIP_TOP_BOTTOM
+            getattr(Image, "Transpose", Image).FLIP_TOP_BOTTOM
         )
 
     def close(self):

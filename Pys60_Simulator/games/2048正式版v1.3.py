@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*- 
+from pys60_examples import to_text, resource_path, data_path
 """#游戏作者：Light.紫.星
 #QQ:1311817771
 #游戏源码未加密，仅供学习交流，切勿用于商业用途，违者自行承担责任
@@ -11,33 +12,21 @@ import appuifw as ui
 import e32
 import graphics as ph,os,random,e32dbm,math,time
 from BingyiApp import *
-cn=lambda x:x.decode("u8")
+cn=lambda x:to_text(x, "u8")
 sleep= e32.ao_sleep
-try:
-    os.makedirs("c:\\python")
-except:
-    pass
-try:
-    os.makedirs("c:\\python\\pygame")
-except:
-    pass
-try:
-    os.makedirs("c:\\python\\pygame\\2048")
-except:
-    pass
-path="c:\\python\\pygame\\2048"
+path = data_path("2048")
 def log(x,y):
     return int(math.log(y)/math.log(x))
 def read():
     try:
-        db= e32dbm.open(path + "\\data", "r")
+        db= e32dbm.open(path + "/data", "r")
         tdb=db.items()
         db.close()
         return int(cn(tdb[0][1]))
     except:
         return 0
 def write(v):
-    db= e32dbm.open(path + "\\data", "c")
+    db= e32dbm.open(path + "/data", "c")
     db["score"]=str(v)
     db.close()
 try:
@@ -377,8 +366,13 @@ class g2048:#游戏主体
                     s.bj.blit(s.kuai, ((( - x * 60) - 1), (-21 - (y * 75))))
                     if s.game[x][y] != 1 : 
                         num = int(s.game[x][y])
-                        s.bj.text(((x * 60) + ((58 - (len(str(num)) * 11)) / 2), (56 + (y * 75))), cn(str(num)), 15, zt)
-            s.img.text((115, 17), cn(str(s.score)), 15, zt2)
+                        label = cn(str(num))
+                        left, top, right, bottom = s.bj.measure_text(label, zt)[0]
+                        tx = x * 60 + 1 + (59 - (right - left)) / 2.0 - left
+                        ty = y * 75 + 21 + (74 - (bottom - top)) / 2.0 - top
+                        s.bj.text((tx, ty), label, 15, zt)
+            score_x = 54 + s.img.measure_text(cn("当前得分:"), zt2)[1]
+            s.img.text((score_x, 17), cn(str(s.score)), 15, zt2)
             app.blit(s.img)
             sleep(0.07)
             if s.first == 1 : 

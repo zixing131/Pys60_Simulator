@@ -7,12 +7,12 @@ python examples/extensions_demo.py --smoke     # short, isolated GUI verificatio
 
 import argparse
 import os
-from pathlib import Path
+import shutil
 import sys
 import tempfile
 
 sys.path.insert(
-    0, str(Path(__file__).resolve().parents[1] / "Pys60_Simulator/pys60Core")
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Pys60_Simulator", "pys60Core"))
 )
 from pys60_runtime import activate
 
@@ -35,9 +35,9 @@ def main():
     parser.add_argument("--camera", help="host camera index, image path, or video path")
     parser.add_argument("--smoke", action="store_true")
     options = parser.parse_args()
-    temporary = tempfile.TemporaryDirectory() if options.smoke else None
+    temporary = tempfile.mkdtemp(prefix="pys60-demo-") if options.smoke else None
     if temporary:
-        os.environ["PYS60_DATA_DIR"] = temporary.name
+        os.environ["PYS60_DATA_DIR"] = temporary
     if options.camera is None:
         source = Image.new("RGB", (640, 480))
         draw = ImageDraw.Draw(source)
@@ -54,7 +54,7 @@ def main():
         [dict(type="service", format="application", data="PyS60 desktop demo")]
     )
     fix = positioning.position()["position"]
-    database = contacts.open("simulator-demo.cdb", "c")
+    database = contacts.open()
     if not database.find("Simulator"):
         person = database.add_contact()
         person.add_field("first_name", "Simulator")
@@ -168,7 +168,7 @@ def main():
     else:
         lock.wait()
     if temporary:
-        temporary.cleanup()
+        shutil.rmtree(temporary)
 
 
 if __name__ == "__main__":

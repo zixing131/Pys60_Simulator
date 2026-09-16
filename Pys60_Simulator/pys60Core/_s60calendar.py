@@ -1,7 +1,11 @@
 """Persistent desktop backend for the original S60 3rd edition wrapper."""
 
+from _compat import text_type as str
+
+from _compat import timestamp, casefold
 import copy
 import datetime as dt
+from dateutil.tz import tzutc
 import time
 import _device
 
@@ -70,7 +74,7 @@ class Database:
         )
         end = (start.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
         return self.find_instances(
-            start.timestamp(), end.timestamp() - 0.000001, "", filter
+            timestamp(start), timestamp(end) - 0.000001, "", filter
         )
 
     def daily_instances(self, day, filter=0):
@@ -78,8 +82,8 @@ class Database:
             hour=0, minute=0, second=0, microsecond=0
         )
         return self.find_instances(
-            start.timestamp(),
-            (start + dt.timedelta(days=1)).timestamp() - 0.000001,
+            timestamp(start),
+            timestamp(start + dt.timedelta(days=1)) - 0.000001,
             "",
             filter,
         )
@@ -87,31 +91,27 @@ class Database:
     def find_instances(self, start, end, search="", filter=0):
         if end < start:
             raise ValueError("end date before start date")
-        start = (
-            dt.datetime.fromtimestamp(start)
-            .replace(hour=0, minute=0, second=0, microsecond=0)
-            .timestamp()
-        )
-        end = (
-            dt.datetime.fromtimestamp(end).replace(
+        start = timestamp(
+            dt.datetime.fromtimestamp(start).replace(
                 hour=0, minute=0, second=0, microsecond=0
             )
-            + dt.timedelta(days=1)
-        ).timestamp() - 0.000001
+        )
+        end = (
+            timestamp(
+                dt.datetime.fromtimestamp(end).replace(
+                    hour=0, minute=0, second=0, microsecond=0
+                )
+                + dt.timedelta(days=1)
+            )
+            - 0.000001
+        )
         result = []
         for key in self:
             entry = self.get_entry(key)
             if filter and not filter & (1 << entry.type()):
                 continue
-            if (
-                search.casefold()
-                not in (
-                    entry.content()
-                    + "\n"
-                    + entry.description()
-                    + "\n"
-                    + entry.location()
-                ).casefold()
+            if casefold(search) not in casefold(
+                entry.content() + "\n" + entry.description() + "\n" + entry.location()
             ):
                 continue
             for stamp in entry.instances(start, end):
@@ -150,9 +150,9 @@ class Database:
                     lines.append(
                         tag
                         + ":"
-                        + dt.datetime.fromtimestamp(
-                            entry.data[keyname], dt.timezone.utc
-                        ).strftime("%Y%m%dT%H%M%SZ")
+                        + dt.datetime.utcfromtimestamp(entry.data[keyname]).strftime(
+                            "%Y%m%dT%H%M%SZ"
+                        )
                     )
             lines.append(
                 "X-PYS60-DATA:"
@@ -201,10 +201,10 @@ class Database:
                 if tag in ("DTSTART", "DTEND", "DUE"):
                     date = dt.datetime.strptime(value.rstrip("Z"), "%Y%m%dT%H%M%S")
                     if value.endswith("Z"):
-                        date = date.replace(tzinfo=dt.timezone.utc)
+                        date = date.replace(tzinfo=tzutc())
                     entry.data[
                         "start_datetime" if tag == "DTSTART" else "end_datetime"
-                    ] = date.timestamp()
+                    ] = timestamp(date)
             entry.commit()
             result.append(entry.key)
         if not result:
@@ -253,15 +253,15 @@ class Entry:
         if end < start:
             raise ValueError("end date before start date")
         if self.type() in (entry_type_event, entry_type_anniv):
-            start = (
-                dt.datetime.fromtimestamp(start)
-                .replace(hour=0, minute=0, second=0, microsecond=0)
-                .timestamp()
+            start = timestamp(
+                dt.datetime.fromtimestamp(start).replace(
+                    hour=0, minute=0, second=0, microsecond=0
+                )
             )
-            end = (
-                dt.datetime.fromtimestamp(end)
-                .replace(hour=0, minute=0, second=0, microsecond=0)
-                .timestamp()
+            end = timestamp(
+                dt.datetime.fromtimestamp(end).replace(
+                    hour=0, minute=0, second=0, microsecond=0
+                )
             )
         self.data.update(start_datetime=start, end_datetime=end)
 
@@ -380,7 +380,7 @@ class Entry:
                 kwargs["bymonth"] = days[0]["month"] + 1
         excluded = {dt.datetime.fromtimestamp(v).date() for v in repeat["exceptions"]}
         return [
-            d.timestamp()
+            timestamp(d)
             for d in rr.rrule(frequency, **kwargs).between(
                 dt.datetime.fromtimestamp(start),
                 dt.datetime.fromtimestamp(end),

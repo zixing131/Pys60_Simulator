@@ -201,7 +201,9 @@ class Canvas(graphics.Image, _Control):
     def _attach(self):
         global cv
         if _ensure_root() is None:
-            self.redraw()
+            # Like a window expose event, drawing starts when the application
+            # next yields, after its constructor has initialized the buffers.
+            e32._schedule(0, lambda: self.redraw() if app.body is self else None)
             return
         if self._widget is None:
             self._widget = tk.Canvas(root, width=self.size[0], height=self.size[1], highlightthickness=0)
@@ -214,6 +216,7 @@ class Canvas(graphics.Image, _Control):
         self._widget.place(x=app.layout(EMainPane)[1][0], y=app.layout(EMainPane)[1][1], width=app.layout(EMainPane)[0][0], height=app.layout(EMainPane)[0][1])
         self._widget.focus_set()
         self.blitSelf()
+        e32._schedule(0, lambda: self.redraw() if app.body is self else None)
 
     def _resize(self, size):
         if self.size != size:
@@ -715,13 +718,17 @@ class Application(object):
             menu = action
 
     def _pump_ui(self):
-        if root is not None and not self._pumping:
+        if root is not None:
+            previous = self._pumping
             self._pumping = True
             try:
-                self._present()
+                if not previous:
+                    self._present()
+                # A key callback can enter a game loop or Ao_lock.wait().
+                # Those nested schedulers must still receive Tk key events.
                 root.update()
             finally:
-                self._pumping = False
+                self._pumping = previous
 
     def Yield(self):
         e32.ao_yield()

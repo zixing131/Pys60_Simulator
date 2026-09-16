@@ -115,12 +115,16 @@ def GetFont(fill=None, font=None):
 
 
 def _metrics(text, font):
+    if not text:
+        return (0, 0, 0, 0), 0
     try:
         box = font.getbbox(text, anchor='ls')
         advance = int(round(font.getlength(text)))
     except AttributeError:  # Pillow for Python 2
         width, height = font.getsize(text)
-        box, advance = (0, -height, width, 0), width
+        left, top = font.getoffset(text)
+        ascent = font.getmetrics()[0]
+        box, advance = (left, top-ascent, width, height-ascent), width
     return tuple(box), advance
 
 
@@ -376,7 +380,22 @@ class Image(object):
                     kwargs['fill'] = None
                 if kwargs.get('outline') is None and kwargs.get('fill') is None:
                     continue
-                getattr(draw, name)(shape, **kwargs)
+                if name == 'polygon':
+                    # Pillow 6 has no polygon width argument. Drawing the
+                    # closed outline as a polyline also matches a GDI pen.
+                    kwargs.pop('width', None)
+                    draw.polygon(shape, **kwargs)
+                    if outline is not None and width > 1:
+                        draw.line(shape + [shape[0]], fill=outline, width=width)
+                else:
+                    getattr(draw, name)(shape, **kwargs)
+                if name == 'arc' and width == 1:
+                    # Pillow 6 omits the final pixel of a quadrant arc.
+                    cx, cy = (shape[0]+shape[2])/2.0, (shape[1]+shape[3])/2.0
+                    rx, ry = (shape[2]-shape[0])/2.0, (shape[3]-shape[1])/2.0
+                    for angle in angles:
+                        draw.point((int(round(cx+rx*math.cos(angle))),
+                                    int(round(cy-ry*math.sin(angle)))), fill=outline)
         self.blitSelf()
 
     def rectangle(self, coords, outline=None, fill=None, width=1, pattern=None):
@@ -446,16 +465,29 @@ class Image(object):
         for x, y in _coords(coords):
             glyphs = PILImage.new('L', self.size)
             draw = ImageDraw.Draw(glyphs)
+            # Ask FreeType for hinted monochrome glyphs. Thresholding an
+            # antialiased mask loses thin CJK strokes at small point sizes.
+            monochrome = bool(flags & FONT_NO_ANTIALIAS or not flags & FONT_ANTIALIAS)
+            draw.fontmode = '1' if monochrome else 'L'
             if flags & FONT_SUPERSCRIPT:
                 y -= face.size // 2
             elif flags & FONT_SUBSCRIPT:
                 y += face.size // 3
-            draw.text((x, y), text, fill=255, font=face, anchor='ls', stroke_width=stroke)
+            # Pillow < 8 silently ignores anchor='ls'. Its default origin is
+            # the ascender, so explicitly convert the PyS60 baseline to it.
+            draw.text((x, y-face.getmetrics()[0]), text, fill=255,
+                      font=face)
+            if stroke:
+                # Pillow 6's stroked monochrome masks corrupt CJK glyphs.
+                # Expand the finished glyph mask instead, on every backend.
+                heavier = PILImage.new('L', self.size)
+                heavier.paste(glyphs, (1, 0))
+                glyphs = ImageChops.lighter(glyphs, heavier)
             if flags & FONT_ITALIC:
                 affine = getattr(PILImage, 'Transform', PILImage).AFFINE
                 glyphs = glyphs.transform(self.size, affine, (1, .25, -.25*y, 0, 1, 0), resample=_RESAMPLE.BICUBIC)
             mask = ImageChops.lighter(mask, glyphs)
-        if flags & FONT_NO_ANTIALIAS or not flags & FONT_ANTIALIAS:
+        if monochrome and flags & FONT_ITALIC:
             mask = mask.point(lambda v: 255 if v >= 128 else 0)
         self.image.paste(self._color(fill), (0, 0) + self.size, mask)
         self.blitSelf()
@@ -468,7 +500,7 @@ class Image(object):
             if value:
                 left, top, right, bottom = box
                 if flags & FONT_BOLD:
-                    left, top, right, bottom = left-1, top-1, right+1, bottom+1
+                    right += 1
                 if flags & FONT_ITALIC:
                     left -= int(math.ceil(bottom * .25))
                     right -= int(math.floor(top * .25))

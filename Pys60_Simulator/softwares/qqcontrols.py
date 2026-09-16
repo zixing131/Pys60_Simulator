@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from pys60_examples import to_text, resource_path, data_path
 # @Time    : 2020/3/29 19:48
 # @Author  : zixing
 # @QQun    : 140369358
@@ -11,7 +12,7 @@ cachePath = mypath + "cache\\"
 import graphics as ph
 import appuifw as ui
 import txtfield
-cn = lambda x: x.decode("u8")
+cn = lambda x: to_text(x, "u8")
 class Events:
     def __init__(self):
         self.KEY_UP = 0
@@ -120,7 +121,7 @@ class Button(Control):
             baseImg.rectangle((self.pos[0], self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]),
                               outline=self.selectedOutLineColor, fill=self.bgcolor, width=2)
         baseImg.text((self.pos[0] + 2, self.pos[1] + self.size[1] - 1), self.text, self.color,
-                     ('dense', self.fontsize))
+                     ('dense', self.fontsize, ph.FONT_ANTIALIAS))
     def pressOk(self):
         if(self.isShow==1 and self.focus==1):
             if( self.event!=None):
@@ -156,7 +157,7 @@ class CheckBox(Button):
             baseImg.rectangle((x+2 , y+2, x + 8, y+ 8),
                                           outline=0xffffff, fill=self.checkColor, width=1)
         baseImg.text((self.pos[0] + 2 + 15, self.pos[1] + self.size[1] - 1), self.text, textcolor,
-                     ('dense', self.fontsize))
+                     ('dense', self.fontsize, ph.FONT_ANTIALIAS))
 
 
     def getValue(self):
@@ -182,7 +183,7 @@ class Label(Control):
     def Paint(self, baseImg):
         if (self.isShow == 0):
             return
-        baseImg.text(self.pos,self.text,self.color,('dense',self.fontsize))
+        baseImg.text(self.pos,self.text,self.color,('dense', self.fontsize, ph.FONT_ANTIALIAS))
 
 
 class DynamicLabel(Control):
@@ -201,7 +202,7 @@ class DynamicLabel(Control):
     def Paint(self, baseImg):
         if (self.isShow == 0):
             return
-        baseImg.text(self.pos,self.text[self.nowdymIndex%len(self.text)],self.color,('dense',self.fontsize))
+        baseImg.text(self.pos,self.text[self.nowdymIndex%len(self.text)],self.color,('dense', self.fontsize, ph.FONT_ANTIALIAS))
 
 
 class Textbox(Control):
@@ -248,10 +249,10 @@ class Textbox(Control):
             baseImg.rectangle((self.pos[0], self.pos[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]),
                               outline=self.selectedOutLineColor, fill=self.bgcolor, width=2)
 
-        drawLength = self.maxLenOfText(self.text,self.size[0],('dense',self.fontsize))
+        drawLength = self.maxLenOfText(self.text,self.size[0],('dense', self.fontsize, ph.FONT_ANTIALIAS))
         drawText =self.text [:drawLength]
         baseImg.text((self.pos[0] + 2, self.pos[1] + self.size[1] - 1), drawText, self.color,
-                         ('dense', self.fontsize))
+                         ('dense', self.fontsize, ph.FONT_ANTIALIAS))
 
 
 class PasswordBox(Textbox):
@@ -312,7 +313,7 @@ class Menu(Control):
             if (i == self.MenuIndex):
                 color = self.selectedTextColor
                 imgTemp.rectangle((3,i * self.menuItemHeight + 3,self.RealMenuWidth - 3,i * self.menuItemHeight + self.menuItemHeight+3),self.selectedBgColor,self.selectedBgColor)
-            imgTemp.text((5, i * self.menuItemHeight + self.menuItemHeight / 2 + 11), self.listName[i], color, ('dense',self.fontsize))
+            imgTemp.text((5, i * self.menuItemHeight + self.menuItemHeight / 2 + 11), self.listName[i], color, ('dense', self.fontsize, ph.FONT_ANTIALIAS))
         T=(0-self.pos[0],0-(self.height - self.pos[1] - self.RealMenuHeight))
         baseImg.blit(imgTemp, T)
         del imgTemp
@@ -552,7 +553,7 @@ class FriendListControl(Control):
                 baseImg.text((self.pos[0] + 16, nowx + self.fontsize),
                              nowtitle,
                              txtcolor,
-                             ('dense', self.fontsize))
+                             ('dense', self.fontsize, ph.FONT_ANTIALIAS))
 
             elif(isTitleItem == 0):
                 if(lastIsOpening == 1):
@@ -571,7 +572,7 @@ class FriendListControl(Control):
                     baseImg.text((self.pos[0] + 16 + baseT +5, nowx + self.fontsize),
                                  nowtitle,
                                  txtcolor,
-                                 ('dense', self.fontsize))
+                                 ('dense', self.fontsize, ph.FONT_ANTIALIAS))
                 else:
                     nowheight = 0
 
@@ -618,7 +619,7 @@ class FriendListControl(Control):
             baseImg.text((self.pos[0]+16, self.pos[1] + (nowx+1) * self.miniconHeight),
                          nowtitle,
                          txtcolor,
-                         ('dense', self.fontsize))
+                         ('dense', self.fontsize, ph.FONT_ANTIALIAS))
             nowx += 1
         '''
 
@@ -806,11 +807,11 @@ class Panel(Control):
         if(self.showMenuBar):
             baseImg.rectangle(( 0,self.height - self.MenuBarHeight ,self.width,self.height),self.MenuBarBgColor,self.MenuBarBgColor)
             baseImg.text((int(self.fontsize/2), self.height - int(self.fontsize/2) ), self.leftMenuName, self.MenuBarTextColor,
-                         ('dense', self.fontsize))
-            p = self.textLen(self.rightMenuName, ('dense', self.fontsize))
+                         ('dense', self.fontsize, ph.FONT_ANTIALIAS))
+            p = self.textLen(self.rightMenuName, ('dense', self.fontsize, ph.FONT_ANTIALIAS))
             baseImg.text((self.width - p - int(self.fontsize / 2), self.height - int(self.fontsize / 2)), self.rightMenuName,
                          self.MenuBarTextColor,
-                         ('dense', self.fontsize))
+                         ('dense', self.fontsize, ph.FONT_ANTIALIAS))
 
         childMenu = self.getChildrenType(self,Menu)
         if(childMenu!=None):
@@ -858,7 +859,7 @@ class Form(Control):
     def event(self,key=None):
         type = key['type']
         code = key['scancode']
-        if type == 3:
+        if type == 2:
             self.WndProc(events.KEY_DOWN, code, 0)
         elif type == 1:
             self.WndProc(events.KEY_REPEAT, code, 0)

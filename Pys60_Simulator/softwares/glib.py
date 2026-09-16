@@ -20,7 +20,7 @@ functions = ['drawImage', 'drawRect', 'FillRect', 'drawRoundRect', 'FillRoundRec
 def drawImage(self, img, x = 0, y = 0, anchor = (LEFT | TOP)):
     if anchor == (LEFT | TOP) : 
         self.blit(img, target = (x, y))
-    elif anchor == (LEFT | HCENTER) : 
+    elif anchor == (LEFT | VCENTER) :
         self.blit(img, target = (x, (y - (img.size[1] / 2))))
     elif anchor == (LEFT | BOTTOM) : 
         self.blit(img, target = (x, (y - img.size[1])))
@@ -41,7 +41,7 @@ def drawImage(self, img, x = 0, y = 0, anchor = (LEFT | TOP)):
 
 
 def drawRect(self, left, top, w, h, col = 0, wid = 1):
-    self.rectangle((left, top, left + w, top + h), fill=col, width = wid)
+    self.rectangle((left, top, left + w, top + h), outline=col, width = wid)
 
 
 
@@ -87,26 +87,21 @@ def FillRoundRect(self, left, top, w, h, xr, yr, col = 0):
 
 
 
-def drawString(self, font, col, x, y, str, anchor = (LEFT | TOP)):
-    tup = self.measure_text(str, font)[0]
-    if anchor == (LEFT | TOP) : 
-        self.text((x, (y + tup[3] - tup[1])), str, col, font)
-    elif anchor == (LEFT | VCENTER) : 
-        self.text((x, y + ((tup[3] - tup[1]) / 2)), str, col, font)
-    elif anchor == (LEFT | BOTTOM) : 
-        self.text((x, y), str, col, font)
-    elif anchor == (HCENTER | TOP) : 
-        self.text(((x - ((tup[2] - tup[0]) / 2)), (y + tup[3] - tup[1])), str, col, font)
-    elif anchor == (HCENTER | VCENTER) : 
-        self.text(((x - ((tup[2] - tup[0]) / 2)), y + ((tup[3] - tup[1]) / 2)), str, col, font)
-    elif anchor == (HCENTER | BOTTOM) : 
-        self.text(((x - ((tup[2] - tup[0]) / 2)), y), str, col, font)
-    elif anchor == (RIGHT | TOP) : 
-        self.text(((x - (tup[2] - tup[0])), (y + tup[3] - tup[1])), str, col, font)
-    elif anchor == (RIGHT | VCENTER) : 
-        self.text(((x - (tup[2] - tup[0])), y + ((tup[3] - tup[1]) / 2)), str, col, font)
-    elif anchor == (RIGHT | BOTTOM) : 
-        self.text(((x - (tup[2] - tup[0])), y), str, col, font)
+def drawString(self, font, col, x, y, text, anchor=(LEFT | TOP)):
+    left, top, right, bottom = self.measure_text(text, font)[0]
+    if anchor & RIGHT:
+        x -= right
+    elif anchor & HCENTER:
+        x -= (left + right) / 2
+    else:
+        x -= left
+    if anchor & BOTTOM:
+        y -= bottom
+    elif anchor & VCENTER:
+        y -= (top + bottom) / 2
+    else:
+        y -= top
+    self.text((x, y), text, col, font)
 
 
 for i in functions:

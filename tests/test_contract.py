@@ -11,6 +11,7 @@ import shutil
 import threading
 import time
 import wave
+from contextlib import closing
 import struct
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Pys60_Simulator', 'pys60Core')))
 import graphics as g
@@ -121,6 +122,32 @@ class GraphicsContract(TemporaryFiles):
         image.arc((0, 0, 21, 21), 0, math.pi/2, outline=0)
         self.assertEqual(image.getpixel(((20, 10), (10, 0), (0, 10))),
                          [(0, 0, 0), (0, 0, 0), (255, 255, 255)])
+
+    def test_polygon_fill_and_wide_outline_on_pillow6(self):
+        image = g.Image.new((30, 30))
+        image.polygon((5, 5, 24, 5, 24, 24, 5, 24),
+                      outline=0, fill=0xff0000, width=3)
+        self.assertEqual(image.getpixel(((15, 15), (5, 5), (15, 6), (0, 0))),
+                         [(255, 0, 0), (0, 0, 0), (0, 0, 0), (255, 255, 255)])
+
+    def test_text_baseline_and_small_cjk_strokes(self):
+        # At baseline 35, every glyph must remain above the font descent.
+        # Pillow 6 silently ignored anchor='ls', drawing below that baseline.
+        text = u'密码gj'
+        masks = {}
+        for flags in (0, g.FONT_ANTIALIAS, g.FONT_BOLD):
+            image = g.Image.new((100, 60), 'RGB')
+            image.clear(0)
+            font = ('dense', 15, flags)
+            image.text((20, 35), text, 0xffffff, font)
+            ink = image.image.getbbox()
+            self.assertLess(ink[1], 30)
+            self.assertLessEqual(ink[3], 40)
+            self.assertGreater(ink[2] - ink[0], 30)
+            self.assertGreater(sum(pixel != (0, 0, 0) for pixel in image.image.getdata()), 100)
+            masks[flags] = set(i for i, pixel in enumerate(image.image.getdata()) if pixel != (0, 0, 0))
+        self.assertTrue(masks[0].issubset(masks[g.FONT_BOLD]))
+        self.assertEqual(image.measure_text(u'', font)[0], (0, 0, 0, 0))
 
     def test_measurement_returns_actual_width_and_limits(self):
         image = g.Image.new((30, 30))
@@ -327,6 +354,7 @@ class UIContract(unittest.TestCase):
         self.assertTrue(all(set(evt) == set(('type', 'keycode', 'scancode', 'modifiers')) for evt in events))
         self.assertEqual(keys, [1])
         ui.app.body = canvas
+        e32.ao_yield()
         self.assertEqual(draws[-1], (0, 0)+canvas.size)
 
     def test_canvas_resize_screenshot(self):
@@ -539,7 +567,7 @@ class AudioContract(TemporaryFiles):
         import audio
         self.audio = audio
         self.filename = self.path('silence.wav')
-        with wave.open(self.filename, 'wb') as stream:
+        with closing(wave.open(self.filename, 'wb')) as stream:
             stream.setparams((1, 2, 22050, 0, 'NONE', 'not compressed'))
             stream.writeframes(b'\x00\x00'*2205)
         self.sound = audio.Sound.open(self.filename)

@@ -1,4 +1,4 @@
-"""Run a Python 3 PyS60 application with the desktop APIs installed."""
+"""Run a Python 2.7 or Python 3 PyS60 application with the desktop APIs installed."""
 
 import os
 import runpy
@@ -18,7 +18,12 @@ def main():
     filename = os.path.abspath(sys.argv[1])
     sys.argv = sys.argv[1:]
     sys.path.insert(0, os.path.dirname(filename))
-    runpy.run_path(filename, run_name="__main__")
+    previous_directory = os.getcwd()
+    try:
+        os.chdir(os.path.dirname(filename))
+        runpy.run_path(filename, run_name="__main__")
+    finally:
+        os.chdir(previous_directory)
 
 
 if __name__ == "__main__":

@@ -43,7 +43,7 @@ class GLCanvas(appuifw.Canvas):
         self._frame = 0
         self._drawing = False
         self._context = None
-        super().__init__(redraw_callback, event_callback, resize_callback)
+        super(GLCanvas, self).__init__(redraw_callback, event_callback, resize_callback)
         self._mode = "RGB"
         self._context = Context(self.size, attributes or {})
 

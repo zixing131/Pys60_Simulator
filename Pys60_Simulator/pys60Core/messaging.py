@@ -1,4 +1,5 @@
 """SMS/MMS lifecycle backed by the simulator's local message store."""
+from _compat import text_type as str
 
 import os
 import time

@@ -1,4 +1,5 @@
 """One software compositor for desktop presentation and graphics.screenshot()."""
+from _compat import string_types
 
 import graphics as g
 
@@ -49,7 +50,7 @@ def control(body, size):
             spec, color, style, highlight = (
                 styles[index] if index < len(styles) else default
             )
-            font = (spec, 18) if isinstance(spec, str) else spec
+            font = (spec, 18) if isinstance(spec, string_types) else spec
             flags = (g.FONT_BOLD if style & ui.STYLE_BOLD else 0) | (
                 g.FONT_ITALIC if style & ui.STYLE_ITALIC else 0
             )
@@ -108,8 +109,8 @@ def control(body, size):
             color = 0xFFFFFF if selected else 0
             labels = (
                 [item]
-                if isinstance(item, str)
-                else [v for v in item if isinstance(v, str)]
+                if isinstance(item, string_types)
+                else [v for v in item if isinstance(v, string_types)]
             )
             for line, label in enumerate(labels):
                 image.text(

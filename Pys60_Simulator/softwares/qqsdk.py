@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from pys60_examples import to_text, resource_path, data_path
 import mypath
 mypath = mypath.getmypath("\\python\\pysoft\\pyqq\\")
 cachePath = mypath + "cache\\"
-cn = lambda x: x.decode("u8")
+cn = lambda x: to_text(x, "u8")
 #qq开放sdk，封装qq协议基本操作
 class QQSDK:
     def __init__(self):

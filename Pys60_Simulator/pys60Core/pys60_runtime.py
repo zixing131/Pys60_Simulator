@@ -1,6 +1,5 @@
 """Explicit activation for hosts that imported stdlib calendar before PyS60."""
 
-import importlib.util
 import os
 import sys
 
@@ -16,11 +15,16 @@ def activate():
     if existing is None or os.path.realpath(
         getattr(existing, "__file__", "")
     ) != os.path.realpath(path):
-        spec = importlib.util.spec_from_file_location("calendar", path)
-        module = importlib.util.module_from_spec(spec)
-        sys.modules["calendar"] = module
         try:
-            spec.loader.exec_module(module)
+            if sys.version_info[0] == 2:
+                import imp
+                imp.load_source("calendar", path)
+            else:
+                import importlib.util
+                spec = importlib.util.spec_from_file_location("calendar", path)
+                module = importlib.util.module_from_spec(spec)
+                sys.modules["calendar"] = module
+                spec.loader.exec_module(module)
         except Exception:
             if existing is not None:
                 sys.modules["calendar"] = existing

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-__doc__="""
+from pys60_examples import to_text, resource_path, data_path
+__doc__=to_text("""
 　BingyiApp模块
 　　　by : ～あ冰^o^翼げ～(本版为紫星修改自用版)
 以下为引入的模块
@@ -18,7 +19,7 @@ app.splitLines(content,width=200)
 App:
 super=    1→禁止按键  0→正常  2→系统要用的
 keyType=    1→传递整个按键事件字典   0→传递简单转化后的数字 
-""".decode("u8")
+""", "u8")
 
 import appuifw,akntextutils,txtfield
 from graphics import*
@@ -26,7 +27,7 @@ import e32
 appuifw.app.screen="full"
 
 def changeScreen(type=0):
-  from Pys60_Simulator.pys60Core.video import orientation
+  from video import orientation
   orientation(type)
   del orientation,type
 
@@ -57,17 +58,17 @@ class App:
     s.selectType=0
     s.keyType=0
     s.keyList=[[16,50,63497],[17,56,63498],[14,52,63495],[15,54,63496],[167,53,63557],[196,63586]]
-    s.TitleName="BingyiApp模块".decode("u8")
+    s.TitleName=to_text("BingyiApp模块", "u8")
     s.__lock= e32.Ao_lock()
     s.__timer= e32.Ao_timer()
     
   def main(s,index=0,*args):
     s.index=index
-    apply(s.classList[s.index].main,args)
+    s.classList[s.index].main(*args)
     del index,args
 
   def allClass(s,classList):
-    s.classList=map(lambda x:x(),classList)
+    s.classList=[cls() for cls in classList]
     del classList
   
   def splitLines(s,content,width=200):
@@ -202,7 +203,7 @@ class App:
           s.__lock.signal()
       elif s.super==3:
         s.super=1
-        for i in xrange(s.maxLines-1):
+        for i in range(s.maxLines-1):
           if len(s.textL)>s.maxLines and s.choice>0:
             s.choice-=1
             s.__drawQuery2()
@@ -213,7 +214,7 @@ class App:
         s.__pressMenu()
       elif s.super==3:
         s.super=1
-        for i in xrange(s.maxLines-1):
+        for i in range(s.maxLines-1):
           if len(s.textL)>s.maxLines and s.choice<len(s.textL)-s.maxLines:
             s.choice+=1
             s.__drawQuery2()
@@ -443,8 +444,8 @@ class App:
     s.__img.line((14,158,225,158),s.colour+0x777777,width=2)
     s.__img.line((14,160+len(list)*25-2,225,160+len(list)*25-2),s.colour+0x777777,width=2)
     s.__img.text((120-s.__img.measure_text(s.title,("dense",22))[0][2]/2.0,155),s.title,0x0,("dense",22,FONT_BOLD|FONT_ANTIALIAS))
-    s.__img.text((18,160+len(list)*25+25),'确定'.decode("u8"),0xff,("dense",20,FONT_BOLD|FONT_ANTIALIAS))
-    s.__img.text((240-18-44,160+len(list)*25+25),'取消'.decode("u8"),0xff,("dense",20,FONT_BOLD|FONT_ANTIALIAS))
+    s.__img.text((18,160+len(list)*25+25),to_text('确定', "u8"),0xff,("dense",20,FONT_BOLD|FONT_ANTIALIAS))
+    s.__img.text((240-18-44,160+len(list)*25+25),to_text('取消', "u8"),0xff,("dense",20,FONT_BOLD|FONT_ANTIALIAS))
 
     if s.type=="query":
       for i in range(len(list)):
@@ -511,8 +512,8 @@ class App:
     for j in range(len(textL)):
       s.__img.text((X+5,i+53+j*25),textL[j],textColor,("dense",18))
     s.__img.line((X+2,i+53+j*25+4,s.screenSize[0]-X-2,i+53+j*25+4),maskColor,width=2)
-    s.__img.text((X+8,i+53+j*25+28),'确定'.decode("u8"),textColor,("dense",18))
-    s.__img.text((s.screenSize[0]-X-3-38,i+53+j*25+28),'取消'.decode("u8"),textColor,("dense",18))
+    s.__img.text((X+8,i+53+j*25+28),to_text('确定', "u8"),textColor,("dense",18))
+    s.__img.text((s.screenSize[0]-X-3-38,i+53+j*25+28),to_text('取消', "u8"),textColor,("dense",18))
     s.__img.line((s.screenSize[0]-X-4,i+35,s.screenSize[0]-X-4,i+53+j*25),0xffff,width=3)
     if len(s.textL)>s.maxLines:
       s.__img.line((s.screenSize[0]-X-4,i+35,s.screenSize[0]-X-4,i+35+(s.choice+1)*(53+j*25-35)/(len(s.textL)-s.maxLines+1)),0xaaff,width=3)
@@ -578,8 +579,8 @@ class App:
       else:
         s.__img.text((X+8,i+53+j*25),selectL[j],textColor,("dense",18))
     s.__img.line((X+2,i+53+j*25+4,s.screenSize[0]-X-2,i+53+j*25+4),maskColor,width=2)
-    s.__img.text((X+8,i+53+j*25+28),'确定'.decode("u8"),textColor,("dense",18))
-    s.__img.text((s.screenSize[0]-X-3-38,i+53+j*25+28),'取消'.decode("u8"),textColor,("dense",18))
+    s.__img.text((X+8,i+53+j*25+28),to_text('确定', "u8"),textColor,("dense",18))
+    s.__img.text((s.screenSize[0]-X-3-38,i+53+j*25+28),to_text('取消', "u8"),textColor,("dense",18))
     s.__img.line((s.screenSize[0]-X-4,i+35,s.screenSize[0]-X-4,i+53+j*25),0xffff,width=3)
     s.__img.line((s.screenSize[0]-X-4,i+35,s.screenSize[0]-X-4,i+35+(s.cursorP+s.listP+1)*(53+j*25-35)/len(s.selectL)),0xaaff,width=3)
     s.__redraw()

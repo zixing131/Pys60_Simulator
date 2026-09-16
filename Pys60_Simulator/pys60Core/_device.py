@@ -6,19 +6,20 @@ import sqlite3
 import time
 import threading
 import e32
+from _compat import makedirs, fspath, string_types
 
 
 def data_path(name):
     root = os.path.expanduser(os.environ.get("PYS60_DATA_DIR", "~/.pys60-simulator"))
     if not os.path.isdir(root):
-        os.makedirs(root, exist_ok=True)
+        makedirs(root)
     return os.path.join(root, name)
 
 
 def database_path(name, default):
     if name is None:
         return data_path(default)
-    name = os.fspath(name)
+    name = fspath(name)
     if not name:
         raise RuntimeError("invalid filename")
     if len(name) > 1 and name[1] == ":":
@@ -36,7 +37,7 @@ class Store:
             raise ValueError("invalid open mode")
         if mode is None and not os.path.exists(path):
             raise e32.SymbianError(-1, "database not found")
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+        makedirs(os.path.dirname(path))
         self.conn = sqlite3.connect(path)
         self.conn.execute(
             "CREATE TABLE IF NOT EXISTS records (id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL)"
@@ -113,7 +114,7 @@ def add_log(kind, direction, number="", name="", **extra):
 def number(value):
     if isinstance(value, bytes):
         value = value.decode("ascii")
-    if not isinstance(value, str):
+    if not isinstance(value, string_types):
         raise TypeError("telephone number must be a string")
     if len(value) > 30:
         raise ValueError("telephone number too long")

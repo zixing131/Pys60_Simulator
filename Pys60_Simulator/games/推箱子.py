@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
+from pys60_examples import to_text, resource_path, data_path
 import os
 import sys
-path = os.getcwd()
-index = path.rfind('\\')
-path=path[:index]
-index = path.rfind('\\')
-path=path[:index]
-sys.path.append(path+"\\Pys60_Simulator\\")
-mypath = path+"\\python\\pygame\\Sokoban\\"
+mypath = data_path("sokoban", seed=resource_path("pygame", "Sokoban")) + "/"
 
 class Sokoban:
   def __init__(s):
@@ -27,8 +22,8 @@ class Sokoban:
     s.img_back.clear(0xffff)
     for i in range(30):
       s.img_back.rectangle((0,i,240,30-i),(255-i*5,i*4,255-i*2))
-    s.length2=s.img_back.measure_text('推 箱 子  V2.00'.decode("u8"),(u'',22))[0]
-    s.img_back.text((120-s.length2[2]/2,15-s.length2[1]/2),'推 箱 子  V2.00'.decode("u8"),(255,255,0),("dense",22))
+    s.length2=s.img_back.measure_text(to_text('推 箱 子  V2.00', "u8"),(u'',22))[0]
+    s.img_back.text((120-s.length2[2]/2,15-s.length2[1]/2),to_text('推 箱 子  V2.00', "u8"),(255,255,0),("dense",22))
     s.img_back.rectangle((1,1+40,239,239+40),0xff0000,width=3)
     s.img_floor_1=s.Image.open(s.path_pic("floor_1"))
     s.img_floor_2=s.Image.open(s.path_pic("floor_2"))
@@ -50,7 +45,7 @@ class Sokoban:
     del i,j,s.img_floor_1,s.img_floor_2
   
   def start(s):
-    s.map_db=s.e32dbm.open((s.path+"record\\map").decode("u8"),"r")
+    s.map_db=s.e32dbm.open(to_text(s.path+"record/map", "u8"),"r")
     s.img_main=s.Image.new(s.screen_size)
     s.img=s.Image.new(s.screen_size)
     s.img_box_1=s.Image.open(s.path_pic("box_1"))
@@ -60,8 +55,8 @@ class Sokoban:
     s.img_flag=s.Image.open(s.path_pic("flag"))  
   
   def exit(s):
-    if s.play==0:text='返回主界面？'.decode("u8")
-    else:text='返回？'.decode("u8")
+    if s.play==0:text=to_text('返回主界面？', "u8")
+    else:text=to_text('返回？', "u8")
     if s.appuifw.query(text,'query'):
       s.run=0
     del text
@@ -75,9 +70,9 @@ class Sokoban:
     s.run=1
     if key_list!=[]:
       s.play=1
-      try:_time=float(open(s.path+"record\\time.db").read())
+      try:_time=float(open(s.path+"record/time.db").read())
       except:_time=0.2
-      s.appuifw.note("开 始 播 放".decode("u8"))
+      s.appuifw.note(to_text("开 始 播 放", "u8"))
       for i in key_list:
         if i==1:s.move_up()
         elif i==2:s.move_down()
@@ -85,7 +80,7 @@ class Sokoban:
         elif i==4:s.move_right()
         if s.run==0:break
         s.e32.ao_sleep(_time)
-      if s.run==1:s.appuifw.note("播放完毕！".decode("u8"),"conf")
+      if s.run==1:s.appuifw.note(to_text("播放完毕！", "u8"),"conf")
       del _time
 
     del level
@@ -101,7 +96,7 @@ class Sokoban:
     s.key_history=[]
     s.map_pic()
     s.redraw()
-    open(s.path+"record\\sokoban.db","w").write("%s"%level)
+    open(s.path+"record/sokoban.db","w").write("%s"%level)
   
   def judge_win(s):
     if s.play==1:return
@@ -114,19 +109,19 @@ class Sokoban:
     if _judge==0:
       key_history=s.key_history
       if s.level<64:
-        s.appuifw.note("恭喜你过关了！\n正在进入下一关！".decode("u8") ,"conf")
+        s.appuifw.note(to_text("恭喜你过关了！\n正在进入下一关！", "u8") ,"conf")
         s.game(s.level+1)
         s.judge_zui(s.level-1,key_history)
       else:
-        s.appuifw.note("恭喜你通关了！".decode("u8") ,"conf")
+        s.appuifw.note(to_text("恭喜你通关了！", "u8") ,"conf")
         s.judge_zui(s.level,key_history)
         s.run=0
       del key_history
     del _judge,i,j
   
   def judge_zui(s,level,key_history):
-    try:db=s.e32dbm.open((s.path+"record\\key").decode("u8"),"w")
-    except:db=s.e32dbm.open((s.path+"record\\key").decode("u8"),"n")
+    try:db=s.e32dbm.open(to_text(s.path+"record/key", "u8"),"w")
+    except:db=s.e32dbm.open(to_text(s.path+"record/key", "u8"),"n")
     try:
       if len(eval(db[str(level)]))<len(key_history):return
     except:pass
@@ -136,8 +131,8 @@ class Sokoban:
   def map_pic(s):
     s.move_history.append(eval(repr(s.map)))
     s.img.blit(s.img_back)
-    s.img.text((20,300),("关卡：%s"%s.level).decode("u8"),0,("dense",20))
-    s.img.text((140,300),("步数：%s"%len(s.key_history)).decode("u8"),0,("dense",20))
+    s.img.text((20,300),to_text("关卡：%s"%s.level, "u8"),0,("dense",20))
+    s.img.text((140,300),to_text("步数：%s"%len(s.key_history), "u8"),0,("dense",20))
     for i in range(len(s.map)):
       for j in range(len(s.map[i])):
         _pos=s.map[i][j]
@@ -259,7 +254,7 @@ class Sokoban:
     
       
   def path_pic(s,_pic_name):
-    return (s.path+"picture\\"+_pic_name+".jpg").decode("u8")
+    return to_text(s.path+"picture/"+_pic_name+".jpg", "u8")
 
 
 
@@ -281,7 +276,7 @@ class main:
     s.start()
 
   def start(s):
-    s.img_back_main=s.Image.open((s.path+"picture\\Sokoban.jpg").decode("u8"))
+    s.img_back_main=s.Image.open(to_text(s.path+"picture/sokoban.jpg", "u8"))
     s.img_main=s.Image.new(s.screen_size)
     s.img=s.Image.new(s.screen_size)
     s.img_back=s.Image.new(s.screen_size)
@@ -301,27 +296,27 @@ class main:
       s.menu=s.menu0
     else:s.menu=s.menu1
     s.img_back.blit(s.img_back_main)
-    s.length=s.img_back.measure_text(s.menu[0].decode("u8"),("dense",20))[0]
+    s.length=s.img_back.measure_text(to_text(s.menu[0], "u8"),("dense",20))[0]
     for i in range(len(s.menu)):
       s.img_back.polygon(s.rim((120-s.length[2]/2-16,135+i*35,120+s.length[2]/2+16,165+i*35)),fill=0xffa600)
-      s.img_back.text((120-s.length[2]/2,160+i*35),s.menu[i].decode("u8"),0x201e1b,("dense",20))
+      s.img_back.text((120-s.length[2]/2,160+i*35),to_text(s.menu[i], "u8"),0x201e1b,("dense",20))
 
 
   def cursor_pic(s):
     s.img.blit(s.img_back)
     if s.menu_show!=2:
       s.img.polygon(s.rim((120-s.length[2]/2-16,135+s.cursor*35,120+s.length[2]/2+16,165+s.cursor*35)),fill=0xffc700)
-      s.img.text((120-s.length[2]/2,160+s.cursor*35),s.menu[s.cursor].decode("u8"),0xff,("dense",20))
+      s.img.text((120-s.length[2]/2,160+s.cursor*35),to_text(s.menu[s.cursor], "u8"),0xff,("dense",20))
     else:
       level_show_old=s.level_show
-      s.level_show=s.cursor/16
+      s.level_show=s.cursor//16
       if level_show_old!=s.level_show:
         s.key_list_pic();s.cursor_pic();s.redraw()
       
       if s.cursor<16*s.level_show+8:g,h=s.cursor+1-16*s.level_show,60
       else:g,h=s.cursor-7-16*s.level_show,180
       s.img.polygon(s.rim((h-s.length2[2]/2-4,g*35,h+s.length2[2]/2+4,30+g*35)),fill=0xffc700)
-      s.img.text((h-s.length2[2]/2,25+g*35),("第%s关:%s步"%(s.cursor+1,len(s.key_list[s.cursor]))).decode("u8"),0xff,("dense",18))
+      s.img.text((h-s.length2[2]/2,25+g*35),to_text("第%s关:%s步"%(s.cursor+1,len(s.key_list[s.cursor])), "u8"),0xff,("dense",18))
 
   def exit(s):
     if s.text_show==1:
@@ -384,16 +379,16 @@ class main:
 
       elif s.cursor==1:
         try:
-          level=int(open(s.path+"record\\sokoban.db").read())
+          level=int(open(s.path+"record/sokoban.db").read())
           s.game(level)
         except:
           s.game(1)
         pass
 
       elif s.cursor==2:
-        level=s.appuifw.query("第？关卡（1～64）".decode("u8"),"number",1)
+        level=s.appuifw.query(to_text("第？关卡（1～64）", "u8"),"number",1)
         if level!=None:
-          if level==0 or level>64:s.appuifw.note(("没有第%s关！！\n（1～64）"%level).decode("u8"))
+          if level==0 or level>64:s.appuifw.note(to_text("没有第%s关！！\n（1～64）"%level, "u8"))
           else:s.game(level)
         
       elif s.cursor==3:
@@ -410,29 +405,29 @@ class main:
         s.best_record()
       elif s.cursor==1:
         while 1:
-          time=s.appuifw.query("播放延时（0.04～5秒）".decode("u8"),"float",0.2)
+          time=s.appuifw.query(to_text("播放延时（0.04～5秒）", "u8"),"float",0.2)
           if time==None:break
           elif time>=0.04 and time<=5:
-            open(s.path+"record\\time.db","w").write("%s"%time)
-            s.appuifw.note("设置成功！".decode("u8"),"conf")
+            open(s.path+"record/time.db","w").write("%s"%time)
+            s.appuifw.note(to_text("设置成功！", "u8"),"conf")
             break
           else: 
-            s.appuifw.note("请重新设置\n（0.04～5秒）".decode("u8"),"conf")
+            s.appuifw.note(to_text("请重新设置\n（0.04～5秒）", "u8"),"conf")
           
       elif s.cursor==2:
-        db=s.e32dbm.open((s.path+"record\\text").decode("u8"),"r")
-        text=db["update"].decode("u8")
-        s.text_pic("更 新".decode("u8"),text)
+        db=s.e32dbm.open(to_text(s.path+"record/text", "u8"),"r")
+        text=to_text(db["update"], "u8")
+        s.text_pic(to_text("更 新", "u8"),text)
         db.close();del db,text
       elif s.cursor==3:
-        db=s.e32dbm.open((s.path+"record\\text").decode("u8"),"r")
-        text=db["help"].decode("u8")
-        s.text_pic("帮 助".decode("u8"),text)
+        db=s.e32dbm.open(to_text(s.path+"record/text", "u8"),"r")
+        text=to_text(db["help"], "u8")
+        s.text_pic(to_text("帮 助", "u8"),text)
         db.close();del db,text
       elif s.cursor==4:
-        db=s.e32dbm.open((s.path+"record\\text").decode("u8"),"r")
-        text=db["about"].decode("u8")
-        s.text_pic("关 于".decode("u8"),text)
+        db=s.e32dbm.open(to_text(s.path+"record/text", "u8"),"r")
+        text=to_text(db["about"], "u8")
+        s.text_pic(to_text("关 于", "u8"),text)
         db.close();del db,text
         
     else:
@@ -440,7 +435,7 @@ class main:
         
   def play_record(s):
       if s.key_list[s.cursor]==[]:
-        s.appuifw.note('没有过关，不能播放！'.decode("u8"))
+        s.appuifw.note(to_text('没有过关，不能播放！', "u8"))
       else:
         s.sokoban.main(s.cursor+1,s.key_list[s.cursor])
         s.appuifw.app.body=s.canvas
@@ -450,10 +445,10 @@ class main:
   
   def best_record(s):
     s.cursor=0
-    path=s.path+"record\\key"
+    path=s.path+"record/key"
     if s.os.path.isfile(path+".e32dbm"):
       s.key_list=[]
-      db=s.e32dbm.open(path.decode("u8"),"r")
+      db=s.e32dbm.open(to_text(path, "u8"),"r")
       for i in range(1,65):
         try:
           s.key_list.append(eval(db[str(i)]))
@@ -473,22 +468,22 @@ class main:
     s.img_back.clear(0xffff)
     for i in range(30):
       s.img_back.rectangle((0,i,240,30-i),(255-i*5,i*4,255-i*2))
-    s.length2=s.img_back.measure_text('最 佳 记 录→播放'.decode("u8"),(u'',22))[0]
-    s.img_back.text((120-s.length2[2]/2,15-s.length2[1]/2),'最 佳 记 录→播放'.decode("u8"),(255,255,0),("dense",22))
-    s.length2=s.img_back.measure_text("第55关:555步".decode("u8"),("dense",18))[0]
+    s.length2=s.img_back.measure_text(to_text('最 佳 记 录→播放', "u8"),(u'',22))[0]
+    s.img_back.text((120-s.length2[2]/2,15-s.length2[1]/2),to_text('最 佳 记 录→播放', "u8"),(255,255,0),("dense",22))
+    s.length2=s.img_back.measure_text(to_text("第55关:555步", "u8"),("dense",18))[0]
     for i in range(s.level_show*16+1,s.level_show*16+17):
       if i<s.level_show*16+9:g,h=i-s.level_show*16,60
       else:g,h=i-8-s.level_show*16,180
       s.img_back.polygon(s.rim((h-s.length2[2]/2-4,g*35,h+s.length2[2]/2+4,30+g*35)),fill=0xffa600)
-      s.img_back.text((h-s.length2[2]/2,25+g*35),("第%s关:%s步"%(i,len(s.key_list[i-1]))).decode("u8"),0x201e1b,("dense",18))
+      s.img_back.text((h-s.length2[2]/2,25+g*35),to_text("第%s关:%s步"%(i,len(s.key_list[i-1])), "u8"),0x201e1b,("dense",18))
   
   def text_pic(s,title,text):
     s.text_show=1
     s.img.clear(0xffff)
     for i in range(30):
       s.img.rectangle((0,i,240,30-i),(255-i*5,i*4,255-i*2))
-    length=s.img.measure_text('推 箱 子 → '.decode("u8")+title,(u'',22))[0]
-    s.img.text((120-length[2]/2,15-length[1]/2),'推 箱 子 → '.decode("u8")+title,(255,255,0),("dense",22))
+    length=s.img.measure_text(to_text('推 箱 子 → ', "u8")+title,(u'',22))[0]
+    s.img.text((120-length[2]/2,15-length[1]/2),to_text('推 箱 子 → ', "u8")+title,(255,255,0),("dense",22))
     text=s.akntextutils.wrap_text_to_array(text, 'dense', 230)
     for i in range(len(text)):
       s.img.text((8,50+i*25),text[i],0,("dense",18))

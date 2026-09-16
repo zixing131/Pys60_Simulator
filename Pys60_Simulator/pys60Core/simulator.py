@@ -7,6 +7,7 @@ Camera access occurs only after explicitly selecting an integer device index.
 import copy
 import time
 import _device
+from _compat import string_types
 
 
 def set_camera_source(source):
@@ -98,7 +99,7 @@ def emit_sensor(sensor_id, data_1, data_2=0, data_3=0):
 def configure_sensors(definitions):
     for name, definition in definitions.items():
         if (
-            not isinstance(name, str)
+            not isinstance(name, string_types)
             or set(definition) != set(("id", "category"))
             or any(not isinstance(v, int) for v in definition.values())
         ):

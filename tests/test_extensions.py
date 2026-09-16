@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 """Desktop extension contracts derived from Nokia's wrappers and method tables."""
 
 import os
@@ -10,11 +12,11 @@ import unittest
 import threading
 import time
 import datetime
-from pathlib import Path
 
 sys.path.insert(
-    0, str(Path(__file__).resolve().parents[1] / "Pys60_Simulator/pys60Core")
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Pys60_Simulator", "pys60Core"))
 )
+from _compat import timestamp
 import e32, graphics, simulator, contacts, calendar, inbox, messaging, telephone, logs, positioning, sensor, camera, location
 
 
@@ -88,7 +90,7 @@ class DeviceTest(unittest.TestCase):
     def test_calendar_transactions_and_repeat(self):
         db = calendar.open()
         event = db.add_appointment()
-        start = datetime.datetime(2026, 9, 1, 10).timestamp()
+        start = timestamp(datetime.datetime(2026, 9, 1, 10))
         event.content = "Meeting"
         event.set_time(start, start + 3600)
         event.set_repeat(
@@ -127,7 +129,7 @@ class DeviceTest(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             db.add_todo_list("x")
         event = db.add_event()
-        stamp = datetime.datetime(2026, 9, 3, 15).timestamp()
+        stamp = timestamp(datetime.datetime(2026, 9, 3, 15))
         event.set_time(stamp)
         event.commit()
         self.assertEqual(len(db.daily_instances(stamp, events=1)), 1)
@@ -432,8 +434,10 @@ class DesktopDrawingTest(unittest.TestCase):
 
 
 class BluetoothTest(unittest.TestCase):
-    setUp = DeviceTest.setUp
-    tearDown = DeviceTest.tearDown
+    def setUp(self):
+        getattr(DeviceTest.setUp, "__func__", DeviceTest.setUp)(self)
+    def tearDown(self):
+        getattr(DeviceTest.tearDown, "__func__", DeviceTest.tearDown)(self)
 
     # Separate only the transport test from the shared temporary device setup.
     def test_virtual_rfcomm_discovery_and_obex(self):
@@ -461,12 +465,14 @@ class BluetoothTest(unittest.TestCase):
             self.assertEqual(socket.bt_obex_discover()[1]["Transfer"], channel)
             source = os.path.join(self.path, "send.bin")
             target = os.path.join(self.path, "receive.bin")
-            Path(source).write_bytes(b"\x00\xffpayload")
+            with open(source, "wb") as stream:
+                stream.write(b"\x00\xffpayload")
             e32.ao_sleep(
                 0.01, lambda: socket.bt_obex_send_file(address, channel, source)
             )
             socket.bt_obex_receive(server, target)
-            self.assertEqual(Path(target).read_bytes(), Path(source).read_bytes())
+            with open(target, "rb") as a, open(source, "rb") as b:
+                self.assertEqual(a.read(), b.read())
         finally:
             if peer is not None:
                 peer.close()

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from pys60_examples import to_text, resource_path, data_path
 """#游戏作者：Light.紫.星
 
 #QQ:1311817771
@@ -7,20 +8,14 @@
 　　
 #塞班论坛：bbs.dospy.com"""
 zt = u"Sans MT 936_s60", 15, 1  # 默认字体
-import base64, random
+import base64, random,os
 import graphics as ph, appuifw as ui
 from BingyiApp import *
 
-cn = lambda x: x.decode("u8")
+cn = lambda x: to_text(x, "u8")
 sleep = e32.ao_sleep
-if os.path.isdir("e:\\python\\pygame\\flappybird\\ph"):
-    path = u"e:\\python\\pygame\\flappybird"
-elif os.path.isdir("c:\\python\\pygame\\flappybird\\ph"):
-    path = u"c:\\python\\pygame\\flappybird"
-elif os.path.isdir("../../python/pygame/flappybird/ph"):
-    path = u"../../python/pygame/flappybird"
-else:
-    ui.note(cn("游戏数据损坏，请重新安装游戏！"))
+path = resource_path("pygame", "flappybird")
+savepath = data_path("flappybird", seed=os.path.join(path, "data"))
 
 
 def read(vpath, value):  # 读取
@@ -33,16 +28,16 @@ def read(vpath, value):  # 读取
         go = open(vpath, "r")
     go1 = go.read()
     go.close()
-    go2 = base64.decodestring(go1.encode("u8"))
-    if go2 == u"None":
-        go2 = base64.decodestring(value.encode("u8"))
+    go2 = base64.b64decode(go1.encode("u8"))
+    if go2 == b"None":
+        go2 = base64.b64decode(value.encode("u8"))
         return int(go2)
     else:
         return int(go2)
 
 
 def write(wpath, va):  # 写入
-    v2 = base64.encodestring(str(va))
+    v2 = base64.b64encode(str(va).encode("ascii")).decode("ascii")
     go = open(wpath, "w")
     go.write(v2)
     go.close()
@@ -50,14 +45,14 @@ def write(wpath, va):  # 写入
 
 class birdload(object, ):
     def __init__(s):
-        s.rate = ph.Image.open(path + "\\ph\\rate.png")
+        s.rate = ph.Image.open(path + "/ph/rate.png")
         s.ratea = ph.Image.new((65, 38), "1")
-        s.ratea.load(path + "\\ph\\ratea.png")
+        s.ratea.load(path + "/ph/ratea.png")
         s.img = ph.Image.new((240, 320))
-        s.logo = ph.Image.open(path + "\\ph\\logo.png")
+        s.logo = ph.Image.open(path + "/ph/logo.png")
         s.logoa = ph.Image.new((180, 50), "1")
-        s.logoa.load(path + "\\ph\\logozhe.png")
-        t = read(path + "\\data\\setbj.ini", u"Mw==")
+        s.logoa.load(path + "/ph/logozhe.png")
+        t = read(savepath + "/setbj.ini", u"Mw==")
         if t == 1:
             s.bjchoice = 1
         elif t == 2:
@@ -65,12 +60,12 @@ class birdload(object, ):
         else:
             s.bjchoice = random.randint(1, 2)
         if s.bjchoice == 1:  # 载入白天
-            s.bj = ph.Image.open(path + "\\ph\\day.png")
+            s.bj = ph.Image.open(path + "/ph/day.png")
         elif s.bjchoice == 2:  # 夜间
-            s.bj = ph.Image.open(path + "\\ph\\night.png")
+            s.bj = ph.Image.open(path + "/ph/night.png")
         else:
             pass
-        t = read(path + "\\data\\setbird.ini", u"NA==")
+        t = read(savepath + "/setbird.ini", u"NA==")
         if t == 1:
             s.birdcolor = 3
         elif t == 2:
@@ -81,31 +76,31 @@ class birdload(object, ):
             s.birdcolor = random.randint(1, 3)
         s.birdcolor = random.randint(1, 3)  # 随机选择bird颜色
         if s.birdcolor == 1:  # 红
-            s.birda = ph.Image.open(path + "\\ph\\reda.png")
-            s.birdb = ph.Image.open(path + "\\ph\\redb.png")
-            s.birdc = ph.Image.open(path + "\\ph\\redc.png")
+            s.birda = ph.Image.open(path + "/ph/reda.png")
+            s.birdb = ph.Image.open(path + "/ph/redb.png")
+            s.birdc = ph.Image.open(path + "/ph/redc.png")
         elif s.birdcolor == 2:  # 黄
-            s.birda = ph.Image.open(path + "\\ph\\yellowa.png")
-            s.birdb = ph.Image.open(path + "\\ph\\yellowb.png")
-            s.birdc = ph.Image.open(path + "\\ph\\yellowc.png")
+            s.birda = ph.Image.open(path + "/ph/yellowa.png")
+            s.birdb = ph.Image.open(path + "/ph/yellowb.png")
+            s.birdc = ph.Image.open(path + "/ph/yellowc.png")
         elif s.birdcolor == 3:  # 蓝
-            s.birda = ph.Image.open(path + "\\ph\\bluea.png")
-            s.birdb = ph.Image.open(path + "\\ph\\blueb.png")
-            s.birdc = ph.Image.open(path + "\\ph\\bluec.png")
+            s.birda = ph.Image.open(path + "/ph/bluea.png")
+            s.birdb = ph.Image.open(path + "/ph/blueb.png")
+            s.birdc = ph.Image.open(path + "/ph/bluec.png")
         else:
             pass
         # 生成bird遮罩
         s.maska = ph.Image.new((40, 40), "1")
-        s.maska.load(path + "\\ph\\maska.png")  # 上
+        s.maska.load(path + "/ph/maska.png")  # 上
         s.maskb = ph.Image.new((40, 40), "1")
-        s.maskb.load(path + "\\ph\\maskb.png")  # 中
+        s.maskb.load(path + "/ph/maskb.png")  # 中
         s.maskc = ph.Image.new((40, 40), "1")
-        s.maskc.load(path + "\\ph\\maskc.png")  # 下
-        s.quit = ph.Image.open(path + "\\ph\\quit.png")
-        s.start = ph.Image.open(path + "\\ph\\start.png")
+        s.maskc.load(path + "/ph/maskc.png")  # 下
+        s.quit = ph.Image.open(path + "/ph/quit.png")
+        s.start = ph.Image.open(path + "/ph/start.png")
         s.starta = ph.Image.new((105, 59), "1")
-        s.starta.load(path + "\\ph\\startzhe.png")
-        s.run = ph.Image.open(path + "\\ph\\run.png")
+        s.starta.load(path + "/ph/startzhe.png")
+        s.run = ph.Image.open(path + "/ph/run.png")
 
     def main(s):
         s.birdf = 1
@@ -152,101 +147,101 @@ class birdload(object, ):
 class flappy(object, ):
     def __init__(s):
         s.img = ph.Image.new((240, 320))
-        s.birdb = ph.Image.open(path + "\\ph\\blueb.png")
+        s.birdb = ph.Image.open(path + "/ph/blueb.png")
         s.maskb = ph.Image.new((40, 40), "1")
-        s.maskb.load(path + "\\ph\\maskb.png")
+        s.maskb.load(path + "/ph/maskb.png")
         s.choose()
         s.jindu(0, 30)
-        s.gpipu = ph.Image.open(path + "\\ph\\greenta.png")
-        s.new = ph.Image.open(path + "\\ph\\new.png")
+        s.gpipu = ph.Image.open(path + "/ph/greenta.png")
+        s.new = ph.Image.open(path + "/ph/new.png")
         gdc = random.randint(1, 100)
         if gdc == 88:
             app.note2(cn("恭喜你中奖了，给你加十分!"), title=cn("中奖"), type=0)
             s.score = 1500
-            s.gpipu = ph.Image.open(path + "\\ph\\redta.png")
+            s.gpipu = ph.Image.open(path + "/ph/redta.png")
         else:
-            s.gpipu = ph.Image.open(path + "\\ph\\greenta.png")
+            s.gpipu = ph.Image.open(path + "/ph/greenta.png")
             s.score = 0
-        s.sp = read(path + "\\data\\speed.ini", u"Ng==")
-        s.long = read(path + "\\data\\long.ini", u"Njk=")
-        s.nand = read(path + "\\data\\sety.ini", u"MTA=")
-        s.nanf = read(path + "\\data\\setx.ini", u"MzA=")
+        s.sp = read(savepath + "/speed.ini", u"Ng==")
+        s.long = read(savepath + "/long.ini", u"Njk=")
+        s.nand = read(savepath + "/sety.ini", u"MTA=")
+        s.nanf = read(savepath + "/setx.ini", u"MzA=")
         s.jindu(30, 60)
         # 生成bird遮罩
         s.maska = ph.Image.new((40, 40), "1")
-        s.maska.load(path + "\\ph\\maska.png")  # 上
+        s.maska.load(path + "/ph/maska.png")  # 上
         s.maskb = ph.Image.new((40, 40), "1")
-        s.maskb.load(path + "\\ph\\maskb.png")  # 中
+        s.maskb.load(path + "/ph/maskb.png")  # 中
         s.maskc = ph.Image.new((40, 40), "1")
-        s.maskc.load(path + "\\ph\\maskc.png")  # 下
+        s.maskc.load(path + "/ph/maskc.png")  # 下
         s.maskd = ph.Image.new((40, 40), "1")
         s.jindu(60, 120)
-        s.maskd.load(path + "\\ph\\maskd.png")  # 俯冲
-        s.run = ph.Image.open(path + "\\ph\\run.png")  # 前进条
-        s.gpipd = ph.Image.open(path + "\\ph\\greentb.png")
+        s.maskd.load(path + "/ph/maskd.png")  # 俯冲
+        s.run = ph.Image.open(path + "/ph/run.png")  # 前进条
+        s.gpipd = ph.Image.open(path + "/ph/greentb.png")
         s.maskpu = ph.Image.new((52, 321), "1")
-        s.maskpu.load(path + "\\ph\\up.png")  # 上
+        s.maskpu.load(path + "/ph/up.png")  # 上
         s.maskpd = ph.Image.new((52, 321), "1")
-        s.maskpd.load(path + "\\ph\\down.png")  # 下
-        s.click = ph.Image.open(path + "\\ph\\click.png")
+        s.maskpd.load(path + "/ph/down.png")  # 下
+        s.click = ph.Image.open(path + "/ph/click.png")
         s.clicka = ph.Image.new((120, 100), "1")
-        s.clicka.load(path + "\\ph\\clickzhe.png")
-        s.logo = ph.Image.open(path + "\\ph\\logo.png")
+        s.clicka.load(path + "/ph/clickzhe.png")
+        s.logo = ph.Image.open(path + "/ph/logo.png")
         s.logoa = ph.Image.new((180, 50), "1")
-        s.logoa.load(path + "\\ph\\logozhe.png")
-        s.ready = ph.Image.open(path + "\\ph\\getready.png")
+        s.logoa.load(path + "/ph/logozhe.png")
+        s.ready = ph.Image.open(path + "/ph/getready.png")
         s.readya = ph.Image.new((186, 51), "1")
-        s.readya.load(path + "\\ph\\getreadyzhe.png")
-        s.over = ph.Image.open(path + "\\ph\\gameover.png")
+        s.readya.load(path + "/ph/getreadyzhe.png")
+        s.over = ph.Image.open(path + "/ph/gameover.png")
         s.overa = ph.Image.new((192, 51), "1")
-        s.overa.load(path + "\\ph\\gameoverzhe.png")
-        s.scorea = ph.Image.open(path + "\\ph\\score.png")
+        s.overa.load(path + "/ph/gameoverzhe.png")
+        s.scorea = ph.Image.open(path + "/ph/score.png")
         s.jindu(120, 180)
         s.scoreb = ph.Image.new((226, 114), "1")
-        s.scoreb.load(path + "\\ph\\scorezhe.png")
+        s.scoreb.load(path + "/ph/scorezhe.png")
         s.medala = ph.Image.new((45, 45), "1")
-        s.medala.load(path + "\\ph\\medal.png")
-        s.goal = ph.Image.open(path + "\\ph\\goal.png")
-        s.silver = ph.Image.open(path + "\\ph\\silver.png")
-        s.tong = ph.Image.open(path + "\\ph\\tong.png")
-        s.iron = ph.Image.open(path + "\\ph\\iron.png")
-        s.new = ph.Image.open(path + "\\ph\\new.png")
-        s.quit = ph.Image.open(path + "\\ph\\quit.png")
-        s.start = ph.Image.open(path + "\\ph\\start.png")
+        s.medala.load(path + "/ph/medal.png")
+        s.goal = ph.Image.open(path + "/ph/goal.png")
+        s.silver = ph.Image.open(path + "/ph/silver.png")
+        s.tong = ph.Image.open(path + "/ph/tong.png")
+        s.iron = ph.Image.open(path + "/ph/iron.png")
+        s.new = ph.Image.open(path + "/ph/new.png")
+        s.quit = ph.Image.open(path + "/ph/quit.png")
+        s.start = ph.Image.open(path + "/ph/start.png")
         s.starta = ph.Image.new((105, 59), "1")
-        s.starta.load(path + "\\ph\\startzhe.png")
+        s.starta.load(path + "/ph/startzhe.png")
         s.jindu(180, 220)
         # 上下鸟
-        s.sbs = ph.Image.open(path + "\\ph\\sbs.png")
-        s.sbx = ph.Image.open(path + "\\ph\\sbx.png")
-        s.sbp = ph.Image.open(path + "\\ph\\sbp.png")
-        s.sys = ph.Image.open(path + "\\ph\\sys.png")
-        s.syx = ph.Image.open(path + "\\ph\\syx.png")
-        s.syp = ph.Image.open(path + "\\ph\\syp.png")
-        s.srs = ph.Image.open(path + "\\ph\\srs.png")
-        s.srx = ph.Image.open(path + "\\ph\\srx.png")
-        s.srp = ph.Image.open(path + "\\ph\\srp.png")
-        s.xbp = ph.Image.open(path + "\\ph\\xbp.png")
-        s.xyp = ph.Image.open(path + "\\ph\\xyp.png")
-        s.xrp = ph.Image.open(path + "\\ph\\xrp.png")
+        s.sbs = ph.Image.open(path + "/ph/sbs.png")
+        s.sbx = ph.Image.open(path + "/ph/sbx.png")
+        s.sbp = ph.Image.open(path + "/ph/sbp.png")
+        s.sys = ph.Image.open(path + "/ph/sys.png")
+        s.syx = ph.Image.open(path + "/ph/syx.png")
+        s.syp = ph.Image.open(path + "/ph/syp.png")
+        s.srs = ph.Image.open(path + "/ph/srs.png")
+        s.srx = ph.Image.open(path + "/ph/srx.png")
+        s.srp = ph.Image.open(path + "/ph/srp.png")
+        s.xbp = ph.Image.open(path + "/ph/xbp.png")
+        s.xyp = ph.Image.open(path + "/ph/xyp.png")
+        s.xrp = ph.Image.open(path + "/ph/xrp.png")
         # bird的up,down遮罩
         s.dz = ph.Image.new((40, 40), "1")
-        s.dz.load(path + "\\ph\\dz.png")
+        s.dz.load(path + "/ph/dz.png")
         s.uu = ph.Image.new((40, 40), "1")
-        s.uu.load(path + "\\ph\\uu.png")
+        s.uu.load(path + "/ph/uu.png")
         s.ud = ph.Image.new((40, 40), "1")
-        s.ud.load(path + "\\ph\\ud.png")
+        s.ud.load(path + "/ph/ud.png")
         s.uz = ph.Image.new((40, 40), "1")
-        s.uz.load(path + "\\ph\\uz.png")
+        s.uz.load(path + "/ph/uz.png")
         s.jindu(220, 240)
         s.choice()
 
     def setbj(s, t):
-        write(path + "\\data\\setbj.ini", t)
+        write(savepath + "/setbj.ini", t)
         app.note2(cn("设置成功！"), type=0)
 
     def setbird(s, t):
-        write(path + "\\data\\setbird.ini", t)
+        write(savepath + "/setbird.ini", t)
         app.note2(cn("设置成功！"), type=0)
 
     def setx(s):
@@ -260,10 +255,10 @@ class flappy(object, ):
             app.note2(cn("这个速度你不可能玩过去的！"), type=0)
         elif temp == 0:
             app.note2(cn("如果你想飞不起来的话就这样吧～～"), type=0)
-            write(path + "\\data\\setx.ini", temp)
+            write(savepath + "/setx.ini", temp)
         else:
             app.note2(cn("设置成功！"), type=0)
-            write(path + "\\data\\setx.ini", temp)
+            write(savepath + "/setx.ini", temp)
         del temp
 
     def sety(s):
@@ -277,10 +272,10 @@ class flappy(object, ):
             app.note2(cn("这个速度你不可能玩过去的！"), type=0)
         elif temp == 0:
             app.note2(cn("如果你真想下不去的话就这样吧～～"), type=0)
-            write(path + "\\data\\sety.ini", temp)
+            write(savepath + "/sety.ini", temp)
         else:
             app.note2(cn("设置成功！"), type=0)
-            write(path + "\\data\\sety.ini", temp)
+            write(savepath + "/sety.ini", temp)
         del temp
 
     def setj(s):
@@ -295,7 +290,7 @@ class flappy(object, ):
             app.note2(cn("接下来会有奇怪的事情发生！"), type=0)
         else:
             app.note2(cn("设置成功！"), type=0)
-        write(path + "\\data\\jsd.ini", str(temp))
+        write(savepath + "/jsd.ini", str(temp))
         del temp
 
     def seta(s):  # 游戏速度
@@ -309,10 +304,10 @@ class flappy(object, ):
             app.note2(cn("这个速度你不可能玩过去的！"), type=0)
         elif temp == 0:
             app.note2(cn("如果你真想原地不动的话就这样吧～～"), type=0)
-            write(path + "\\data\\speed.ini", temp)
+            write(savepath + "/speed.ini", temp)
         else:
             app.note2(cn("设置成功！"), type=0)
-            write(path + "\\data\\speed.ini", temp)
+            write(savepath + "/speed.ini", temp)
         del temp
 
     def setb(s):  # 管道间隔
@@ -328,7 +323,7 @@ class flappy(object, ):
             app.note2(cn("据我所知，这样的宽度没人能玩过去！"), type=0)
         else:
             app.note2(cn("设置成功！"), type=0)
-            write(path + "\\data\\long.ini", temp)
+            write(savepath + "/long.ini", temp)
         del temp
         s.game = 0
 
@@ -343,7 +338,7 @@ class flappy(object, ):
             title=cn("游戏关于"), type=0)
 
     def choice(s):
-        t = read(path + "\\data\\setbird.ini", u"NA==")
+        t = read(savepath + "/setbird.ini", u"NA==")
         if t == 1:
             birdcolor = 3
         elif t == 2:
@@ -353,37 +348,37 @@ class flappy(object, ):
         else:
             birdcolor = random.randint(1, 3)
         if birdcolor == 1:  # 红
-            s.birda = ph.Image.open(path + "\\ph\\reda.png")
-            s.birdb = ph.Image.open(path + "\\ph\\redb.png")
-            s.birdc = ph.Image.open(path + "\\ph\\redc.png")
-            s.birdd = ph.Image.open(path + "\\ph\\redd.png")
-            s.birdx = ph.Image.open(path + "\\ph\\srs.png")
-            s.birdy = ph.Image.open(path + "\\ph\\srp.png")
-            s.birdz = ph.Image.open(path + "\\ph\\srx.png")
-            s.birdp = ph.Image.open(path + "\\ph\\xrp.png")
+            s.birda = ph.Image.open(path + "/ph/reda.png")
+            s.birdb = ph.Image.open(path + "/ph/redb.png")
+            s.birdc = ph.Image.open(path + "/ph/redc.png")
+            s.birdd = ph.Image.open(path + "/ph/redd.png")
+            s.birdx = ph.Image.open(path + "/ph/srs.png")
+            s.birdy = ph.Image.open(path + "/ph/srp.png")
+            s.birdz = ph.Image.open(path + "/ph/srx.png")
+            s.birdp = ph.Image.open(path + "/ph/xrp.png")
         elif birdcolor == 2:  # 黄
-            s.birda = ph.Image.open(path + "\\ph\\yellowa.png")
-            s.birdb = ph.Image.open(path + "\\ph\\yellowb.png")
-            s.birdc = ph.Image.open(path + "\\ph\\yellowc.png")
-            s.birdd = ph.Image.open(path + "\\ph\\yellowd.png")
-            s.birdx = ph.Image.open(path + "\\ph\\sys.png")
-            s.birdy = ph.Image.open(path + "\\ph\\syp.png")
-            s.birdz = ph.Image.open(path + "\\ph\\syx.png")
-            s.birdp = ph.Image.open(path + "\\ph\\xyp.png")
+            s.birda = ph.Image.open(path + "/ph/yellowa.png")
+            s.birdb = ph.Image.open(path + "/ph/yellowb.png")
+            s.birdc = ph.Image.open(path + "/ph/yellowc.png")
+            s.birdd = ph.Image.open(path + "/ph/yellowd.png")
+            s.birdx = ph.Image.open(path + "/ph/sys.png")
+            s.birdy = ph.Image.open(path + "/ph/syp.png")
+            s.birdz = ph.Image.open(path + "/ph/syx.png")
+            s.birdp = ph.Image.open(path + "/ph/xyp.png")
         elif birdcolor == 3:  # 蓝
-            s.birda = ph.Image.open(path + "\\ph\\bluea.png")
-            s.birdb = ph.Image.open(path + "\\ph\\blueb.png")
-            s.birdc = ph.Image.open(path + "\\ph\\bluec.png")
-            s.birdd = ph.Image.open(path + "\\ph\\blued.png")
-            s.birdx = ph.Image.open(path + "\\ph\\sbs.png")
-            s.birdy = ph.Image.open(path + "\\ph\\sbp.png")
-            s.birdz = ph.Image.open(path + "\\ph\\sbx.png")
-            s.birdp = ph.Image.open(path + "\\ph\\xbp.png")
+            s.birda = ph.Image.open(path + "/ph/bluea.png")
+            s.birdb = ph.Image.open(path + "/ph/blueb.png")
+            s.birdc = ph.Image.open(path + "/ph/bluec.png")
+            s.birdd = ph.Image.open(path + "/ph/blued.png")
+            s.birdx = ph.Image.open(path + "/ph/sbs.png")
+            s.birdy = ph.Image.open(path + "/ph/sbp.png")
+            s.birdz = ph.Image.open(path + "/ph/sbx.png")
+            s.birdp = ph.Image.open(path + "/ph/xbp.png")
         else:
             pass
 
     def choose(s):
-        t = read(path + "\\data\\setbj.ini", u"Mw==")
+        t = read(savepath + "/setbj.ini", u"Mw==")
         if t == 1:
             bjchoice = 1
         elif t == 2:
@@ -391,12 +386,12 @@ class flappy(object, ):
         else:
             bjchoice = random.randint(1, 2)
         if bjchoice == 1:  # 载入白天
-            s.bj = ph.Image.open(path + "\\ph\\day.png")
-            s.bj0 = ph.Image.open(path + "\\ph\\day.png")
+            s.bj = ph.Image.open(path + "/ph/day.png")
+            s.bj0 = ph.Image.open(path + "/ph/day.png")
             s.bj0.text((50, 260), cn("载入中，请稍等……"), 0xf, zt)
         elif bjchoice == 2:  # 夜间
-            s.bj = ph.Image.open(path + "\\ph\\night.png")
-            s.bj0 = ph.Image.open(path + "\\ph\\night.png")
+            s.bj = ph.Image.open(path + "/ph/night.png")
+            s.bj0 = ph.Image.open(path + "/ph/night.png")
             s.bj0.text((50, 260), cn("载入中，请稍等……"), 0xf, zt)
         else:
             pass
@@ -411,15 +406,15 @@ class flappy(object, ):
     def died(s):
         s.game = 2
         s.m = 260
-        s.high = read(path + "\\data\\h.ini", "MA==")
-        sc = (s.score - 210) / 138 + 1
+        s.high = read(savepath + "/h.ini", "MA==")
+        sc = (s.score - 210) // 138 + 1
         if sc < 0:
             sc = 0
         # high=1
         # sc=25
         if sc > s.high:
             app.note2(cn("恭喜您获得最高分:" + str(sc) + "分！"), title=cn("新记录"), type=0)
-            write(path + "\\data\\h.ini", str(sc))
+            write(savepath + "/h.ini", str(sc))
             s.pai = s.goal
             s.high = sc
         elif sc <= s.high:
@@ -467,21 +462,21 @@ class flappy(object, ):
             s.choice()
             s.score = 0
             # 抽奖功能
-            s.gpipu = ph.Image.open(path + "\\ph\\greenta.png")
-            s.new = ph.Image.open(path + "\\ph\\new.png")
+            s.gpipu = ph.Image.open(path + "/ph/greenta.png")
+            s.new = ph.Image.open(path + "/ph/new.png")
             gdc = random.randint(1, 100)
             if gdc == 88:
                 app.note2(cn("恭喜你中奖了，给你加十分!"), title=cn("中奖"), type=0)
                 s.score = 1500
-                s.gpipu = ph.Image.open(path + "\\ph\\redta.png")
+                s.gpipu = ph.Image.open(path + "/ph/redta.png")
             else:
-                s.gpipu = ph.Image.open(path + "\\ph\\greenta.png")
+                s.gpipu = ph.Image.open(path + "/ph/greenta.png")
                 s.score = 0
-            s.sp = read(path + "\\data\\speed.ini", u"Ng==")
-            s.long = read(path + "\\data\\long.ini", u"Njk=")
-            s.nand = read(path + "\\data\\sety.ini", u"MTA=")
-            s.nanf = read(path + "\\data\\setx.ini", u"MzA=")
-            s.setjsd = read(path + "\\data\\jsd.ini", "MQ==")
+            s.sp = read(savepath + "/speed.ini", u"Ng==")
+            s.long = read(savepath + "/long.ini", u"Njk=")
+            s.nand = read(savepath + "/sety.ini", u"MTA=")
+            s.nanf = read(savepath + "/setx.ini", u"MzA=")
+            s.setjsd = read(savepath + "/jsd.ini", "MQ==")
         else:
             pass
         if s.press == 1:
@@ -553,7 +548,7 @@ class flappy(object, ):
             pass
 
     def main(s):
-        s.setjsd = read(path + "\\data\\jsd.ini", "MQ==")
+        s.setjsd = read(savepath + "/jsd.ini", "MQ==")
         s.jsd = 2
         s.m, s.high, s.x, s.y, s.game, s.flyt, s.down, s.birdf, s.press, s.game, s.score = 260, 0, 57, 100, 0, 0, 0, 1, 1, 0, 0  # 预处理数据
         s.mark, s.down = 1, 10
@@ -658,7 +653,7 @@ class flappy(object, ):
                 s.pip(s.long)
                 s.img.blit(s.run, (s.mark, -260))
                 s.img.blit(s.bird, (-50, -s.y), mask=s.maskf)
-                stmp = (s.score - 210) / 138 + 1
+                stmp = (s.score - 210) // 138 + 1
                 if stmp < 1:
                     stmp = 0
                 else:
@@ -666,7 +661,7 @@ class flappy(object, ):
                 s.img.text((103, 30), cn("" + str(stmp)), 0xf, zt)
                 del stmp
             elif s.game == 2:
-                stmp = (s.score - 210) / 138 + 1
+                stmp = (s.score - 210) // 138 + 1
                 s.img.blit(s.over, (-25, -50), mask=s.overa)
                 s.img.blit(s.scorea, (-7, -100), mask=s.scoreb)
                 s.img.text((183, 153), cn("" + str(stmp)), 0xf, zt)

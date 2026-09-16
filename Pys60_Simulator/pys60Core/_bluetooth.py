@@ -9,6 +9,7 @@ import weakref
 import select
 import socket as _socket
 import e32
+from _compat import PY2, fspath, string_types
 
 AF_BT, BTPROTO_RFCOMM = 0x101, 3
 RFCOMM, OBEX, AUTH, ENCRYPT, AUTHOR = 101, 102, 1, 2, 4
@@ -21,7 +22,7 @@ _receivers = {}
 
 class Socket(_native):
     def __init__(
-        self, family=_socket.AF_INET, type=_socket.SOCK_STREAM, proto=0, fileno=None
+        self, family=_socket.AF_INET, type=_socket.SOCK_STREAM, proto=0, fileno=None, _sock=None
     ):
         self._bluetooth = family == AF_BT
         self._channel = None
@@ -30,29 +31,36 @@ class Socket(_native):
             if type != _socket.SOCK_STREAM or proto not in (0, BTPROTO_RFCOMM):
                 raise _socket.error("unsupported Bluetooth socket type")
             family, proto = _socket.AF_INET, 0
-        super().__init__(family, type, proto, fileno=fileno)
+        if PY2:
+            if fileno is not None:
+                raise ValueError('use an accepted socket rather than a raw descriptor on Python 2')
+            _native.__init__(self, family, type, proto, _sock=_sock)
+            # Python 2 installs recv as an instance delegate, hiding our override.
+            del self.recv
+        else:
+            _native.__init__(self, family, type, proto, fileno=fileno)
 
     def bind(self, address):
         if not self._bluetooth:
-            return super().bind(address)
+            return super(Socket, self).bind(address)
         host, channel = address
         if not isinstance(channel, int) or not 1 <= channel <= 30:
             raise _socket.error("invalid channel")
         if channel in _channels:
             raise _socket.error("channel already bound")
-        super().bind(("127.0.0.1", 0))
+        super(Socket, self).bind(("127.0.0.1", 0))
         self._channel = channel
         _channels[channel] = self
 
     def connect(self, address, callback=None):
         if not self._bluetooth:
-            return super().connect(address)
+            return super(Socket, self).connect(address)
         if callback is not None and not callable(callback):
             raise TypeError("callback must be callable")
         host, channel = address
         if host.lower() != _address or channel not in _channels:
             raise _socket.error("virtual Bluetooth service not found")
-        super().connect(_native.getsockname(_channels[channel]))
+        super(Socket, self).connect(_native.getsockname(_channels[channel]))
         if callback is not None:
             e32._schedule(0, lambda: callback(None))
 
@@ -80,20 +88,25 @@ class Socket(_native):
 
     def accept(self, callback=None):
         if not self._bluetooth:
-            return super().accept()
+            return super(Socket, self).accept()
 
         def accept():
-            fd, address = self._accept()
-            child = Socket(fileno=fd)
+            if PY2:
+                raw, address = self._sock.accept()
+                child = Socket(_sock=raw)
+            else:
+                fd, address = self._accept()
+                child = Socket(fileno=fd)
             child._bluetooth = True
             return child, _address
 
         return self._wait_read(accept, callback)
 
     def recv(self, bufsize, flags=0, callback=None):
+        receive = self._sock.recv if PY2 else super(Socket, self).recv
         if not self._bluetooth:
-            return super().recv(bufsize, flags)
-        return self._wait_read(lambda: _native.recv(self, bufsize, flags), callback)
+            return receive(bufsize, flags)
+        return self._wait_read(lambda: receive(bufsize, flags), callback)
 
     def close(self):
         for operation in self._operations:
@@ -102,7 +115,7 @@ class Socket(_native):
         _services.pop(self, None)
         if self._channel is not None and _channels.get(self._channel) is self:
             _channels.pop(self._channel, None)
-        super().close()
+        super(Socket, self).close()
 
 
 def _check(sock, bound=False):
@@ -124,7 +137,7 @@ def bt_rfcomm_get_available_server_channel(sock):
 
 def bt_advertise_service(name, sock, flag, service_type=RFCOMM):
     _check(sock, True)
-    if not isinstance(name, str):
+    if not isinstance(name, string_types):
         raise TypeError("Unicode service name expected")
     if not name or flag not in (0, 1) or service_type not in (RFCOMM, OBEX):
         raise _socket.error("invalid service name, flag or type")
@@ -164,7 +177,7 @@ def bt_obex_receive(sock, filename):
     _check(sock, True)
     if sock._channel in _receivers:
         raise _socket.error("receiver already active")
-    transfer = {"path": os.fspath(filename), "done": False, "error": None}
+    transfer = {"path": fspath(filename), "done": False, "error": None}
     _receivers[sock._channel] = transfer
     try:
         e32._wait_until(lambda: transfer["done"] or sock.fileno() < 0)

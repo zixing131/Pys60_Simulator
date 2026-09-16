@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from pys60_examples import to_text, resource_path, data_path
 # @Time    : 2020/3/29 20:42
 # @Author  : zixing
 # @QQun    : 140369358
@@ -12,7 +13,7 @@ from qqsdk import QQSDK
 zt = u"Sans MT 936_s60", 15, 1
 import appuifw as ui, e32
 import os
-import graphics as ph, base64, thread, os, random
+import graphics as ph, base64, os, random
 # from BingyiApp import *
 import akntextutils2
 import math
@@ -20,7 +21,7 @@ from graphics import *
 from qqcontrols import *
 # import fontSize
 
-cn = lambda x: x.decode("u8")
+cn = lambda x: to_text(x, "u8")
 sleep = e32.ao_sleep
 
 import mypath
@@ -129,15 +130,15 @@ class AllForm:
         self.menuLogin.hide()
         qq = self.textboxUsername.text
         pwd = self.textboxPassword.text
-        self.qsdk.init(qq.encode('u8'),pwd.encode('u8'))
+        self.qsdk.init(qq, pwd)
         self.qsdk.login()
 
         headimgpath = self.qsdk.getHeadImgPath()
 
         img = ph.Image.open(headimgpath)
         img = img.resize((32, 32))
-        img.save('miniheadimgpath.jpg')
-        miniheadimgpath = 'miniheadimgpath.jpg'
+        miniheadimgpath = os.path.join(data_path("pyqq"), "miniheadimgpath.jpg")
+        img.save(miniheadimgpath)
         self.imgHead.bgImage = miniheadimgpath
         # 昵称
         self.labelNickName.text = cn(self.qsdk.getNickName())
@@ -354,7 +355,7 @@ class AllForm:
             if(self.RunningForm == self.logining):
                 self.MainForm.redraw()
                 loopindex +=1
-                time.sleep(0.5)
+                e32.ao_sleep(0.5)
                 if(loopindex >2):
                     break
         if(self.loginCancel == 0):

@@ -85,7 +85,7 @@ def call_state(cb):
     global _callback, _owner
     if not callable(cb):
         raise TypeError("callback must be callable")
-    _callback, _owner = cb, threading.get_ident()
+    _callback, _owner = cb, threading.current_thread().ident
 
 
 def incoming_call():
