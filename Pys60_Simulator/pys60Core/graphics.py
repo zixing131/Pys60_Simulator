@@ -1,447 +1,511 @@
 # -*- coding: utf-8 -*-
-import sysgraphics
+"""Pillow backend for the PyS60 1.4.5 graphics API.
 
-try:  # import as appropriate for 2.x vs. 3.x
-    import tkinter as tk
-except:
-    import Tkinter as tk
-from PIL import Image as Image2
-from PIL import ImageDraw
-from PIL import ImageFont
+The C++ argument order (not the inconsistent blit documentation) is used.
+RGB12/RGB16 and grayscale conversion follow the SDK TRgb integer formulas.
+"""
+import math
+import numbers
 import os
+from PIL import Image as PILImage, ImageDraw, ImageFont, ImageChops
+import e32
 
 screen = (240, 320)
-# from appuifw import app as _app
-Draw = lambda x: x
 app = None
-
-ROTATE_270 = 270
-FONT_BOLD = 1
-FONT_ITALIC = 2
-FONT_SUBSCRIPT = 4
-FONT_SUPERSCRIPT = 8
-FONT_ANTIALIAS = 16
-FONT_NO_ANTIALIAS = 32
-
-
-# win=sysgraphics.GraphWin("Pys60 Simulator",240,320)
-def RGB_to_Hex(tmp):
-    rgb = tmp  # 将RGB格式划分开来
-    strs = '#'
-    for i in rgb:
-        num = int(i)  # 将str转int
-        # 将R、G、B分别转化为16进制拼接转换并大写
-        strs += str(hex(num))[-2:].replace('x', '0').upper()
-
-    return strs
+FLIP_LEFT_RIGHT, FLIP_TOP_BOTTOM, ROTATE_90, ROTATE_180, ROTATE_270 = range(1, 6)
+FONT_BOLD, FONT_ITALIC, FONT_SUBSCRIPT, FONT_SUPERSCRIPT = 1, 2, 4, 8
+FONT_ANTIALIAS, FONT_NO_ANTIALIAS = 16, 32
+_MODES = {'1': '1', 'L': 'L', 'RGB12': 'RGB', 'RGB16': 'RGB', 'RGB': 'RGB'}
+_TRANSPOSE = getattr(PILImage, 'Transpose', PILImage)
+_RESAMPLE = getattr(PILImage, 'Resampling', PILImage)
+try:
+    string_types = (basestring,)
+except NameError:
+    string_types = (str,)
 
 
-def hex2rgb(hexcolor):
-    rgb = [(hexcolor >> 16) & 0xff,
-           (hexcolor >> 8) & 0xff,
-           hexcolor & 0xff
-           ]
-    return rgb
+def _coords(coords):
+    try:
+        values = list(coords)
+        if not values:
+            raise ValueError('empty coordinate sequence')
+        if isinstance(values[0], numbers.Real):
+            if len(values) % 2:
+                raise TypeError('even number of coordinate values expected')
+            values = list(zip(values[::2], values[1::2]))
+        if any(len(p) != 2 or any(not isinstance(v, numbers.Real) for v in p) for p in values):
+            raise TypeError('invalid coordinate sequence')
+        return [(int(p[0]), int(p[1])) for p in values]
+    except (ValueError, TypeError):
+        raise TypeError('invalid coordinate sequence')
 
 
-def rgb2hex(rgbcolor):
-    r, g, b = rgbcolor
-    return (r << 16) + (g << 8) + b
+def _size(size):
+    points = _coords(size)
+    if len(points) != 1 or min(points[0]) <= 0:
+        raise ValueError('size must contain two positive values')
+    return points[0]
 
 
-myfnt = None
-lastfont = None
+def hex2rgb(color):
+    return [(color >> 16) & 255, (color >> 8) & 255, color & 255]
+
+
+def rgb2hex(color):
+    r, g, b = color
+    return (r << 16) | (g << 8) | b
+
+
+def _rgb(color):
+    if isinstance(color, numbers.Integral):
+        return tuple(hex2rgb(color))
+    if isinstance(color, tuple) and len(color) == 3:
+        if all(isinstance(v, numbers.Integral) for v in color):
+            return tuple(v & 255 for v in color)
+    raise ValueError('invalid color specification; expected int or (r,g,b) tuple')
+
+
+def RGB_to_Hex(color):
+    return '#%02x%02x%02x' % _rgb(color)
+
+
+def convertColor(color):
+    return RGB_to_Hex(color)
+
+
+_font_cache = {}
+_FONT_SIZES = {'normal': 18, 'dense': 14, 'title': 20, 'annotation': 12,
+               'legend': 14, 'symbol': 18, 'large': 22}
+
+
+def _font_flags(font):
+    return (font[2] or 0) if isinstance(font, (tuple, list)) and len(font) == 3 else 0
 
 
 def GetFont(fill=None, font=None):
-    global myfnt, lastfont
-    if (font == lastfont):
-        pass
+    name, size, flags = None, None, 0
+    if isinstance(font, (tuple, list)):
+        if not 1 <= len(font) <= 3:
+            raise ValueError('font must contain one to three items')
+        name = font[0]
+        if len(font) > 1:
+            size = font[1]
+        flags = _font_flags(font)
     else:
-        p = os.path.split(os.path.realpath(__file__))[0] + '\\fonts\\S60SC.ttf'
-        current_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'fonts','S60SC.ttf')
-        intf = int(font[1])
-        if (intf % 2 == 0):
-            # 奇怪的bug，偶数大小的字体在py2.5上面乱码
-            intf = intf - 1
-        if (os.path.exists(p)):
-            myfnt = ImageFont.truetype(p, intf, encoding='utf-8')
-        elif (os.path.exists("fonts\\S60SC.ttf")):
-            myfnt = ImageFont.truetype("..\\fonts\\S60SC.ttf", intf, encoding='utf-8')
-        elif (os.path.exists("fonts/S60SC.ttf")):
-            myfnt = ImageFont.truetype("fonts\\S60SC.ttf", intf, encoding='utf-8')
+        name = font
+    if name is not None and not isinstance(name, string_types):
+        raise ValueError('invalid font name')
+    if size is not None and not isinstance(size, numbers.Real):
+        raise TypeError('font size must be a number or None')
+    if not isinstance(flags, numbers.Integral):
+        raise TypeError('font flags must be integers or None')
+    if flags & ~63:
+        raise ValueError('invalid font flags')
+    # Six points at the simulator's 96 dpi; system labels use the device profile.
+    size = int(size) if size is not None else _FONT_SIZES.get(name, 8)
+    if size <= 0:
+        raise ValueError('font size must be positive')
+    if flags & (FONT_SUBSCRIPT | FONT_SUPERSCRIPT):
+        size = max(1, size * 2 // 3)
+    path = os.environ.get('PYS60_FONT', os.path.join(os.path.dirname(__file__), 'fonts', 'S60SC.ttf'))
+    key = (path, size)
+    if key not in _font_cache:
+        _font_cache[key] = ImageFont.truetype(path, size)
+    return _font_cache[key]
 
-        elif (os.path.exists("../pys60Core/fonts/S60SC.ttf")):
-            myfnt = ImageFont.truetype("../pys60Core/fonts/S60SC.ttf", intf, encoding='utf-8')
-        elif (os.path.exists("./fonts/S60SC.ttf")):
-            myfnt = ImageFont.truetype("../pys60Core/fonts/S60SC.ttf", intf, encoding='utf-8')
-        elif(os.path.exists(current_path)):
-            myfnt = ImageFont.truetype(current_path, intf, encoding='utf-8')
-        elif (os.path.exists("Pys60_Simulator\\fonts\\S60SC.ttf")):
-            myfnt = ImageFont.truetype("Pys60_Simulator\\fonts\\S60SC.ttf", intf, encoding='utf-8')
-        elif (os.path.exists("Pys60_Simulator\\pys60Core\\fonts\\S60SC.ttf")):
-            myfnt = ImageFont.truetype("Pys60_Simulator\\fonts\\S60SC.ttf", intf, encoding='utf-8')
 
-    lastfont = font
-    return myfnt
+def _metrics(text, font):
+    try:
+        box = font.getbbox(text, anchor='ls')
+        advance = int(round(font.getlength(text)))
+    except AttributeError:  # Pillow for Python 2
+        width, height = font.getsize(text)
+        box, advance = (0, -height, width, 0), width
+    return tuple(box), advance
 
-GetFont()
 
 def getTextFontWidth(text, size=18):
-    im = Image2.new('RGB', (1, 1), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(im)
-    #if (type(text) == type(u'')):
-    #    text = text.encode('utf-8')
-    w, h = draw.textsize(text, font=GetFont(font=('dense', size)))
-    return [w, h]
+    box, advance = _metrics(text, GetFont(font=('dense', size)))
+    return [advance, box[3] - box[1]]
 
 
-def convertColor(bgcolor):
-    if (type(bgcolor) is tuple):
-        bgcolor = RGB_to_Hex(bgcolor)
-    elif (type(bgcolor) is int):
-        bgcolor = hex2rgb(bgcolor)
-        bgcolor = sysgraphics.color_rgb(bgcolor[0], bgcolor[1], bgcolor[2])
-    return bgcolor
+def _convert_pixels(pixels, mode):
+    """SDK GDI.INL TRgb::_Color4K/_Color64K/_Gray256, without dithering."""
+    if mode in ('1', 'L'):
+        if pixels.mode not in ('1', 'L'):
+            import numpy as np
+            rgb = np.asarray(pixels.convert('RGB'), dtype=np.uint16)
+            grey = ((2 * rgb[:, :, 0] + 5 * rgb[:, :, 1] + rgb[:, :, 2]) >> 3).astype('uint8')
+            pixels = PILImage.fromarray(grey)
+        if mode == '1':
+            return pixels.convert('L').point(lambda v: 255 if v >= 128 else 0, '1')
+        return pixels.convert('L')
+    pixels = pixels.convert('RGB')
+    if mode == 'RGB12':
+        table = [(v >> 4) * 17 for v in range(256)]
+        return pixels.point(table * 3)
+    if mode == 'RGB16':
+        rb = [(v & 248) + ((v & 248) >> 5) for v in range(256)]
+        green = [(v & 252) + ((v & 252) >> 6) for v in range(256)]
+        return pixels.point(rb + green + rb)
+    return pixels
 
 
-class Image:
-    def __init__(self, size, mode=None, canvas=None):
-        size = [int(size[0]), int(size[1])]
-        if (mode != 'L'):
-            self.image = Image2.new("RGBA", size, (255, 255, 255))
-        else:
-            self.image = Image2.new("RGBA", size, (255, 255, 255))
-
-        self.size = size
-        self._image = self.size
-        self.mode = mode
+class Image(object):
+    def __init__(self, size, mode='RGB16', canvas=None):
+        if mode is None:  # legacy simulator constructor
+            mode = 'RGB16'
+        if mode not in _MODES:
+            raise ValueError('invalid mode')
+        self._mode = mode
+        self.image = PILImage.new(_MODES[mode], _size(size), 'white')
         self.canvas = canvas
-        # win=sysgraphics.GraphWin(width=size[0],height=size[1])
-        # _app.redraw()
+        self._twipsize = tuple(v * 15 for v in self.size)
+        self._pending = None
+        self._waiting = False
 
-    def transpose(self, a=1):
-        return self
+    size = property(lambda self: self.image.size)
+    mode = property(lambda self: self._mode)
+    twipsize = property(lambda self: self._twipsize,
+                        lambda self, value: setattr(self, '_twipsize', _coords(value)[0]))
 
-    def open(path):
-        img = Image2.open(path)
-        img2 = Image(img.size)
-        img2.image = img
-        return img2
-
-    def load(self, path):
-        img = Image2.open(path)
-        if (self.mode != None):
-            img = img.convert(self.mode)
-        self.image = img
-        self.size = img.size
-
-    def new(size, mode=None):
+    @staticmethod
+    def new(size, mode='RGB16'):
+        if mode not in _MODES:
+            raise ValueError('invalid mode')
         return Image(size, mode)
 
-    # "coords", "start", "end", "outline", "fill",
-    # "width", "pattern"
-    def rectangle(self, coords, outline=0x0, fill=-1, width=1, pattern=0x0):
-        draw = ImageDraw.Draw(self.image)
-        if (fill == -1):
-            outline = convertColor(outline)
-            draw.rectangle((coords[0], coords[1], coords[2], coords[3]), outline=outline)
-            del draw
-            return
-        fill = convertColor(fill)
-        if (outline != 0):
-            outline = convertColor(outline)
-            draw.rectangle((coords[0], coords[1], coords[2], coords[3]), fill=fill, outline=outline)  # , width=width
-        else:
-            draw.rectangle((coords[0], coords[1], coords[2], coords[3]), fill=fill)  # , width=width
-        del draw
+    @staticmethod
+    def open(filename):
+        try:
+            with PILImage.open(filename) as source:
+                result = Image(source.size)
+                result.image = _convert_pixels(source, result.mode)
+                return result
+        except (OSError, IOError) as exc:
+            raise e32.SymbianError(-1, str(exc))
 
-    def clear(self, color=0):
-        color = convertColor(color)
-        if (self.mode != None):
-            color = color + color[-2:]
-        image2 = Image2.new("RGBA", self.size, color)
-        self.image.paste(image2, (0, 0, self.size[0], self.size[1]))
-        self.blitSelf()
+    @staticmethod
+    def inspect(filename):
+        with PILImage.open(filename) as source:
+            return {'size': source.size}
 
-    def blit(self, img, source=None, target=None, scale=False, mask=None):
-        '''
-        if(source):
-            source = list(source)
-            print(source)
-            if(len(source)==2 ):
-                if (target == None):
-                    target = [0, 0]
-                else:
-                    target = list(target)
-                if(source[0]< 0 and source[1] < 0):
-                    source = [source[1],source[0],0,0]
-                    if(source[0]<0):
-                        source[0] = abs(source[0])
-                        source[2] = source[0]+img.size[0]
-                        target[1] = source[0]
-                    if (source[1] < 0):
-                        source[1] = abs(source[1])
-                        target[0] = source[1]
-                        source[3] = source[1] + img.size[1]
-                else:
-                    pass
-                    #target[0] = source[0]
-                    #target[1] = source[1]
-        '''
+    @staticmethod
+    def from_cfbsbitmap(bitmap):
+        raise e32.SymbianError(-5, 'Native CFbsBitmap handles are not available on desktop')
 
-        target_size = screen
-        source_size = img.size
-        fx1 = 0
-        fy1 = 0
-        fx2 = source_size[0]
-        fy2 = source_size[1]
-        tx1 = 0
-        ty1 = 0
-        tx2 = target_size[0]
-        ty2 = target_size[1]
-        n = 0
+    @staticmethod
+    def from_icon(filename, image_id, size):
+        raise e32.SymbianError(-5, 'Symbian MBM/MIF icon decoding is not available')
 
-        if (source):
-            if (len(source) == 2):
-                fx1 = source[0]
-                fy1 = source[1]
-                if (type(fx1) is tuple):
-                    fx2 = fx1[1]
-                    fx1 = fx1[0]
-                    fy2 = fy1[1]
-                    fy1 = fy1[0]
-                else:
-                    fx2 = fx1 + fx2
-                    fy2 = fy1 + fy2
-            elif (len(source) == 4):
-                fx1 = source[0]
-                fy1 = source[1]
-                fx2 = source[2]
-                fy2 = source[3]
-        if (target):
-            if (len(target) == 2):
-                tx1 = target[0]
-                ty1 = target[1]
-                tx2 = tx1 + tx2
-                ty2 = ty1 + ty2
-            elif (len(target) == 4):
-                tx1 = target[0]
-                ty1 = target[1]
-                tx2 = target[2]
-                ty2 = target[3]
-
-        toRect = (int(tx1), int(ty1), int(tx2 - tx1), int(ty2 - ty1))  # xywh
-        fromRect = (int(fx1), int(fy1), int(fx2 - fx1), int(fy2 - fy1))  # xywh
-
-        if (scale):
-            if (mask):
-                print('sorry, scaling and masking is not supported at the same time.')
-                return
-            else:
-                self.image.paste(img.image.resize((toRect[2], toRect[3])), (toRect[0], toRect[1]))
-        else:
-            # print((tx1-fx1, ty1-fy1))
-            if (mask):
-                self.image.paste(img.image.crop((0, 0, fromRect[2], fromRect[3])), (int(tx1 - fx1), int(ty1 - fy1)),
-                                 mask=mask.image.crop((0, 0, fromRect[2], fromRect[3])))
-            else:
-                self.image.paste(img.image.crop((0, 0, fromRect[2], fromRect[3])), (int(tx1 - fx1), int(ty1 - fy1)))
-
-        self.blitSelf()
-
-    def blitold(self, img, source=None, target=None, scale=False, mask=None):
-        if (source == None):
-            source = (0, 0, img.size[0], img.size[1])
-        if (target == None):
-            target = (0, 0, img.size[0], img.size[1])
-        if (len(source) == 2):
-            source = (source[0], source[1], img.size[0], img.size[1])
-        if (len(target) == 2):
-            target = (target[0], target[1], img.size[0], img.size[1])
-        # pos=(target[0]-source[0],target[1]-source[1])
-        pos = (int(target[0] - source[0]), int(target[1] - source[1]))
-        if (mask != None):
-            try:
-                # self.image.paste(img.image, (pos[0], pos[1], pos[0] + source[2], pos[1] + source[3]),mask=mask.image)
-                self.image.paste(img.image.crop((0, 0, (int)(source[2]), (int)(source[3]))),
-                                 ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])),
-                                 mask=mask.image.crop((0, 0, (int)(source[2]), (int)(source[3]))))
-            except Exception, ex:
-                print(ex)
-                self.image.paste(img.image.crop((0, 0, (int)(source[2]), (int)(source[3]))),
-                                 ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])))
-
-                # self.image.paste(img.image.crop(
-                #     ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3]))),
-                #      ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])))
-
-                # self.image.paste(img.image, (pos[0], pos[1], pos[0] +source[2], pos[1] + source[3]))
-        else:
-            try:
-                # self.image.paste(img.image, (pos[0], pos[1], pos[0] + source[2], pos[1] + source[3]))
-                self.image.paste(img.image.crop((0, 0, (int)(source[2]), (int)(source[3]))),
-                                 ((int)(pos[0]), (int)(pos[1]), (int)(pos[0] + source[2]), (int)(pos[1] + source[3])))
-
-            except Exception, ex:
-                print("graphics 150", ex)
-        self.blitSelf()
-
-    def line(self, pos, bgcolor=0, width=0, outline=0):
-        draw = ImageDraw.Draw(self.image)
-        bgcolor = convertColor(bgcolor)
-        draw.line((pos[0], pos[1], pos[2], pos[3]), fill=bgcolor, width=width)
-        # myline = sysgraphics.Line(sysgraphics.Point(pos[0],pos[1]),sysgraphics.Point(pos[2],pos[3]))
-        # myline.setFill(bgcolor)
-        # myline.setWidth(width)
-        # myline.draw(win)
-        del draw
-
-    def save(self, path):
-        self.image = self.image.convert('RGB')
-        self.image.save(path)
-
-    def text(self, pos, text, fill=0x0, font=('dense', 15)):
-        if (font == None):
-            font = ('dense', 15)
-        elif (len(font) >= 2 and font[1] == None):
-            font = ('dense', 15)
-        color = fill
-        # print(pos,text,color,font)
-        draw = ImageDraw.Draw(self.image)
-        color = convertColor(color)
-        if (type(font) is str or type(font) is unicode):
-            font = (font, 15)
-        else:
-            try:
-                font = (font[0], int(font[1]))
-            except Exception, e:
-                print font
-        # text=text.encode('u8')
-        #if (type(text) == type(u'')):
-        #    text = text.encode('utf-8')
-        draw.text((int(pos[0]), int(pos[1] - font[1])), text, fill=color, font=GetFont(color, font))
-        self.blitSelf()
-
-    def blitSelf(self):
-        if (self.canvas):
-            self.canvas.blitSelf()
-        # else:
-        #    if(app):
-        #        pass
-        #        app.body.blit(self)
-
-    def polygon(self, pos, color=0x0, width=1, fill=0x0, outline=0x0):
-        draw = ImageDraw.Draw(self.image)
-        ismask = 0
-        if (len(str(fill)) > 7):
-            ismask = 1
-        fill = convertColor(fill)
-        if (ismask):
-            fill = fill + 'bb'
-        # print(fill)
-        pos2 = []
-        for i in pos:
-            if (type(i) is tuple or type(i) is list):
-                pos2 += list(i)
-            else:
-                pos2.append(i)
-        pos2 = list(pos2)
-        draw.polygon(pos2, fill=fill)
-        del draw
-
-    def point(self, pos, color, width=1, fill=0x0):
-        # draw = ImageDraw.Draw(self.image)
-        # fill = convertColor(fill)
-        # pos = list(pos)
-        # draw.point( pos , fill=fill)
-        # del draw
-        self.ellipse((pos[0], pos[1], pos[0] + width, pos[1] + width), color, color)
-
-    def arc(self, pos, pi1, pi2, color, width=1):
-        draw = ImageDraw.Draw(self.image)
-        color = convertColor(color)
-        pos = list(pos)
-        draw.arc(pos, pi1, pi2, fill=color)
-        del draw
-
-    def pieslice(self, pos, pi1, pi2, color, width=1):
-        draw = ImageDraw.Draw(self.image)
-        color = convertColor(color)
-        pos = list(pos)
-        draw.pieslice(pos, pi1, pi2, fill=color)
-        del draw
-
-    def ellipse(self, pos, color=0x0, fill=0x0):
-        draw = ImageDraw.Draw(self.image)
-        color = convertColor(color)
-        fill = convertColor(fill)
-        draw.ellipse(pos, color, fill)
-        del draw
-
-    def getpixel(self, (x, y)):
-        color = self.image.getpixel((x, y))
-        if (type(color) != tuple):
-            color = hex2rgb(color)
-            print color
-        return [color]
-
-    def resize(self, size, a=None, b=None):
-        self.image = self.image.resize(size)
-        self.size = size
+    def _drawapi(self):
         return self
 
-    def measure_text(self, title, font='dense', maxwidth=-1, maxadvance=-1):
-        if (maxwidth == -1):
-            fontsize = 18
-            if (type(font) is tuple or type(font) is list):
-                if (font[1] == None):
-                    fontsize = 18
-                else:
-                    fontsize = font[1]
+    def _bitmapapi(self):
+        return self
 
-            w, h = getTextFontWidth(title, int(fontsize))
-            self.blitSelf()
-            return ((0, 0 - h, w, 0), w, len(title))
-        else:
-            fontsize = 18
-            if (type(font) is tuple or type(font) is list):
-                fontsize = font[1]
-            w, h = getTextFontWidth(title, int(fontsize))
-            self.blitSelf()
-            if (w <= maxwidth):
-                w = maxwidth
-                return ((0, 0 - h, w, 0), w, len(title))
+    def _wait(self):
+        if self._pending is not None:
+            if self._waiting:
+                raise RuntimeError('Image object busy.')
+            self._waiting = True
+            try:
+                e32._wait_until(lambda: self._pending is None)
+            finally:
+                self._waiting = False
+
+    def _operation(self, operation, callback, returns_image=False):
+        if callback is not None and not callable(callback):
+            raise TypeError('callback must be callable')
+        self._wait()
+        if callback is None:
+            try:
+                return operation()
+            except (IOError, OSError) as exc:
+                raise e32.SymbianError(-2, str(exc))
+        def complete():
+            self._pending = None
+            try:
+                result = operation()
+            except (IOError, OSError):
+                callback(None if returns_image else -2)
             else:
-                w, h = 0, 0
-                nowchars = ''
-                for i in title:
-                    nowchars += i
-                    w, h = getTextFontWidth(nowchars, int(fontsize))
-                    if (w >= maxwidth):
-                        nowchars = nowchars[:-1]
-                        w, h = getTextFontWidth(nowchars, int(fontsize))
-                        break
-                return ((0, 0 - h, w, 0), w, len(nowchars))
+                callback(result if returns_image else 0)
+        self._pending = e32._schedule(0, complete)
 
-    new = staticmethod(new)
-    open = staticmethod(open)
+    def stop(self):
+        e32._cancel(self._pending)
+        self._pending = None
+
+    def load(self, filename, callback=None):
+        self._wait()
+        if self.inspect(filename)['size'] != self.size:
+            raise RuntimeError("file size doesn't match image size")
+        def operation():
+            with PILImage.open(filename) as source:
+                self.image = _convert_pixels(source, self.mode)
+            self.blitSelf()
+        return self._operation(operation, callback)
+
+    def save(self, filename, callback=None, format=None, quality=75, bpp=24, compression='default'):
+        if format is None:
+            suffix = os.path.splitext(filename)[1].lower()
+            format = {'.jpg': 'JPEG', '.jpeg': 'JPEG', '.png': 'PNG'}.get(suffix)
+            if format is None:
+                raise ValueError('unrecognized suffix and format not specified')
+        if format not in ('JPEG', 'PNG'):
+            raise ValueError('invalid format')
+        if format == 'JPEG' and not 0 <= quality <= 100:
+            raise ValueError('invalid quality')
+        if format == 'PNG' and bpp not in (1, 8, 24):
+            raise ValueError('invalid number of bits per pixel')
+        compressions = {'default': 6, 'no': 0, 'fast': 1, 'best': 9}
+        if format == 'PNG' and compression not in compressions:
+            raise ValueError('invalid compression level')
+        def operation():
+            if format == 'JPEG':
+                self.image.convert('RGB').save(filename, format, quality=quality)
+            else:
+                mode = {1: '1', 8: 'L', 24: 'RGB'}[bpp]
+                self.image.convert(mode).save(filename, format, compress_level=compressions[compression])
+        return self._operation(operation, callback)
+
+    def resize(self, size, callback=None, keepaspect=0):
+        size = _size(size)
+        def operation():
+            actual = size
+            if keepaspect:
+                ratio = min(float(size[0]) / self.size[0], float(size[1]) / self.size[1])
+                actual = tuple(max(1, int(v * ratio)) for v in self.size)
+            result = Image(actual, self.mode)
+            result.image = self.image.resize(actual, _RESAMPLE.LANCZOS if self.mode != '1' else _RESAMPLE.NEAREST)
+            result._normalize()
+            return result
+        return self._operation(operation, callback, True)
+
+    def transpose(self, direction, callback=None):
+        directions = {FLIP_LEFT_RIGHT: _TRANSPOSE.FLIP_LEFT_RIGHT,
+                      FLIP_TOP_BOTTOM: _TRANSPOSE.FLIP_TOP_BOTTOM,
+                      ROTATE_90: _TRANSPOSE.ROTATE_90, ROTATE_180: _TRANSPOSE.ROTATE_180,
+                      ROTATE_270: _TRANSPOSE.ROTATE_270}
+        if direction not in directions:
+            raise ValueError('invalid transpose direction')
+        def operation():
+            pixels = self.image.transpose(directions[direction])
+            result = Image(pixels.size, self.mode)
+            result.image = pixels
+            result._normalize()
+            return result
+        return self._operation(operation, callback, True)
+
+    def getpixel(self, coords):
+        pixels = self.image.convert('RGB')
+        return [pixels.getpixel(p) for p in _coords(coords)]
+
+    def _color(self, value):
+        if value is None:
+            return None
+        rgb = _rgb(value)
+        if self.image.mode in ('1', 'L'):
+            grey = (2 * rgb[0] + 5 * rgb[1] + rgb[2]) >> 3
+            return (255 if grey >= 128 else 0) if self.image.mode == '1' else grey
+        return rgb
+
+    def clear(self, color=0xffffff):
+        self.image.paste(self._color(color), (0, 0) + self.size)
+        self.blitSelf()
+
+    def _shape(self, name, coords, outline, fill, width, pattern, angles=None):
+        points = _coords(coords)
+        if not isinstance(width, numbers.Integral):
+            raise TypeError('width must be an integer')
+        outline, fill = self._color(outline), self._color(fill)
+        if pattern is not None:
+            if not isinstance(pattern, Image):
+                raise TypeError('pattern must be an Image')
+            if pattern.mode != '1':
+                raise ValueError('pattern must be a binary (1-bit) Image')
+        draw = ImageDraw.Draw(self.image)
+        if name == 'line':
+            if outline is not None and width > 0:
+                draw.line(points, fill=outline, width=width)
+        elif name == 'point':
+            # The actual 1.4.5 C++ implementation plots only the first point.
+            if outline is not None and width > 0:
+                x, y = points[0]
+                if width == 1:
+                    draw.point((x, y), fill=outline)
+                else:
+                    radius = width // 2
+                    draw.ellipse((x-radius, y-radius, x-radius+width-1, y-radius+width-1), fill=outline)
+        else:
+            if name == 'polygon':
+                shapes = [points]
+            else:
+                if len(points) % 2:
+                    raise ValueError('even number of coordinates expected')
+                shapes = [(points[i][0], points[i][1], points[i+1][0]-1, points[i+1][1]-1)
+                          for i in range(0, len(points), 2)]
+            for shape in shapes:
+                if name != 'polygon' and (shape[2] < shape[0] or shape[3] < shape[1]):
+                    continue
+                kwargs = {'outline': outline, 'fill': fill}
+                if angles is not None:
+                    kwargs.update(start=-math.degrees(angles[1]), end=-math.degrees(angles[0]))
+                if name == 'arc':
+                    if outline is None or width <= 0:
+                        continue
+                    kwargs = {'fill': outline, 'start': kwargs['start'], 'end': kwargs['end']}
+                if width > 0:
+                    kwargs['width'] = width
+                else:
+                    kwargs['outline' if name != 'arc' else 'fill'] = None
+                if pattern is not None and name != 'arc':
+                    mask = PILImage.new('L', self.size)
+                    mask_draw = ImageDraw.Draw(mask)
+                    mask_args = {'fill': 255}
+                    if angles is not None:
+                        mask_args.update(start=kwargs['start'], end=kwargs['end'])
+                    getattr(mask_draw, name)(shape, **mask_args)
+                    tile = PILImage.new('L', self.size)
+                    for y in range(0, self.size[1], pattern.size[1]):
+                        for x in range(0, self.size[0], pattern.size[0]):
+                            tile.paste(pattern.image.convert('L'), (x, y))
+                    if fill is not None:
+                        self.image.paste(fill, (0, 0) + self.size, ImageChops.multiply(mask, tile))
+                    kwargs['fill'] = None
+                if kwargs.get('outline') is None and kwargs.get('fill') is None:
+                    continue
+                getattr(draw, name)(shape, **kwargs)
+        self.blitSelf()
+
+    def rectangle(self, coords, outline=None, fill=None, width=1, pattern=None):
+        self._shape('rectangle', coords, outline, fill, width, pattern)
+
+    def ellipse(self, coords, outline=None, fill=None, width=1, pattern=None):
+        self._shape('ellipse', coords, outline, fill, width, pattern)
+
+    def line(self, coords, outline=None, fill=None, width=1, pattern=None):
+        self._shape('line', coords, outline, fill, width, pattern)
+
+    def polygon(self, coords, outline=None, fill=None, width=1, pattern=None):
+        self._shape('polygon', coords, outline, fill, width, pattern)
+
+    def point(self, coords, outline=None, fill=None, width=1, pattern=None):
+        self._shape('point', coords, outline, fill, width, pattern)
+
+    def arc(self, coords, start, end, outline=None, fill=None, width=1, pattern=None):
+        self._shape('arc', coords, outline, fill, width, pattern, (start, end))
+
+    def pieslice(self, coords, start, end, outline=None, fill=None, width=1, pattern=None):
+        self._shape('pieslice', coords, outline, fill, width, pattern, (start, end))
+
+    def blit(self, image, source=None, target=None, scale=0, mask=None):
+        if not isinstance(image, Image):
+            raise TypeError('Image object expected as 1st argument')
+        if mask is not None:
+            if not isinstance(mask, Image):
+                raise TypeError('Mask must be an Image object')
+            if mask.mode not in ('1', 'L'):
+                raise ValueError('Mask must be a binary (1-bit) or grayscale (8-bit) Image')
+            if mask.size != image.size:
+                raise ValueError('mask and source sizes must match')
+            if scale:
+                raise ValueError('sorry, scaling and masking is not supported at the same time.')
+        def rect(spec, size):
+            points = [(0, 0)] if spec is None else _coords(spec)
+            if len(points) not in (1, 2):
+                raise TypeError('invalid rectangle specification')
+            return points[0] + (points[1] if len(points) == 2 else size)
+        sx, sy, ex, ey = rect(source, image.size)
+        tx, ty, rx, ry = rect(target, self.size)
+        if ex <= sx or ey <= sy:
+            return
+        if scale:
+            if rx <= tx or ry <= ty:
+                return
+            pixels = image.image.crop((sx, sy, ex, ey)).resize((rx-tx, ry-ty))
+            self.image.paste(_convert_pixels(pixels, self.mode), (tx, ty))
+        else:
+            # BitBlt clips to source bounds, without introducing black padding.
+            left, top = max(0, sx), max(0, sy)
+            right, bottom = min(ex, image.size[0]), min(ey, image.size[1])
+            if right <= left or bottom <= top:
+                return
+            crop = (left, top, right, bottom)
+            pixels = _convert_pixels(image.image.crop(crop), self.mode)
+            alpha = mask.image.crop(crop) if mask is not None else None
+            self.image.paste(pixels, (tx+left-sx, ty+top-sy), alpha)
+        self.blitSelf()
+
+    def text(self, coords, text, fill=0, font=None):
+        face = GetFont(font=font)
+        flags = _font_flags(font)
+        stroke = 1 if flags & FONT_BOLD else 0
+        mask = PILImage.new('L', self.size)
+        for x, y in _coords(coords):
+            glyphs = PILImage.new('L', self.size)
+            draw = ImageDraw.Draw(glyphs)
+            if flags & FONT_SUPERSCRIPT:
+                y -= face.size // 2
+            elif flags & FONT_SUBSCRIPT:
+                y += face.size // 3
+            draw.text((x, y), text, fill=255, font=face, anchor='ls', stroke_width=stroke)
+            if flags & FONT_ITALIC:
+                affine = getattr(PILImage, 'Transform', PILImage).AFFINE
+                glyphs = glyphs.transform(self.size, affine, (1, .25, -.25*y, 0, 1, 0), resample=_RESAMPLE.BICUBIC)
+            mask = ImageChops.lighter(mask, glyphs)
+        if flags & FONT_NO_ANTIALIAS or not flags & FONT_ANTIALIAS:
+            mask = mask.point(lambda v: 255 if v >= 128 else 0)
+        self.image.paste(self._color(fill), (0, 0) + self.size, mask)
+        self.blitSelf()
+
+    def measure_text(self, text, font=None, maxwidth=-1, maxadvance=-1):
+        face = GetFont(font=font)
+        flags = _font_flags(font)
+        def metrics(value):
+            box, advance = _metrics(value, face)
+            if value:
+                left, top, right, bottom = box
+                if flags & FONT_BOLD:
+                    left, top, right, bottom = left-1, top-1, right+1, bottom+1
+                if flags & FONT_ITALIC:
+                    left -= int(math.ceil(bottom * .25))
+                    right -= int(math.floor(top * .25))
+                shift = -face.size // 2 if flags & FONT_SUPERSCRIPT else face.size // 3 if flags & FONT_SUBSCRIPT else 0
+                box = (left, top+shift, right, bottom+shift)
+            return box, advance
+        count = len(text)
+        for i in range(1, len(text)+1):
+            box, advance = metrics(text[:i])
+            if (maxwidth >= 0 and box[2]-box[0] > maxwidth) or (maxadvance >= 0 and advance > maxadvance):
+                count = i-1
+                break
+        box, advance = metrics(text[:count])
+        return box, advance, count
+
+    def _normalize(self):
+        self.image = _convert_pixels(self.image, self.mode)
+
+    def blitSelf(self):
+        self._normalize()
+        if self.canvas is not None and self.canvas is not self:
+            self.canvas.blitSelf()
 
 
-def Draw(canvas):
-    img = Image(canvas.size, canvas=canvas)
-    canvas.blit(img)
-    return img
+def Draw(drawable):
+    if not hasattr(drawable, '_drawapi'):
+        raise TypeError('object does not support drawing')
+    return drawable._drawapi()
 
 
 def screenshot():
-    nowimg = Image((240, 320))
-    if (app == None):
-        return nowimg
-    img = app.getscreen()  # Image((240, 320))
-    nowimg.image = img
-    return nowimg
+    result = Image(screen)
+    if app is not None:
+        result.image = app.getscreen().convert('RGB').copy()
+    return result
 
-
-if (__name__ == '__main__'):
-    print(convertColor((3, 280, 280)))
+__all__ = ('Draw', 'Image', 'screenshot', 'FONT_BOLD', 'FONT_ITALIC',
+           'FONT_SUBSCRIPT', 'FONT_SUPERSCRIPT', 'FONT_ANTIALIAS',
+           'FONT_NO_ANTIALIAS', 'FLIP_LEFT_RIGHT', 'FLIP_TOP_BOTTOM',
+           'ROTATE_90', 'ROTATE_180', 'ROTATE_270')
